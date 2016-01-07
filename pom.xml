@@ -34,7 +34,7 @@
   </properties>
 
   <scm>
-    <developerConnection>scm:git://${svn.base.dir}</developerConnection>
+    <developerConnection>scm:git://${scm.base.dir}</developerConnection>
   </scm>
 
   <distributionManagement>

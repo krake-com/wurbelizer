@@ -29,7 +29,7 @@ package org.wurbelizer.misc;
  */
 public class Version {
 
-  /** the Open Source official release **/
+  /** the release from manifest **/
   public static final String RELEASE = Version.class.getPackage().getImplementationVersion();
 
 
