@@ -1,0 +1,255 @@
+/**
+ * Wurbelizer - http://www.wurbelizer.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
+
+package org.wurbelizer.wurbile;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Collection;
+import java.util.List;
+import org.wurbelizer.misc.Constants;
+import org.wurbelizer.misc.Logger;
+import org.wurbelizer.misc.Verbosity;
+import org.wurbelizer.misc.Version;
+import org.wurbelizer.wurblet.WurbletData;
+
+
+/**
+ * Default implementation of a wurblet compiler.<p>
+ *
+ * This wurbiler can be used as a console application (provided for testing purposes only)
+ * or from within ant, as implemented in {@link AntWurbiler}.<p>
+ *
+ * It takes the wurbelizable-source as its first argument and
+ * creates a java output file together with the serialized fixed
+ * source file.
+ *
+ * Example:
+ * <pre>
+ * java org.wurbelizer.DefaultWurbiler Test.wrbl
+ * </pre>
+ * (the extension {@code .wrbl} may be omitted)<p>
+ *
+ * Creates:
+ * {@code Test.java}, the wurblet source ready to be compiled by javac, and
+ * {@code Test.ser}, the fixed source.
+ *
+ * @author harald
+ * @version $Revision: 97 $
+ */
+
+public class DefaultWurbiler extends AbstractWurbiler {
+
+  private final File wrblFile;        // input file
+  private File outputJavaDir;         // output directory where to put .java-files
+  private File outputTextDir;         // output directory where to put .ser-files
+
+
+  /**
+   * Creates an instance of a wurbiler with default options
+   * for wrblFile to be compiled to outputDir.
+   *
+   * @param wrblFile the input wurbelizer file
+   * @param outputJavaDir the output directory getting the Java-files
+   * @param outputTextDir the output directory getting the fixed text .ser-files.
+   * @param logger the logger
+   * @param verbosity the verbosity
+   * @throws java.io.FileNotFoundException if file not found
+   */
+  public DefaultWurbiler(File wrblFile, File outputJavaDir, File outputTextDir, Logger logger, Verbosity verbosity) throws FileNotFoundException {
+    super(new BufferedReader(new FileReader(wrblFile)), wrblFile.getName(), new StringWriter(), null);
+    this.wrblFile  = wrblFile;
+    this.outputJavaDir = outputJavaDir;
+    this.outputTextDir = outputTextDir;
+    setLogger(logger);
+    setVerbosity(verbosity);
+  }
+
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int compile() throws WurbileException {
+
+    String wurbletName = wrblFile.getName();
+    if (wurbletName.endsWith(Constants.JAVA_SOURCE_EXTENSION))  {
+      throw new WurbileException("wurblet source must be a Java file (.java)");
+    }
+    if (wurbletName.endsWith(Constants.FILE_SOURCE_EXTENSION))  {
+      throw new WurbileException("wurblet source must be a fixed-text file (.ser)");
+    }
+    wurbletName = wurbletName.substring(0, wurbletName.length() - Constants.WURBLET_SOURCE_EXTENSION.length());
+
+
+    // compile the wurblet (in memory)
+    int errors = super.compile();
+
+
+    // ---------- generate Java file ------------------
+    Writer writer = null;
+    String javaFileName = null;
+
+    try {
+
+      // write wurbelizable code and fill tempWriter
+      try (Writer tempWriter = getWriter()) {
+        // write wurbelizable code and fill tempWriter
+
+        String javaDirName = outputJavaDir.getAbsolutePath();
+        if (getPackageName() != null)  {
+          // add the package name
+          javaDirName += "/" + getPackageName().replace('.', '/');
+          outputJavaDir = new File(javaDirName);
+        }
+        // create if it does not exist
+        outputJavaDir.mkdirs();
+
+        if (!outputJavaDir.isDirectory()) {
+          throw new WurbileException("output directory missing or " + javaDirName + " isn't a directory");
+        }
+
+        javaFileName = javaDirName + "/" + wurbletName + ".java";
+
+        writer = new PrintWriter(new BufferedWriter(new FileWriter(javaFileName)));
+
+        // write intro
+        writer.write("// wurblet generated by Wurbelizer " + Version.RELEASE + ", see http://www.wurbelizer.org\n\n");
+
+
+        if (getPackageName() != null)  {
+          writer.write("package " + getPackageName() + ";\n\n");
+        }
+        String[] imports = getImports();
+        if (imports != null)  {
+          for (String imp : imports) {
+            writer.write("import " + imp + ";\n");
+          }
+        }
+
+        String pkgname = getParentClass();
+        if (pkgname == null) {
+          pkgname = "AbstractWurblet";
+        }
+
+        writer.write("\n\npublic class " + wurbletName + " extends " + pkgname);
+        Collection<String> interfaces = getInterfaces();
+        if (interfaces != null && interfaces.isEmpty() == false) {
+          writer.write(" implements");
+          boolean needComma = false;
+          for (String iface: interfaces) {
+            if (needComma)  {
+              writer.write(", ");
+            }
+            else  {
+              writer.write(" ");
+              needComma = true;
+            }
+            writer.write(iface);
+          }
+        }
+        writer.write(" {\n\n");
+        writer.write("  @Override\n");
+        writer.write("  public void run() throws WurbelException {\n");
+        writer.write("    super.run();\n");
+        writer.write("    try {\n");
+        writer.write("      // ----------------- begin wurblet code -----------------\n\n");
+
+        // write wurbelizable code and fill tempWriter
+        writer.write(tempWriter.toString());
+      }
+
+      // write closing
+      writer.write("\n");
+      writer.write("      // ----------------- end wurblet code -----------------\n");
+      writer.write("    }\n");
+      writer.write("    catch (Exception ex) {\n");
+      writer.write("      throw new WurbelException(\"wurblet \" + this + \" failed\", ex);\n");
+      writer.write("    }\n");
+      writer.write("  }\n");
+      writer.write("}\n");
+    }
+    catch (IOException ex) {
+      throw new WurbileException("cannot generate Java source file " + javaFileName, ex);
+    }
+    finally {
+      try {
+        getReader().close();
+        if (writer != null) {
+          writer.close();
+        }
+      }
+      catch (IOException ex) { }
+    }
+
+
+    // ---------- generate fixed text file ------------------
+
+    String textDirName = outputTextDir.getAbsolutePath();
+    if (getPackageName() != null)  {
+      // add the package name
+      textDirName += "/" + getPackageName().replace('.', '/');
+      outputTextDir = new File(textDirName);
+    }
+    // create if it does not exist
+    outputTextDir.mkdirs();
+
+    if (!outputTextDir.isDirectory()) {
+      throw new WurbileException("output directory missing or " + textDirName + " isn't a directory");
+    }
+
+    List<String> sourceList = getSourceList();
+    String[] source = new String[sourceList.size()];
+    int i = 0;
+    for (String s: sourceList) {
+      source[i++] = s;
+    }
+
+    // write fixed text file
+    ObjectOutputStream os = null;
+    String textFileName = textDirName + "/" + wurbletName + Constants.FILE_SOURCE_EXTENSION;
+    try {
+      os = new ObjectOutputStream(new FileOutputStream(textFileName));
+      os.writeObject(new WurbletData(source, getArgs()));
+    }
+    catch (IOException ex) {
+      throw new WurbileException("cannot generate fixed text file " + textFileName, ex);
+    }
+    finally {
+      try {
+        os.close();
+      }
+      catch (Exception ex) { }
+    }
+
+
+    return errors;
+  }
+
+}

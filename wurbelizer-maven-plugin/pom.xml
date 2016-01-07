@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.wurbelizer</groupId>
+    <artifactId>wurbelizer-parent</artifactId>
+    <version>2.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.wurbelizer</groupId>
+  <artifactId>wurbelizer-maven-plugin</artifactId>
+  <version>2.0-SNAPSHOT</version>
+  <packaging>maven-plugin</packaging>
+  <name>Wurbelizer Maven Plugin</name>
+  <description>Maven Plugin for Wurbelizer</description>
+  <url>http://www.wurbelizer.org</url>
+
+  <dependencies>
+    <!-- dependant modules -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>wurbelizer</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- plugin dependencies -->
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-project</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.shared</groupId>
+      <artifactId>file-management</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>descriptor</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
+

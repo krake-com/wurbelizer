@@ -1,0 +1,171 @@
+/**
+ * Wurbelizer - http://www.wurbelizer.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
+
+package org.wurbelizer.wurblet;
+
+import java.io.PrintStream;
+import org.wurbelizer.wurbel.JavaSourceType;
+import org.wurbelizer.wurbel.WurbelException;
+import org.wurbelizer.wurbel.Wurbler;
+
+
+
+
+/**
+ * Provides basic functionality of a wurblet.<br>
+ * A wurblet is a code generator that is invoked from within a container,
+ * the so-called wurbler. Wurblets generate code to one or more output streams.
+ * The default output stream and the fixed source list is provided by the wurbler.
+ *
+ * @author harald
+ * @version $Revision: 97 $
+ */
+
+public abstract class AbstractWurblet implements Wurblet {
+
+  protected Wurbler container;      // the container
+  protected PrintStream out;        // the default output stream
+  protected String[] source;        // the fixed source
+
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void run() throws WurbelException {
+    out    = container.getPrintStream();
+    source = container.getSource();
+  }
+
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void cleanup() throws WurbelException {
+    // do nothing
+  }
+
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setContainer(Wurbler container) {
+    this.container = container;
+  }
+
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Wurbler getContainer() {
+    return container;
+  }
+
+
+  /**
+   * Gets the classname (from container).<br>
+   * This is the baseclassname (not containing the package!)
+   * @return the class basename
+   * @throws WurbelException
+   */
+  public String getClassName() throws WurbelException {
+    String className = getContainer().getProperty(Wurbler.PROPSPACE_WURBLET, JavaSourceType.CLASS_NAME);
+    if (className == null) {
+      throw new WurbelException("can't determine classname");
+    }
+    return className;
+  }
+
+  /**
+   * Gets the super-classname (from container).<br>
+   *
+   * @return the super class
+   * @throws WurbelException
+   */
+  public String getSuperClassName() throws WurbelException {
+    String superClassName = getContainer().getProperty(Wurbler.PROPSPACE_WURBLET, JavaSourceType.EXTENDS);
+    if (superClassName == null) {
+      // try interface: they are numbered starting at 0
+      superClassName = getContainer().getProperty(Wurbler.PROPSPACE_WURBLET, JavaSourceType.EXTENDS + "0");
+    }
+    if (superClassName == null) {
+      throw new WurbelException("can't determine super-classname");
+    }
+    return superClassName;
+  }
+
+
+  /**
+   * Gets the packagename (from container).
+   * @return the package name
+   * @throws WurbelException
+   */
+  public String getPackageName() throws WurbelException {
+    String packageName = getContainer().getProperty(Wurbler.PROPSPACE_WURBLET, JavaSourceType.PACKAGE_NAME);
+    if (packageName == null) {
+      throw new WurbelException("can't determine packagename");
+    }
+    return packageName;
+  }
+
+
+
+  /**
+   * Gets the guardname
+   * @return the guardname
+   * @throws WurbelException
+   */
+  public String getGuardName() throws WurbelException {
+    String guardName = getContainer().getProperty(Wurbler.PROPSPACE_WURBLET, Wurbler.WURBLET_GUARDNAME);
+    if (guardName == null) {
+      throw new WurbelException("can't determine guardName");
+    }
+    return guardName;
+  }
+
+
+  @Override
+  public String toString() {
+    String name = getClass().getName();
+    int ndx = name.lastIndexOf('.');
+    if (ndx >= 0) {
+      name = name.substring(ndx + 1);
+    }
+    StringBuilder buf = new StringBuilder(name);
+    try {
+      String className = getClassName();
+      buf.append(" in ").append(className);
+    }
+    catch (WurbelException wex) {
+      // ignore
+    }
+    try {
+      String guardName = getGuardName();
+      buf.append(" generating ").append(guardName);
+    }
+    catch (WurbelException wex) {
+      // ignore
+    }
+    return buf.toString();
+  }
+
+}
