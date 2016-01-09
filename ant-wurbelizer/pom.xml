@@ -15,7 +15,7 @@
   <name>Wurbelizer Ant Wrapper</name>
   <description>A wrapper for the wurbelizer to be used by ant</description>
   <url>http://www.wurbelizer.org</url>
-    
+
     <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>

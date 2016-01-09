@@ -15,7 +15,7 @@
   <name>Wurbelizer Console</name>
   <description>Some classes to run the wurbelizer from the console.</description>
   <url>http://www.wurbelizer.org</url>
-    
+
     <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
