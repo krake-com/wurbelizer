@@ -2,19 +2,17 @@
   <!--
    Wurbelizer Parent
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.wurbelizer</groupId>
   <artifactId>wurbelizer-parent</artifactId>
-  <version>2.0-SNAPSHOT</version>
+  <version>2.0.0</version>
   <packaging>pom</packaging>
 
   <name>Wurbelizer Parent</name>
   <description>common configuration for all wurbelizer modules</description>
-  <url>${project.artifactId}</url>
-  <inceptionYear>2010</inceptionYear>
+  <url>http://www.wurbelizer.org</url>
   <organization>
     <name>Krake Softwaretechnik</name>
     <url>http://www.krake.de</url>
@@ -134,6 +132,9 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>2.10.3</version>
+          <configuration>
+            <skip>true</skip>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -147,6 +148,43 @@
         </plugin>
       </plugins>
     </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>external.atlassian.jgitflow</groupId>
+        <artifactId>jgitflow-maven-plugin</artifactId>
+        <version>1.0-m5.1</version>
+        <configuration>
+          <!-- Enable this to push to origin using SSH keys -->
+          <enableSshAgent>true</enableSshAgent>
+          <!-- Keep your maven submodules at the same version as the parent POM -->
+          <autoVersionSubmodules>true</autoVersionSubmodules>
+          <!--
+            Pusing in-development features to origin allows all devs to see what each other
+            are working on
+          -->
+          <pushFeatures>true</pushFeatures>
+          <!--
+            This allows the CI server (e.g. Jenkins) to automatically push new releases to
+            origin; you can then either manually deploy them or, if you are doing Continuous
+            Deployments, auto-deploy them to prod
+          -->
+          <pushReleases>false</pushReleases>
+          <!--
+            Hot Fixes should be pushed to origin as well so that any dev can pick them up
+          -->
+          <pushHotfixes>true</pushHotfixes>
+          <!--
+            Prevents deployments from dev workstations so that they can be done by a CI
+            server
+          -->
+          <noDeploy>true</noDeploy>
+          <flowInitContext>
+            <!-- defaults are ok -->
+          </flowInitContext>
+        </configuration>
+      </plugin>
+    </plugins>
 
   </build>
 
