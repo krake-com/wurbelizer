@@ -16,7 +16,7 @@
   <description>A wrapper for the wurbelizer to be used by ant</description>
   <url>http://www.wurbelizer.org</url>
 
-    <dependencies>
+  <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>wurbelizer</artifactId>
@@ -27,6 +27,19 @@
       <artifactId>ant</artifactId>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
 
