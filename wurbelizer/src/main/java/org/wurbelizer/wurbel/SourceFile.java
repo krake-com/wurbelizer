@@ -37,7 +37,6 @@ import java.io.PrintStream;
  * SourceDocument).
  *
  * @author harald
- * @version $Revision: 97 $
  */
 
 public class SourceFile {

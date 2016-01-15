@@ -33,7 +33,6 @@ import static org.apache.tools.ant.Project.MSG_WARN;
  * Used if the wurbelizer is invoked from within Ant.
  *
  * @author harald
- * @version $Revision: 97 $
  */
 public class AntLogger implements Logger {
 

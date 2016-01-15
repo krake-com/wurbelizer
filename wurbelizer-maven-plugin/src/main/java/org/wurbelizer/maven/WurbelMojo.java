@@ -47,8 +47,8 @@ import org.wurbelizer.wurbel.HeapFileFactory;
 import org.wurbelizer.wurbel.JavaSourceType;
 import org.wurbelizer.wurbel.SourceException;
 import org.wurbelizer.wurbel.SourceWurbler;
-import org.wurbelizer.wurbel.WurbelUtilities;
 import org.wurbelizer.wurbel.WurbelException;
+import org.wurbelizer.wurbel.WurbelUtilities;
 import org.wurbelizer.wurbel.Wurbler;
 
 /**
@@ -60,7 +60,6 @@ import org.wurbelizer.wurbel.Wurbler;
  * @configurator set-classrealm
  *
  * @author harald
- * @version $Revision: 97 $
  */
 public class WurbelMojo extends AbstractWurbelizerMojo {
 
@@ -152,13 +151,6 @@ public class WurbelMojo extends AbstractWurbelizerMojo {
   private ArtifactMetadataSource metadataSource;
 
 
-
-
-  /**
-   * {@inheritDoc}
-   * @throws MojoExecutionException
-   * @throws MojoFailureException
-   */
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
 

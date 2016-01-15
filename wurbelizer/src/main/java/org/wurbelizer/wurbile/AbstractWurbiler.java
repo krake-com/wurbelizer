@@ -48,7 +48,7 @@ import org.wurbelizer.wurbel.WurbelUtilities;
  * when running the wurblet.<p>
  *
  * By default the input stream starts at the source-level.
- * The backslash is recognized as wurblet-level is entered via {@code @[} and left via {@code ]@}.
+ * The backslash is recognized as wurblet-level is entered via {@code &#64;[} and left via {@code ]&#64;}.
  * Wurblet-levels again may contain other wurblet-levels, i.e. they may be nested
  * resulting in a wurblet generating a wurblet which in turn generates java source
  * or even another wurblet.<p>
@@ -93,7 +93,6 @@ import org.wurbelizer.wurbel.WurbelUtilities;
  *
  *
  * @author harald
- * @version $Revision: 97 $
  */
 
 public class AbstractWurbiler implements Wurbiler {

@@ -21,17 +21,16 @@ package org.wurbelizer.wurbel;
 
 
 /**
- * Here-Document: all text in between @&gt; filename and @&lt; within a comment block.<br>
+ * Here-Document: all text in between &#64;&gt; filename and &#64;&lt; within a comment block.<br>
  *
  * @author harald
- * @version $Revision: 97 $
  */
 
 public class SourceHereSubElement extends SourceSubElement {
-  
+
   /**
    * Creates a here document.
-   * 
+   *
    * @param element the {@link SourceElement} containing the here-document
    * @param name the name of the here-document
    * @param text the contents of the here-document

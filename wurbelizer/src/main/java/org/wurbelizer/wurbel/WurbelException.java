@@ -20,7 +20,7 @@
 package org.wurbelizer.wurbel;
 
 /**
- * An exception thrown while executing a {@link Wurblet}.
+ * An exception thrown while executing a {@link org.wurbelizer.wurblet.Wurblet}.
  *
  * @author harald
  */

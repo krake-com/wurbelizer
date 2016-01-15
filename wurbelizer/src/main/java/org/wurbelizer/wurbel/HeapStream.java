@@ -26,7 +26,6 @@ import java.io.PrintStream;
  * A stream backed up by a heapfile.
  *
  * @author harald
- * @version $Revision: 97 $
  */
 public class HeapStream {
 
@@ -40,7 +39,7 @@ public class HeapStream {
    *
    * @param container the wurblet container
    * @param heapName the name of the code stream
-   * @throws WurbelException
+   * @throws WurbelException if stream could not be created
    */
   public HeapStream(Wurbler container, String heapName) throws WurbelException {
     // remember invocation params
@@ -58,7 +57,7 @@ public class HeapStream {
    * @param heapName the name of the heapfile
    * @return the printstream
    *
-   * @throws WurbelException
+   * @throws WurbelException if heapfile could not be reverted of created
    */
   protected PrintStream createStream(String heapName) throws WurbelException {
     HeapFile file = HeapFileFactory.get(heapName);

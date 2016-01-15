@@ -34,15 +34,16 @@ import org.wurbelizer.misc.Verbosity;
  *
  * Because ANT does not provide a foreach "out of the box", the main-method supports
  * file lists as follows:
- * <pre>java org.wurbelizer.DefaultWurbler --glob="blahdir/.*\.map$" <wurblet> .... @ ....</pre>
- * The @ will be replaced by the filename and the wurblet is invoked for each such file.
+ * <pre>
+ * java org.wurbelizer.DefaultWurbler --glob="blahdir/.*\.map$" &#64;
+ * </pre>
+ * The &#64; will be replaced by the filename and the wurblet is invoked for each such file.
  * Note that it's not a real globbing, but uses regex.
  * This is not the most generic solution, but it does the job for wurblets like CreateTableSql.
  * <p>
  * Note that this wurbler runs each wurblet only once!
  *
  * @author harald
- * @version $Revision: 97 $
  */
 
 public class DefaultWurbler extends AbstractWurbler {

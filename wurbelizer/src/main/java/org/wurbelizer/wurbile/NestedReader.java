@@ -52,7 +52,7 @@ public class NestedReader {
    * Creates a reader from a file.
    *
    * @param path the file's pathname
-   * @throws FileNotFoundException
+   * @throws FileNotFoundException if no such file
    */
   public NestedReader(String path) throws FileNotFoundException {
     this.file = new File(path);
@@ -64,7 +64,7 @@ public class NestedReader {
    * Reads the next character.
    *
    * @return the character, -1 if end of reader
-   * @throws IOException
+   * @throws IOException if reading failed
    */
   public int read() throws IOException {
     int c = reader.read();

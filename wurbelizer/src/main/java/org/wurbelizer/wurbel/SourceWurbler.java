@@ -43,11 +43,10 @@ import org.wurbelizer.misc.Verbosity;
  * A wurblet container.<br>
  * Reads a source file, scans for &#64;wurblets and sub elements and applies them
  * as long as there is no more change to the source code.
- * The {@code SourceWurbler} usually is invoked from within the {@link AntWurbler}
+ * The {@code SourceWurbler} usually is invoked from within the {@code AntWurbler}.
  * but may also be invoked from the command line (for testing purposes).
  *
  * @author harald
- * @version $Revision: 97 $
  */
 
 public class SourceWurbler extends AbstractWurbler {
@@ -72,7 +71,7 @@ public class SourceWurbler extends AbstractWurbler {
    * Registered source types.<br>
    * Files not registered will not be processed.
    */
-  private static final Map<String,SourceType> sourceTypes = new TreeMap<>();
+  private static final Map<String,SourceType> SOURCE_TYPES = new TreeMap<>();
 
   /**
    * Registers a source type.<br>
@@ -80,7 +79,7 @@ public class SourceWurbler extends AbstractWurbler {
    * @param type the source type
    */
   public static void registerSourceType(SourceType type) {
-    sourceTypes.put(type.getFileExtension(), type);
+    SOURCE_TYPES.put(type.getFileExtension(), type);
   }
 
 
@@ -101,7 +100,6 @@ public class SourceWurbler extends AbstractWurbler {
   private Properties wurbProps;                     // properties from wurb-file
   private int loopCount;                            // loop counter
   private SourceType sourceType;                    // type of this source file
-
 
 
 
@@ -145,7 +143,7 @@ public class SourceWurbler extends AbstractWurbler {
     }
     String fileExtension = filename.substring(ndx);
 
-    sourceType = sourceTypes.get(fileExtension);
+    sourceType = SOURCE_TYPES.get(fileExtension);
     if (sourceType == null) {
       throw new WurbelException("unknown file extension: " + fileExtension);
     }
@@ -221,86 +219,28 @@ public class SourceWurbler extends AbstractWurbler {
   }
 
 
-
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Verbosity getVerbosity() {
     return verbosity;
   }
 
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Logger getLogger() {
     return logger;
   }
 
 
-
-
-
-  /**
-   * Set guardtype from string
-   */
-  private void setGuardType(String value)  {
-    // overwrite guardtype from wurbfile
-    if (value != null && value.equalsIgnoreCase("netbeans")) {
-      guardType = SourceElement.Type.GUARDED_NETBEANS;
-    }
-    // else if other guarded types to come...
-  }
-
-  /**
-   * Set foldtype from string
-   */
-  private void setDefaultFoldType(String value)  {
-    if (value != null) {
-      value = value.toUpperCase();
-      if (!value.equals("none")) {
-        defaultFoldType = SourceDocument.FoldType.valueOf(value);
-      }
-    }
-  }
-
-
-
-  /**
-   * process property line
-   */
-  private void processPropertyLine(String line) {
-    String key = WurbelUtilities.scanPropertyLine(line, wurbProps);
-    if (key != null && key.equals(PROPERTY_GUARDTYPE)) {
-      // overwrite guardtype from wurbfile
-      setGuardType(wurbProps.getProperty(PROPERTY_GUARDTYPE));
-    }
-  }
-
-
-
-
-
-
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int getInvocationCount() {
     return loopCount;
   }
 
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public File getAnalyzeFile(String name) {
     return new File(analyzeDir, name);
   }
-
 
 
   /**
@@ -310,8 +250,8 @@ public class SourceWurbler extends AbstractWurbler {
    *         {@link #RC_HEREDOCS} = heredocs written and file not modified,<br>
    *         {@link #RC_UPDATED} = file updated without errors, 0 = no change
    *
-   * @throws WurbelException
-   * @throws SourceException
+   * @throws WurbelException if a file- or heapfile operation failed
+   * @throws SourceException if source scanning failed
    */
   public int wurbelize() throws WurbelException, SourceException {
 
@@ -639,6 +579,43 @@ public class SourceWurbler extends AbstractWurbler {
       }
     }
     return invert;    // condition is not met
+  }
+
+
+  /**
+   * Set guardtype from string
+   */
+  private void setGuardType(String value)  {
+    // overwrite guardtype from wurbfile
+    if (value != null && value.equalsIgnoreCase("netbeans")) {
+      guardType = SourceElement.Type.GUARDED_NETBEANS;
+    }
+    // else if other guarded types to come...
+  }
+
+
+  /**
+   * Set foldtype from string
+   */
+  private void setDefaultFoldType(String value)  {
+    if (value != null) {
+      value = value.toUpperCase();
+      if (!value.equals("none")) {
+        defaultFoldType = SourceDocument.FoldType.valueOf(value);
+      }
+    }
+  }
+
+
+  /**
+   * process property line
+   */
+  private void processPropertyLine(String line) {
+    String key = WurbelUtilities.scanPropertyLine(line, wurbProps);
+    if (key != null && key.equals(PROPERTY_GUARDTYPE)) {
+      // overwrite guardtype from wurbfile
+      setGuardType(wurbProps.getProperty(PROPERTY_GUARDTYPE));
+    }
   }
 
 }

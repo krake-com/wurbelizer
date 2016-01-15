@@ -27,7 +27,6 @@ import java.util.ResourceBundle;
  * Holds versioning information.<br>
  *
  * @author harald
- * @version $Revision: 97 $
  */
 public class Version {
 

@@ -28,7 +28,6 @@ import org.wurbelizer.misc.Constants;
  * The Java source type.
  *
  * @author harald
- * @version $Revision: 97 $
  */
 public class JavaSourceType implements SourceType {
 

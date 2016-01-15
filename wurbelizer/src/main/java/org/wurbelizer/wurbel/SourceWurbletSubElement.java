@@ -28,19 +28,18 @@ import java.util.Properties;
  * <p>
  * A wurblet anchor is of the form:
  * <pre>
- * &#64;wurblet[(wurbler-args...)] <guardname> <wurbletname> [wurblet-args ...]
+ * &#64;wurblet[(wurbler-args...)] &lt;guardname&gt; &lt;wurbletname&gt; [wurblet-args ...]
  * </pre>
  * The optional wurbler args must be enclosed in parantheses and are directives for
  * the container that executes the wurblets.
  * The guardname is mandatory and must be unique within the source file, except if
- * an inline wurblet (-,+,<,>).
+ * an inline wurblet (-,+,&lt;,&gt;).
  * The wurbletname is the classname of the wurblet and may be given either as an
  * absolute classname (containing dots) or a relative name which the wurbler
  * will expand according to some given wurblet path.
  * The optional wurblet arguments are passed through the {@link ArgScanner}.
  *
  * @author harald
- * @version $Revision: 97 $
  */
 
 public class SourceWurbletSubElement extends SourceSubElement {

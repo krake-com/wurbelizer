@@ -27,7 +27,6 @@ import java.io.PrintStream;
  * Prints to stdout.
  *
  * @author harald
- * @version $Revision: 97 $
  */
 public class DefaultLogger implements Logger {
 

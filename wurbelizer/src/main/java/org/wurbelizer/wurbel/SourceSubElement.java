@@ -30,7 +30,6 @@ package org.wurbelizer.wurbel;
  * SubElements may be named or unnamed.
  *
  * @author harald
- * @version $Revision: 97 $
  */
 public abstract class SourceSubElement {
 

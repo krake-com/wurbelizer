@@ -29,7 +29,7 @@ import java.util.Map;
 public class SourceFileFactory {
 
   // all sourcefiles <filename>:<file>
-  private static final Map<String,SourceFile> fileMap = new HashMap<>();
+  private static final Map<String,SourceFile> FILE_MAP = new HashMap<>();
 
 
   /**
@@ -42,7 +42,7 @@ public class SourceFileFactory {
    * @throws WurbelException if reading the file did fail
    */
   public static synchronized SourceFile open(String filename) throws WurbelException {
-    SourceFile file = fileMap.get(filename);
+    SourceFile file = FILE_MAP.get(filename);
     if (file == null) {
       file = new SourceFile(filename);
     }
@@ -54,7 +54,7 @@ public class SourceFileFactory {
    * Discard all files in list, if any.
    */
   public static synchronized void initialize() {
-    fileMap.clear();
+    FILE_MAP.clear();
   }
 
 
@@ -62,7 +62,7 @@ public class SourceFileFactory {
    * Rewinds all output streams (makes them empty again).
    */
   public static synchronized void resetAll()  {
-    for (SourceFile file: fileMap.values())  {
+    for (SourceFile file: FILE_MAP.values())  {
       file.reset();
     }
   }
@@ -71,13 +71,13 @@ public class SourceFileFactory {
   /**
    * Closes all files and clears the vector
    *
-   * @throws WurbelException
+   * @throws WurbelException if closing a file failed
    */
   public static synchronized void closeAll() throws WurbelException {
-    for (SourceFile file: fileMap.values())  {
+    for (SourceFile file: FILE_MAP.values())  {
       file.close();
     }
-    fileMap.clear();
+    FILE_MAP.clear();
   }
 
 

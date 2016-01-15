@@ -25,7 +25,6 @@ import java.util.Properties;
  * Source file type.
  *
  * @author harald
- * @version $Revision: 97 $
  */
 public interface SourceType {
 

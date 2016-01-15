@@ -36,7 +36,6 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
  * It extracts the classrealm and sets it in the mojo (where it is unavailable).
  *
  * @author harald
- * @version $Revision: 97 $
  *
  * @plexus.component role="org.codehaus.plexus.component.configurator.ComponentConfigurator"
  *                   role-hint="set-classrealm"
@@ -58,7 +57,7 @@ public class ClassRealmConfigurator extends AbstractComponentConfigurator {
     else  {
       throw new ComponentConfigurationException("configurator can only be applied to an AbstractWurbelizerMojo");
     }
-    
+
     converterLookup.registerConverter(new ClassRealmConverter(containerRealm));
 
     ObjectWithFieldsConverter converter = new ObjectWithFieldsConverter();

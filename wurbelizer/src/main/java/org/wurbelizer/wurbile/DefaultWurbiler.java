@@ -44,7 +44,7 @@ import org.wurbelizer.wurblet.WurbletData;
  * Default implementation of a wurblet compiler.<p>
  *
  * This wurbiler can be used as a console application (provided for testing purposes only)
- * or from within ant, as implemented in {@link AntWurbiler}.<p>
+ * or from within ant, as implemented in AntWurbiler.<p>
  *
  * It takes the wurbelizable-source as its first argument and
  * creates a java output file together with the serialized fixed
@@ -61,7 +61,6 @@ import org.wurbelizer.wurblet.WurbletData;
  * {@code Test.ser}, the fixed source.
  *
  * @author harald
- * @version $Revision: 97 $
  */
 
 public class DefaultWurbiler extends AbstractWurbiler {

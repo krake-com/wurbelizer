@@ -27,7 +27,6 @@ import org.wurbelizer.misc.Logger;
  * Prints to stdout.
  *
  * @author harald
- * @version $Revision: 97 $
  */
 public class MavenLogger implements Logger {
 
@@ -96,5 +95,5 @@ public class MavenLogger implements Logger {
   public void error(String message, Throwable t) {
     log.error(message, t);
   }
-  
+
 }

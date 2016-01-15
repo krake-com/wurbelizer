@@ -23,7 +23,6 @@ package org.wurbelizer.misc;
  * The verbosity level.
  *
  * @author harald
- * @version $Revision: 97 $
  */
 public enum Verbosity {
 

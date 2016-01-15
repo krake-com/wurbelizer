@@ -33,7 +33,6 @@ import java.io.StringReader;
  * within a single ant run.
  *
  * @author harald
- * @version $Revision: 97 $
  */
 public class HeapFile {
 
@@ -50,8 +49,6 @@ public class HeapFile {
    *
    * @param heapName the unique heapName of the heapfile
    * @param text the initial contents, null = empty.
-   *
-   * @throws WurbelException if the file already exists
    */
   public HeapFile(String heapName, String text) {
 

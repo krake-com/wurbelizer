@@ -29,14 +29,14 @@ import java.util.Map;
 public class HeapFileFactory {
 
   // all heapfiles
-  private static final Map<String,HeapFile> heapFiles = new HashMap<>();
+  private static final Map<String,HeapFile> HEAP_FILES = new HashMap<>();
 
 
   /**
    * initializes the heapfiles.
    */
   public static synchronized void initialize() {
-    heapFiles.clear();
+    HEAP_FILES.clear();
   }
 
   /**
@@ -44,15 +44,16 @@ public class HeapFileFactory {
    *
    * @param heapName the unique name of the heapfile
    * @param text the initial contents, null = empty.
+   * @return the heapfile
    *
    * @throws WurbelException if the file already exists
    */
   public static synchronized HeapFile create(String heapName, String text) throws WurbelException {
-    if (heapFiles.get(heapName) != null) {
+    if (HEAP_FILES.get(heapName) != null) {
       throw new WurbelException("HeapFile '" + heapName + "' already exists");
     }
     HeapFile heapFile = new HeapFile(heapName, text);
-    heapFiles.put(heapName, heapFile);
+    HEAP_FILES.put(heapName, heapFile);
     return heapFile;
   }
 
@@ -63,9 +64,11 @@ public class HeapFileFactory {
    * @param sourceName the name of the source file this heapfile is associated to
    * @param heapName the unique name of the heapfile
    * @param text the initial contents, null = empty.
+   * @return the heapfile
+   * @throws WurbelException if heapname is not unique
    */
   public static synchronized HeapFile createOrOverwrite(String sourceName, String heapName, String text) throws WurbelException {
-    HeapFile heapFile = heapFiles.get(heapName);
+    HeapFile heapFile = HEAP_FILES.get(heapName);
     if (heapFile != null) {
       if (heapFile.getSourceName() != null && sourceName != null &&
           !heapFile.getSourceName().equals(sourceName)) {
@@ -80,7 +83,7 @@ public class HeapFileFactory {
     else  {
       heapFile = new HeapFile(heapName, text);
       heapFile.setSourceName(sourceName);
-      heapFiles.put(heapName, heapFile);
+      HEAP_FILES.put(heapName, heapFile);
     }
     return heapFile;
   }
@@ -92,7 +95,7 @@ public class HeapFileFactory {
    * @return the heapfile, null if no such file.
    */
   public static synchronized HeapFile get(String heapName) {
-    return heapFiles.get(heapName);
+    return HEAP_FILES.get(heapName);
   }
 
 
@@ -103,7 +106,7 @@ public class HeapFileFactory {
    * @return true if removed, false if no such file.
    */
   public static synchronized boolean delete(String heapName) {
-    return heapFiles.remove(heapName) != null;
+    return HEAP_FILES.remove(heapName) != null;
   }
 
 

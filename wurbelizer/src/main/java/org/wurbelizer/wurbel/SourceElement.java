@@ -47,7 +47,6 @@ import org.wurbelizer.misc.Constants;
  * rectangular cut).
  *
  * @author harald
- * @version $Revision: 97 $
  */
 
 public class SourceElement {
@@ -117,6 +116,8 @@ public class SourceElement {
 
   /**
    * Scans for sub elements if this is a comment or guarded block.
+   *
+   * @throws SourceException if scanning failed
    */
   public void scan() throws SourceException {
 

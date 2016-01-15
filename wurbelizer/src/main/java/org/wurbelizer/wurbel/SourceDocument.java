@@ -39,7 +39,6 @@ import org.wurbelizer.misc.Verbosity;
  * Elements can also be addressed by their logical index (starting at 0).
  *
  * @author harald
- * @version $Revision: 97 $
  */
 
 public class SourceDocument {
@@ -258,7 +257,7 @@ public class SourceDocument {
    * @param guardedName the name of the guarded section to remove
    * @param startIndex start index in elements where to start the search
    *
-   * @return the index >= 0 if removed, -1 if no such section
+   * @return the index &ge; 0 if removed, -1 if no such section
    */
   public int deleteGuarded(String guardedName, int startIndex) {
     for (int i=startIndex; i < elements.size(); i++) {
@@ -311,7 +310,7 @@ public class SourceDocument {
    *
    * @param guardedName the name of the guarded section to remove
    *
-   * @return the index >= 0 if removed, -1 if no such section
+   * @return the index &ge; 0 if removed, -1 if no such section
    */
   public int deleteGuarded(String guardedName)  {
     return deleteGuarded(guardedName, 0);
@@ -327,7 +326,7 @@ public class SourceDocument {
    * @param str the new text
    * @param parentWurblet the parent wurblet, null if none
    *
-   * @return the index >=0 of the replaced element, -1 if not found
+   * @return the index &ge; of the replaced element, -1 if not found
    *
    * @throws org.wurbelizer.wurbel.SourceException if operation failed
    */
@@ -514,7 +513,7 @@ public class SourceDocument {
    *
    * @param text the contents of the document
    *
-   * @throws org.wurbelizer.wurbel.SourceException if parsing the contents failed
+   * @throws SourceException if parsing the contents failed
    */
   public void setText(StringBuilder text) throws SourceException {
 

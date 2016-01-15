@@ -37,7 +37,6 @@ import org.wurbelizer.wurblet.WurbletData;
  * The container is responsible to load a wurblet and run it.
  *
  * @author harald
- * @version $Revision: 97 $
  */
 
 public abstract class AbstractWurbler implements Wurbler {
@@ -173,7 +172,7 @@ public abstract class AbstractWurbler implements Wurbler {
   /**
    * Invokes the cleanup method on all wurblets ran so far.
    *
-   * @throws WurbelException
+   * @throws WurbelException if cleanup failed
    */
   public void cleanupInvokedWurblets() throws WurbelException {
     if (wurblets != null) {

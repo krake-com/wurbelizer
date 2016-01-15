@@ -55,7 +55,6 @@ import org.wurbelizer.misc.Verbosity;
  * Make sure that wurbelizer.jar is in the classpath of ant.
  *
  * @author harald
- * @version $Revision: 97 $
  */
 
 

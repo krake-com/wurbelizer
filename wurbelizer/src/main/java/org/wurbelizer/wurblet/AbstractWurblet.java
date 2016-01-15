@@ -34,7 +34,6 @@ import org.wurbelizer.wurbel.Wurbler;
  * The default output stream and the fixed source list is provided by the wurbler.
  *
  * @author harald
- * @version $Revision: 97 $
  */
 
 public abstract class AbstractWurblet implements Wurblet {
@@ -44,9 +43,6 @@ public abstract class AbstractWurblet implements Wurblet {
   protected String[] source;        // the fixed source
 
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void run() throws WurbelException {
     out    = container.getPrintStream();
@@ -54,27 +50,18 @@ public abstract class AbstractWurblet implements Wurblet {
   }
 
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void cleanup() throws WurbelException {
     // do nothing
   }
 
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setContainer(Wurbler container) {
     this.container = container;
   }
 
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Wurbler getContainer() {
     return container;

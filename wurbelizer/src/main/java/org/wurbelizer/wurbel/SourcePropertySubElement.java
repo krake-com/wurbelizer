@@ -24,11 +24,10 @@ import java.util.StringTokenizer;
 
 
 /**
- * Property-Document: all text in between @{ and @} within a comment block.<br>
+ * Property-Document: all text in between &#64;{ and &#64;} within a comment block.<br>
  * Property documents are unnamed.
  *
  * @author harald
- * @version $Revision: 97 $
  */
 public class SourcePropertySubElement extends SourceSubElement {
 

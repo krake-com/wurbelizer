@@ -25,7 +25,6 @@ package org.wurbelizer.misc;
  * for example Ant or Maven.
  *
  * @author harald
- * @version $Revision: 97 $
  */
 public interface Logger {
 

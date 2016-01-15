@@ -39,7 +39,6 @@ import org.wurbelizer.wurbile.WurbileException;
  * @goal wurbile
  * @phase generate-sources
  * @author harald
- * @version $Revision: 97 $
  */
 public class WurbileMojo extends AbstractWurbelizerMojo {
 

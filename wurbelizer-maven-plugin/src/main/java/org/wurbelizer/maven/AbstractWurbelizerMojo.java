@@ -36,7 +36,6 @@ import org.wurbelizer.wurbel.WurbelUtilities;
  * A generic wurbelizer mojo.
  *
  * @author harald
- * @version $Revision: 97 $
  */
 public abstract class AbstractWurbelizerMojo extends AbstractMojo {
 
@@ -90,13 +89,11 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
   /**
    * Sets the classrealm.
    *
-   * @param classRealm
-   *
+   * @param classRealm the realm
    */
   public void setClassRealm(ClassRealm classRealm) {
     this.classRealm = classRealm;
   }
-
 
 
 
@@ -171,7 +168,8 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
 
   /**
    * Checks if given directory resides in resources.
-   * @param dirName
+   * 
+   * @param dirName the directory name
    * @return the resource dir, null if not a resource
    */
   protected String getResourceDirName(String dirName) {
@@ -184,7 +182,6 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
     }
     return null;
   }
-
 
 
   /**

@@ -27,7 +27,6 @@ import org.apache.maven.shared.model.fileset.FileSet;
  * camel-case fiddling.
  *
  * @author mnolte
- * @version $Revision: 97 $
  */
 public class Fileset extends FileSet {
 

@@ -42,7 +42,6 @@ import java.util.Properties;
  * Thus, a variable may contain quotes and these quotes need <strong>not</strong> be escaped.
  *
  * @author harald
- * @version $Revision: 97 $
  */
 
 public class ArgScanner {

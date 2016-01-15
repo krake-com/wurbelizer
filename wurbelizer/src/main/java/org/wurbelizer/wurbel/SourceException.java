@@ -24,16 +24,15 @@ package org.wurbelizer.wurbel;
  * Exception thrown whenever scanning of the sourcefile failed.<br>
  *
  * @author harald
- * @version $Revision: 97 $
  */
 
 @SuppressWarnings("serial")
 public class SourceException extends Exception {
-  
+
   private SourceElement elem;
   private SourceDocument doc;
-  
-  
+
+
   /**
    * Constructs an {@code SourceException} with the specified detail message.
    *
@@ -44,8 +43,8 @@ public class SourceException extends Exception {
     super(message);
     this.elem = elem;
   }
-  
-  
+
+
   /**
    * Constructs an {@code SourceException} with the specified detail message.
    *
@@ -56,11 +55,8 @@ public class SourceException extends Exception {
     super(message);
     this.doc = doc;
   }
-  
-  
-  /**
-   * {@inheritDoc}
-   */
+
+
   @Override
   public String getMessage() {
     if (elem != null) {
@@ -73,5 +69,5 @@ public class SourceException extends Exception {
       return super.getMessage();
     }
   }
-  
+
 }
