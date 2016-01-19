@@ -20,22 +20,23 @@ package org.wurbelizer.wurbile;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.file.Files;
 
 /**
+ * Reader to load source files.
  *
  * @author harald
  */
 public class NestedReader {
 
-  private final Reader reader;      // reader
-  private final String name;        // the name
-  private File file;                // != null if included file reader
-  private int line = 1;             // line-number, starting at 1
-  private int pos;                  // position in line
+  private final BufferedReader reader;      // reader
+  private final String name;                // the name
+  private File file;                        // != null if included file reader
+  private int lineNo;                       // line-number, starting at 1
+  private int linePos;                      // position in line
+  private String line;                      // the current line, null if read next
 
   /**
    * Creates a reader with a given name.
@@ -43,21 +44,21 @@ public class NestedReader {
    * @param reader the original reader
    * @param name the reader's name
    */
-  public NestedReader(Reader reader, String name) {
+  public NestedReader(BufferedReader reader, String name) {
     this.reader = reader;
     this.name = name;
   }
 
   /**
-   * Creates a reader from a file.
+   * Creates a nested reader from a file's pathname.
    *
    * @param path the file's pathname
-   * @throws FileNotFoundException if no such file
+   * @throws IOException if no such file
    */
-  public NestedReader(String path) throws FileNotFoundException {
-    this.file = new File(path);
-    this.name = file.getName();
-    this.reader = new BufferedReader(new FileReader(file));
+  public NestedReader(String path) throws IOException {
+    file = new File(path);
+    name = file.getName();
+    reader = Files.newBufferedReader(file.toPath());
   }
 
   /**
@@ -67,18 +68,26 @@ public class NestedReader {
    * @throws IOException if reading failed
    */
   public int read() throws IOException {
-    int c = reader.read();
-    if (c == -1 && file != null) {
-      reader.close();  // close include readers
+    if (line != null) {
+      if (line.length() > linePos) {
+        return line.charAt(linePos++);
+      }
+      line = null;
+      return '\n';
     }
-    if (c == '\n') {
-      line++;
-      pos = 0;
+
+    // next line
+    line = reader.readLine();
+    if (line == null) {
+      if (file != null) {
+        reader.close(); // close include readers
+      }
+      return -1;    // end of file
     }
-    else {
-      pos++;
-    }
-    return c;
+    
+    lineNo++;
+    linePos = 0;
+    return read();
   }
 
   /**
@@ -122,8 +131,8 @@ public class NestedReader {
    *
    * @return the line number
    */
-  public int getLine() {
-    return line;
+  public int getLineNo() {
+    return lineNo;
   }
 
   /**
@@ -131,8 +140,8 @@ public class NestedReader {
    *
    * @return the position
    */
-  public int getPos() {
-    return pos;
+  public int getLinePos() {
+    return linePos;
   }
 
   @Override

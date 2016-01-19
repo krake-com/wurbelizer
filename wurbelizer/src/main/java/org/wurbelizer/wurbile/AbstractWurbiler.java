@@ -19,7 +19,7 @@
 
 package org.wurbelizer.wurbile;
 
-import java.io.FileNotFoundException;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -144,12 +144,12 @@ public class AbstractWurbiler implements Wurbiler {
   /**
    * Creates a compiler instance.
    *
-   * @param in the input stream
+   * @param in the input reader
    * @param inName the name of the input stream (for diagnostics only)
-   * @param out the output stream
+   * @param out the output writer
    * @param sourceList the fixed source list (null to create it)
    */
-  public AbstractWurbiler(Reader in, String inName, Writer out, List<String> sourceList) {
+  public AbstractWurbiler(BufferedReader in, String inName, Writer out, List<String> sourceList) {
 
     this.out = out;
     this.sourceList = sourceList;
@@ -505,7 +505,7 @@ public class AbstractWurbiler implements Wurbiler {
           return false;
         }
       }
-      catch (FileNotFoundException ex)  {
+      catch (IOException ex)  {
         logError(ex.toString());
         return false;
       }
@@ -727,7 +727,7 @@ public class AbstractWurbiler implements Wurbiler {
    * @return the current source-location
    */
   private String srcLocation()  {
-    return in.getLine() + ":" + in.getPos();
+    return in.getLineNo() + ":" + in.getLinePos();
   }
 
 

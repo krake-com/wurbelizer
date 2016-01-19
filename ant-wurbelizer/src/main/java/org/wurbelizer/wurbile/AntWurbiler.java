@@ -20,7 +20,7 @@
 package org.wurbelizer.wurbile;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -408,7 +408,7 @@ public class AntWurbiler extends MatchingTask {
           log(file.getName() + ": " + errors + " wurbile errors");
         }
       }
-      catch (FileNotFoundException | WurbileException | RuntimeException ex)  {
+      catch (IOException | WurbileException | RuntimeException ex)  {
         errorFilesCount++;
         log(ex.toString(), Project.MSG_ERR);
       }

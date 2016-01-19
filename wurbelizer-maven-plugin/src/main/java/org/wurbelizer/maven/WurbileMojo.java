@@ -20,7 +20,6 @@
 package org.wurbelizer.maven;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -198,7 +197,7 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
           getLog().error(fileName + ": " + errors + " wurbile errors");
         }
       }
-      catch (FileNotFoundException | WurbileException | RuntimeException ex) {
+      catch (IOException | WurbileException | RuntimeException ex) {
         errorFilesCount++;
         throw new MojoExecutionException("unable to wurbelize source " + fileName, ex);
       }

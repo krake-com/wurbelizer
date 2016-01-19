@@ -19,18 +19,16 @@
 
 package org.wurbelizer.wurbile;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.List;
 import org.wurbelizer.misc.Constants;
@@ -81,8 +79,8 @@ public class DefaultWurbiler extends AbstractWurbiler {
    * @param verbosity the verbosity
    * @throws java.io.FileNotFoundException if file not found
    */
-  public DefaultWurbiler(File wrblFile, File outputJavaDir, File outputTextDir, Logger logger, Verbosity verbosity) throws FileNotFoundException {
-    super(new BufferedReader(new FileReader(wrblFile)), wrblFile.getName(), new StringWriter(), null);
+  public DefaultWurbiler(File wrblFile, File outputJavaDir, File outputTextDir, Logger logger, Verbosity verbosity) throws IOException {
+    super(Files.newBufferedReader(wrblFile.toPath()), wrblFile.getName(), new StringWriter(), null);
     this.wrblFile  = wrblFile;
     this.outputJavaDir = outputJavaDir;
     this.outputTextDir = outputTextDir;
@@ -242,11 +240,12 @@ public class DefaultWurbiler extends AbstractWurbiler {
     }
     finally {
       try {
-        os.close();
+        if (os != null) {
+          os.close();
+        }
       }
       catch (Exception ex) { }
     }
-
 
     return errors;
   }

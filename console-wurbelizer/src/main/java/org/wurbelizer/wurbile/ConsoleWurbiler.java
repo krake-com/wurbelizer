@@ -19,7 +19,7 @@
 package org.wurbelizer.wurbile;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import org.wurbelizer.misc.DefaultLogger;
 import org.wurbelizer.misc.Verbosity;
 
@@ -113,7 +113,7 @@ public class ConsoleWurbiler {
         System.exit(2);
       }
     }
-    catch (FileNotFoundException | WurbileException | RuntimeException ex)  {
+    catch (IOException | WurbileException | RuntimeException ex)  {
       ex.printStackTrace();
       System.exit(1);
     }
