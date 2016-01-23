@@ -58,7 +58,7 @@ public interface Wurblet {
   /**
    * Performs any cleanup necessary after last invocation of a wurblet.
    *
-   * @throws WurbelException
+   * @throws WurbelException if cleanup failed
    */
   void cleanup() throws WurbelException;
 

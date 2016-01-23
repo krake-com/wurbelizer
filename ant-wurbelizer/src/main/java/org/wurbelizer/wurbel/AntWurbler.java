@@ -50,7 +50,7 @@ import org.wurbelizer.misc.Verbosity;
  *
  * Integrate into ant with:
  * <pre>
- *   &lt;taskdef name="wurbel" classname="org.wurbelizer.AntWurbler"/&gt
+ *   &lt;taskdef name="wurbel" classname="org.wurbelizer.AntWurbler"/&gt;
  * </pre>
  * Make sure that wurbelizer.jar is in the classpath of ant.
  *

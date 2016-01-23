@@ -72,7 +72,7 @@ public abstract class AbstractWurblet implements Wurblet {
    * Gets the classname (from container).<br>
    * This is the baseclassname (not containing the package!)
    * @return the class basename
-   * @throws WurbelException
+   * @throws WurbelException if classname could not be determined
    */
   public String getClassName() throws WurbelException {
     String className = getContainer().getProperty(Wurbler.PROPSPACE_WURBLET, JavaSourceType.CLASS_NAME);
@@ -86,7 +86,7 @@ public abstract class AbstractWurblet implements Wurblet {
    * Gets the super-classname (from container).<br>
    *
    * @return the super class
-   * @throws WurbelException
+   * @throws WurbelException if classname could not be determined
    */
   public String getSuperClassName() throws WurbelException {
     String superClassName = getContainer().getProperty(Wurbler.PROPSPACE_WURBLET, JavaSourceType.EXTENDS);
@@ -104,7 +104,7 @@ public abstract class AbstractWurblet implements Wurblet {
   /**
    * Gets the packagename (from container).
    * @return the package name
-   * @throws WurbelException
+   * @throws WurbelException if packagename could not be determined
    */
   public String getPackageName() throws WurbelException {
     String packageName = getContainer().getProperty(Wurbler.PROPSPACE_WURBLET, JavaSourceType.PACKAGE_NAME);
@@ -119,7 +119,7 @@ public abstract class AbstractWurblet implements Wurblet {
   /**
    * Gets the guardname
    * @return the guardname
-   * @throws WurbelException
+   * @throws WurbelException if guardname could not be determined
    */
   public String getGuardName() throws WurbelException {
     String guardName = getContainer().getProperty(Wurbler.PROPSPACE_WURBLET, Wurbler.WURBLET_GUARDNAME);

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Properties;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.codehaus.classworlds.ClassRealm;
@@ -33,7 +34,7 @@ import org.wurbelizer.misc.Verbosity;
 import org.wurbelizer.wurbel.WurbelUtilities;
 
 /**
- * A generic wurbelizer mojo.
+ * Base class of wurbelizer mojos.
  *
  * @author harald
  */
@@ -41,28 +42,25 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
 
   /**
    * The Maven Project Object.
-   *
-   * @parameter default-value="${project}"
-   * @required
-   * @readonly
    */
+  @Parameter(defaultValue = "${project}",
+             required = true,
+             readonly = true)
   protected MavenProject project;
 
   /**
    * The list of file sets to wurbile.<br>
    * If set the source directory is ignored.
-   *
-   * @parameter
    */
+  @Parameter
   protected List<FileSet> filesets;
 
   /**
    * The verbosity.<br>
    * One of "default", "info" or "debug".
    * Debus is also turned on (if not set explicitly) by Maven's global debug flag (see command line switch <code>-X</code>).
-   *
-   * @parameter default-value="${wurbel.verbosity}"
    */
+  @Parameter(defaultValue = "${wurbel.verbosity}")
   protected String verbosity;
 
 
@@ -81,7 +79,7 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
   /**
    * The classrealm.
    * <p>
-   * Retrieved if @configurator set-classrealm is set in the class doc of the mojo.
+   * Retrieved if &#64;configurator set-classrealm is set in the class doc of the mojo.
    */
   protected ClassRealm classRealm;
 
@@ -168,7 +166,7 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
 
   /**
    * Checks if given directory resides in resources.
-   * 
+   *
    * @param dirName the directory name
    * @return the resource dir, null if not a resource
    */
