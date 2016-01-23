@@ -23,6 +23,9 @@ import java.io.File;
 import java.io.IOException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
 import org.wurbelizer.misc.Constants;
@@ -33,38 +36,37 @@ import org.wurbelizer.wurbile.WurbileException;
 /**
  * Wurbile Wurblets.<br>
  * The wurblet sources (wrbl-files) are translated to Java-sources
- * and the ser-files (serialized fixed text).
+ * and ser-files (serialized fixed text) and then compiled to Java class files.<br>
+ * Those class files can later be instantiated as code generators by the Wurbler.<br>
+ * See the wurbelizer:wurbel goal.
  *
- * @goal wurbile
- * @phase generate-sources
  * @author harald
  */
+@Mojo(name = "wurbile",
+      defaultPhase = LifecyclePhase.GENERATE_SOURCES)
 public class WurbileMojo extends AbstractWurbelizerMojo {
 
 
   /**
    * Directory holding the wurblet sources.
-   *
-   * @parameter property="wurbile.sourceDir"
-   *            default-value="${project.build.sourceDirectory}/../wurblets"
-   * @required
    */
+  @Parameter(defaultValue = "${project.build.sourceDirectory}/../wurblets",
+             property = "wurbile.sourceDir",
+             required = true)
   private File wurbletSourceDir;
 
   /**
    * Directory for the generated wurblet Java sources.
-   *
-   * @parameter property="wurbile.javaDir"
-   *            default-value="${project.build.directory}/generated-sources/wurblets"
    */
+  @Parameter(defaultValue = "${project.build.directory}/generated-sources/wurblets",
+             property = "wurbile.javaDir")
   private File wurbletTargetJavaDir;
 
   /**
    * Directory for the generated wurbley fixed text sources.
-   *
-   * @parameter property="wurbile.textDir"
-   *            default-value="${project.build.directory}/classes"
    */
+  @Parameter(defaultValue = "${project.build.directory}/classes",
+             property = "wurbile.textDir")
   private File wurbletTargetTextDir;
 
   /**
@@ -72,6 +74,7 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
    *
    * @parameter default-value="-1";
    */
+  @Parameter(defaultValue = "-1")
   private Integer indent;
 
 
@@ -82,11 +85,6 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
   protected int totalErrors;
 
 
-  /**
-   * {@inheritDoc}
-   * @throws MojoExecutionException
-   * @throws MojoFailureException
-   */
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
 

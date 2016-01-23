@@ -23,14 +23,13 @@ import org.apache.maven.plugin.logging.Log;
 import org.wurbelizer.misc.Logger;
 
 /**
- * A simple default logger.
- * Prints to stdout.
+ * The maven logger.
  *
  * @author harald
  */
 public class MavenLogger implements Logger {
 
-  private Log log;
+  private final Log log;    // the maven logger
 
   public MavenLogger(Log log) {
     this.log = log;
