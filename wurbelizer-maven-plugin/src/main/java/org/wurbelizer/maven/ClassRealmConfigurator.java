@@ -21,31 +21,32 @@
 package org.wurbelizer.maven;
 
 import org.codehaus.classworlds.ClassRealm;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.configurator.AbstractComponentConfigurator;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
+import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.configurator.ConfigurationListener;
 import org.codehaus.plexus.component.configurator.converters.composite.ObjectWithFieldsConverter;
+import org.codehaus.plexus.component.configurator.converters.lookup.ConverterLookup;
 import org.codehaus.plexus.component.configurator.converters.special.ClassRealmConverter;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
 
 /**
- * A custom configurator for the WurbelMojo.
+ * A custom configurator for the {@link WurbelMojo}.
  * <p>
  * It extracts the classrealm and sets it in the mojo (where it is unavailable).
  *
  * @author harald
- *
- * @plexus.component role="org.codehaus.plexus.component.configurator.ComponentConfigurator"
- *                   role-hint="set-classrealm"
- * @plexus.requirement role="org.codehaus.plexus.component.configurator.converters.lookup.ConverterLookup"
- *                   role-hint="default"
  */
+@Component(role=ComponentConfigurator.class, hint = "set-classrealm")
 public class ClassRealmConfigurator extends AbstractComponentConfigurator {
 
 
   @Override
+  @Requirement(role=ConverterLookup.class, hint = "default")
   public void configureComponent(Object component, PlexusConfiguration configuration,
                                  ExpressionEvaluator expressionEvaluator, ClassRealm containerRealm,
                                  ConfigurationListener listener)
@@ -65,6 +66,5 @@ public class ClassRealmConfigurator extends AbstractComponentConfigurator {
     converter.processConfiguration(converterLookup, component, containerRealm.getClassLoader(),
                                    configuration, expressionEvaluator, listener);
   }
-
 
 }
