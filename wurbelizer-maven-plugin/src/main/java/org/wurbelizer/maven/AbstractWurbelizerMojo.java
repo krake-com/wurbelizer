@@ -34,7 +34,7 @@ import org.wurbelizer.misc.Verbosity;
 import org.wurbelizer.wurbel.WurbelUtilities;
 
 /**
- * A generic wurbelizer mojo.
+ * Base class of wurbelizer mojos.
  *
  * @author harald
  */
