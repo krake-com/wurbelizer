@@ -55,13 +55,17 @@ public class SourceWurbletSubElement extends SourceSubElement {
    * Creates a sub element.
    *
    * @param element the {@link SourceElement} containing the sub element.
+   * @param commentLead the comment lead string at start of line (null if none)
    * @param wurbletBegin text offset for begin of wurblet within whole document
    * @param wurbletEnd text offset for end of wurblet within whole document
    *
    * @throws org.wurbelizer.wurbel.SourceException if creation failed
    */
-  public SourceWurbletSubElement(SourceElement element, int wurbletBegin, int wurbletEnd) throws SourceException {
+  public SourceWurbletSubElement(SourceElement element, String commentLead, int wurbletBegin, int wurbletEnd)
+         throws SourceException {
+
     super(element, element.getSourceDocument().getText().substring(wurbletBegin, wurbletEnd));
+
     this.wurbletBegin = wurbletBegin;
     this.wurbletEnd = wurbletEnd;
 
@@ -87,9 +91,11 @@ public class SourceWurbletSubElement extends SourceSubElement {
 
     // scan for args
     List<String> argList = new ArrayList<>();   // wurblet args (args for wurblet)
-    String currentGuardedName = null;      // guardname in comment block
-    String currentWurbletName = null;      // name of the wurblet in comment block
-    ArgScanner scanner = new ArgScanner(getText().substring(start), props);
+    String currentGuardedName = null;           // guardname in comment block
+    String currentWurbletName = null;           // name of the wurblet in comment block
+    // wurblet text with comment leads removed
+    String wurbletText = filterCommentLeads(getText().substring(start), commentLead);
+    ArgScanner scanner = new ArgScanner(wurbletText, props);
     String arg;
     while ((arg = scanner.next()) != null)  {
       if (currentGuardedName == null) {
@@ -265,6 +271,37 @@ public class SourceWurbletSubElement extends SourceSubElement {
       buf.append(' ').append(arg);
     }
     return buf.toString();
+  }
+
+
+  /**
+   * Removes all comment leads.
+   *
+   * @param text the original text
+   * @param commentLead the comment lead, null if none
+   * @return the stripped text
+   */
+  private String filterCommentLeads(String text, String commentLead) {
+    if (commentLead != null && commentLead.length() > 0) {
+      String line = text;
+      StringBuilder buf = new StringBuilder();
+      while (line != null) {
+        if (line.startsWith(commentLead)) {
+          line = line.substring(commentLead.length());
+        }
+        int ndx = line.indexOf('\n');
+        if (ndx >= 0) {
+          buf.append(line.substring(0, ndx + 1));
+          line = line.substring(ndx + 1);
+        }
+        else {
+          buf.append(line);
+          line = null;
+        }
+      }
+      return buf.toString();
+    }
+    return text;
   }
 
 }

@@ -133,9 +133,39 @@ public class SourceElement {
 
       while ((start = text.indexOf("@wurblet", start)) >= 0)  {
         if (start == 0 || (start > 0 && text.charAt(start-1) != '\\')) {  // if not escaped '\@wurblet'
+          // determine comment lead
+          String commentLead = null;
+          if (type == Type.BLOCK_COMMENT) {
+            // go back to line start
+            int lineNdx = start;
+            while (lineNdx-- >= 0) {
+              if (text.charAt(lineNdx) == '\n') {
+                lineNdx++;
+                commentLead = text.substring(lineNdx, start);
+                // lead must contain only whitespaces and a single asterisk
+                int asterCount = 0;
+                for (int i=0; i < commentLead.length(); i++) {
+                  char c = commentLead.charAt(i);
+                  if (Character.isWhitespace(c)) {
+                    continue;
+                  }
+                  if (c == '*') {
+                    asterCount++;
+                  }
+                  else {
+                    break;
+                  }
+                }
+                if (asterCount != 1) {
+                  commentLead = null;
+                }
+                break;
+              }
+            }
+          }
           // find end which is max up to line-end or concatenated lines via backslash
           int currentEnd = start;
-          for(;;)  {
+          for (;;)  {
             currentEnd = text.indexOf('\n', currentEnd);
             if (currentEnd == -1)  {
               currentEnd = text.length();    // no line terminator (end of file)
@@ -153,7 +183,7 @@ public class SourceElement {
             }
           }
           // create new wurblet directive
-          wurblets.add(new SourceWurbletSubElement(this, begin + start, begin + currentEnd));
+          wurblets.add(new SourceWurbletSubElement(this, commentLead, begin + start, begin + currentEnd));
           start = currentEnd;
         }
         else  {
