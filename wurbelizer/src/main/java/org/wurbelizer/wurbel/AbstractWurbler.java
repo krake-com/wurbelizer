@@ -20,6 +20,7 @@
 package org.wurbelizer.wurbel;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -110,19 +111,15 @@ public abstract class AbstractWurbler implements Wurbler {
       throw new WurbelException("Wurblet '" + className + "' not found");
     }
 
-    // load fixed source
-    ObjectInputStream is = null;
     // make className relative, if absolute
     int ndx = className.lastIndexOf('.');
     String serName = (ndx > 0 ? className.substring(ndx+1) : className) + Constants.FILE_SOURCE_EXTENSION;
-    try {
-      is = new ObjectInputStream(clazz.getResourceAsStream(serName));
-    }
-    catch (Exception ex)  {
-      throw new WurbelException("can't load fixed text object '" + serName + "'", ex);
+    InputStream inp = clazz.getResourceAsStream(serName);
+    if (inp == null) {
+      throw new WurbelException("no such fixed text object '" + serName + "'");
     }
 
-    try {
+    try (ObjectInputStream is = new ObjectInputStream(inp)) {
       WurbletData data = (WurbletData)is.readObject();
       setSource(data.getSource());
       setArgs(data.getArgs());
@@ -130,12 +127,6 @@ public abstract class AbstractWurbler implements Wurbler {
     }
     catch (IOException | ClassNotFoundException | RuntimeException ex) {
       throw new WurbelException("cannot read from fixed text object '" + serName + "'", ex);
-    }
-    finally {
-      try {
-        is.close();
-      }
-      catch (Exception ex) { }
     }
   }
 

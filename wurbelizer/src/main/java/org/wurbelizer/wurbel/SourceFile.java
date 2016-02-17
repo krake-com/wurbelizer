@@ -43,7 +43,7 @@ public class SourceFile {
 
   private static final int BUFSIZE = 1024;
 
-  private String filename;                    // filename
+  private final String filename;              // filename
   private String orgText;                     // original text
   private ByteArrayOutputStream outStream;    // output stream
   private PrintStream printStream;            // the print output stream
@@ -144,37 +144,30 @@ public class SourceFile {
     }
     else  {
       String newText = getNewText();
-      return newText != null && orgText.equals(newText) == false;
+      return newText != null && !orgText.equals(newText);
     }
   }
 
 
   /**
-   * Flushs the file (overwrite existing file or create a new one).
+   * Flushes the file (overwrite existing file or create a new one).
    *
    * @throws WurbelException if flush failed
    */
   public void flush() throws WurbelException {
-    FileWriter fw = null;
-    try {
+    if (outStream != null) {
       File file = new File(filename);
       File parentFile = file.getParentFile();
       if (parentFile != null) {
         parentFile.mkdirs();  // create any missing directories
       }
-      fw = new FileWriter(file);
-      if (outStream != null)  {
+
+      try (FileWriter fw = new FileWriter(file)) {
         fw.write(outStream.toString());
       }
-    }
-    catch (IOException ex) {
-      throw new WurbelException("flushing " + filename + " failed", ex);
-    }
-    finally {
-      try {
-        fw.close();
+      catch (IOException ex) {
+        throw new WurbelException("flushing " + filename + " failed", ex);
       }
-      catch (Exception ex) { }
     }
   }
 

@@ -413,7 +413,7 @@ public class SourceWurbler extends AbstractWurbler {
               loadWurblet(wurbletName, wurbletPath, wurbProps);
 
               // get arguments if not fixed
-              if (isFixedArgs() == false) {
+              if (!isFixedArgs()) {
                 setArgs(wurblet.getWurbletArgs());
               }
               setPrintStream(ps);

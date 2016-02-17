@@ -91,16 +91,16 @@ public class SourceDocument {
     COLLAPSED,
     /** editor fold which is expanded by default */
     EXPANDED
-  };
+  }
 
 
 
 
   private StringBuilder text;               // whole document as one String
-  private String name;                      // the documents name
-  private Properties wurbProps;             // extra wurblet properties
-  private Logger logger;                    // the logger
-  private Verbosity verbosity;              // the verbosity
+  private final String name;                // the documents name
+  private final Properties wurbProps;       // extra wurblet properties
+  private final Logger logger;              // the logger
+  private final Verbosity verbosity;        // the verbosity
   private List<SourceElement> elements;     // List of SourceElements
 
 
@@ -289,7 +289,7 @@ public class SourceDocument {
             if (ndx >= 0) {
               // check that all characters following the ndx are whitespaces
               for (int n=ndx; n < len; n++) {
-                if (Character.isWhitespace(elemText.charAt(n)) == false)  {
+                if (!Character.isWhitespace(elemText.charAt(n)))  {
                   return i; // no: how can that be??
                 }
               }

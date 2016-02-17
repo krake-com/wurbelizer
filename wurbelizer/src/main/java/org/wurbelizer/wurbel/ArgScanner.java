@@ -81,7 +81,7 @@ public class ArgScanner {
     while (ndx < len) {
       char c = str.charAt(ndx);
       if (arg == null)  {
-        if (Character.isWhitespace(c) == false && c != '\\') {
+        if (!Character.isWhitespace(c) && c != '\\') {
           // start found
           arg = new StringBuilder();
           continue;
