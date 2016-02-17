@@ -575,7 +575,7 @@ public class AbstractWurbiler implements Wurbiler {
   private boolean handleImplements(StringTokenizer stok) {
     while (stok.hasMoreTokens()) {
       String iface = stok.nextToken();
-      if (addInterface(iface) == false) {
+      if (!addInterface(iface)) {
         logError("interface  " + iface + " already added at " + srcLocation());
         return false;
       }

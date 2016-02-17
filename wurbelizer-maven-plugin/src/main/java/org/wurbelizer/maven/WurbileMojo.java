@@ -71,8 +71,6 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
 
   /**
    * Sets the indent of the generated Java source.
-   *
-   * @parameter default-value="-1";
    */
   @Parameter(defaultValue = "-1")
   private Integer indent;
@@ -128,12 +126,12 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
 
 
   /**
-   * Wurbile all wurblets in a fileset.
+   * Wurbiles all wurblets in a fileset.
    *
-   * @param fileSet
-   * @throws MojoExecutionException
+   * @param fileSet the set of files
+   * @throws MojoExecutionException if compilation failed
    */
-  private void wurbileFileSet(final FileSet fileSet) throws MojoExecutionException {
+  private void wurbileFileSet(FileSet fileSet) throws MojoExecutionException {
 
     int wurbiledFilesCount  = 0;
     int errorFilesCount     = 0;
@@ -143,7 +141,7 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
       fileSet.setDirectory(wurbletSourceDir.getAbsolutePath());
     }
 
-    String dirName = null;
+    String dirName;
     try {
       dirName = new File(fileSet.getDirectory()).getCanonicalPath();
     }
@@ -196,7 +194,7 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
         }
       }
       catch (IOException | WurbileException | RuntimeException ex) {
-        errorFilesCount++;
+        totalErrors += errorFilesCount + 1;
         throw new MojoExecutionException("unable to wurbelize source " + fileName, ex);
       }
     }
