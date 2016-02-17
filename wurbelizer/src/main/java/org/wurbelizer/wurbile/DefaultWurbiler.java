@@ -157,7 +157,7 @@ public class DefaultWurbiler extends AbstractWurbiler {
 
         writer.write("\n\npublic class " + wurbletName + " extends " + pkgname);
         Collection<String> interfaces = getInterfaces();
-        if (interfaces != null && interfaces.isEmpty() == false) {
+        if (interfaces != null && !interfaces.isEmpty()) {
           writer.write(" implements");
           boolean needComma = false;
           for (String iface: interfaces) {

@@ -267,7 +267,7 @@ public class WurbelMojo extends AbstractWurbelizerMojo {
       fileSet.setDirectory(sourceDir.getAbsolutePath());
     }
 
-    String dirName = null;
+    String dirName;
     try {
       dirName = new File(fileSet.getDirectory()).getCanonicalPath();
     }

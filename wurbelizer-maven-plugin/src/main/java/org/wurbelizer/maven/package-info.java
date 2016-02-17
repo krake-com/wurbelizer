@@ -19,8 +19,8 @@
 /**
  * Maven plugins.
  * <ul>
- * <li>{@link WurbileMojo}: compile wurblets</li>
- * <li>{@link WurbelMojo}: run wurblets</li>
+ * <li>{@link org.wurbelizer.maven.WurbileMojo}: compile wurblets</li>
+ * <li>{@link org.wurbelizer.maven.WurbelMojo}: run wurblets</li>
  * </ul>
  */
 package org.wurbelizer.maven;

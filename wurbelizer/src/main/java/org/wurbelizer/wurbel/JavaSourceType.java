@@ -155,6 +155,12 @@ public class JavaSourceType implements SourceType {
   }
 
 
+  /**
+   * Extracts the annotations.
+   *
+   * @param props the properties
+   * @param code the source code
+   */
   private void extractAnnotations(Properties props, String code) {
     Matcher matcher = ANNOTATION_PATTERN.matcher(code);
     int ndx = 0;
@@ -164,9 +170,10 @@ public class JavaSourceType implements SourceType {
   }
 
   /**
-   * extract the superclass it this is a class
-   * @param props
-   * @param code
+   * Extracts the superclass if this is a class.
+   *
+   * @param props the properties
+   * @param code the source code
    */
   private void extractExtends(Properties props, String code, boolean isInterface) {
     Matcher matcher = EXTENDS_PATTERN.matcher(code);
@@ -190,9 +197,10 @@ public class JavaSourceType implements SourceType {
   }
 
   /**
-   * extract the interfaces this class implements
-   * @param props
-   * @param code
+   * Extracts the interfaces this class implements.
+   *
+   * @param props the properties
+   * @param code the source code
    */
   private void extractImplements(Properties props, String code) {
     Matcher matcher = IMPLEMENTS_PATTERN.matcher(code);

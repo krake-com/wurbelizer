@@ -36,22 +36,22 @@ public interface Wurbler {
   /**
    * file extension for the wurblet source
    */
-  static final String WURBLET_PROPERTIES_EXTENSION = ".wurb";
+  String WURBLET_PROPERTIES_EXTENSION = ".wurb";
 
   /**
    * namespace for the runtime environment
    */
-  static final String PROPSPACE_ENV = "env";
+  String PROPSPACE_ENV = "env";
 
   /**
    * namespace for the wurblet
    */
-  static final String PROPSPACE_WURBLET = "wurblet";
+  String PROPSPACE_WURBLET = "wurblet";
 
   /**
    * extra namespace (used for wurbletProperites in maven poms).
    */
-  static final String PROPSPACE_EXTRA = "extra";
+  String PROPSPACE_EXTRA = "extra";
 
 
 
@@ -59,27 +59,27 @@ public interface Wurbler {
   /**
    * property in wurblet namespace holding the absolute pathname of the source file
    */
-  static final String WURBLET_FILENAME = "filename";
+  String WURBLET_FILENAME = "filename";
 
   /**
    * property in wurblet namespace holding the pathname of the *.wurb-file (additional properties), null if none
    */
-  static final String WURBLET_WURBNAME = "wurbname";
+  String WURBLET_WURBNAME = "wurbname";
 
   /**
    * property in wurblet namespace holding the directory of the source file
    */
-  static final String WURBLET_DIRNAME = "dirname";
+  String WURBLET_DIRNAME = "dirname";
 
   /**
    * property in wurblet namespace holding the guardname of the wurblet anchor (wurblet tag)
    */
-  static final String WURBLET_GUARDNAME = "guardname";
+  String WURBLET_GUARDNAME = "guardname";
 
   /**
    * property in wurblet namespace holding the name of the wurblet
    */
-  static final String WURBLET_WURBLETNAME = "wurbletname";
+  String WURBLET_WURBLETNAME = "wurbletname";
 
 
 

@@ -49,7 +49,7 @@ import org.wurbelizer.misc.Verbosity;
 public class DefaultWurbler extends AbstractWurbler {
 
   private String analyzeDir;      // wurblet extra analyze dir
-  private Logger logger;          // the default logger
+  private final Logger logger;    // the default logger
   private Verbosity verbosity;    // tell what's going on
 
 
