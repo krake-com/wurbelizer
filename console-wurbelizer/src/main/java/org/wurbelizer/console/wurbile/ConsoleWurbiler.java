@@ -16,12 +16,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package org.wurbelizer.wurbile;
+package org.wurbelizer.console.wurbile;
 
 import java.io.File;
 import java.io.IOException;
 import org.wurbelizer.misc.DefaultLogger;
 import org.wurbelizer.misc.Verbosity;
+import org.wurbelizer.wurbile.DefaultWurbiler;
+import org.wurbelizer.wurbile.WurbileException;
 
 /**
  * Invokes the wurbiler from the console.

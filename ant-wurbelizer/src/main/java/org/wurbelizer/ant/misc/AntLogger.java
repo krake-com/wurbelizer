@@ -17,11 +17,12 @@
  */
 
 
-package org.wurbelizer.misc;
+package org.wurbelizer.ant.misc;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import org.apache.tools.ant.Project;
+import org.wurbelizer.misc.Logger;
 
 import static org.apache.tools.ant.Project.MSG_DEBUG;
 import static org.apache.tools.ant.Project.MSG_ERR;

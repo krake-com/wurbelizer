@@ -64,6 +64,10 @@
   </issueManagement>
 
   <distributionManagement>
+    <site>
+      <id>${url}</id>
+      <url>scp://${url}/docs/${project.version}</url>
+    </site>
     <repository>
       <id>${repo.id}</id>
       <name>Release Repository</name>
@@ -159,11 +163,6 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-site-plugin</artifactId>
-          <version>3.4</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
           <version>2.8.2</version>
         </plugin>
@@ -229,6 +228,18 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>findbugs-maven-plugin</artifactId>
           <version>3.0.3</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.5.1</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.apache.maven.wagon</groupId>
+              <artifactId>wagon-ssh</artifactId>
+              <version>2.10</version>
+            </dependency>
+          </dependencies>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -352,6 +363,9 @@
                   <goal>jar</goal>
                 </goals>
                 <configuration>
+                  <bottom>
+                    <![CDATA[<a href="${url}">${project.name}</a> - a lightweight code generator]]>
+                  </bottom>
                   <quiet>true</quiet>
                   <archive>
                     <manifest>
@@ -365,6 +379,13 @@
                 </configuration>
               </execution>
             </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-site-plugin</artifactId>
+            <configuration>
+              <siteDirectory>${project.basedir}/src/site</siteDirectory>
+            </configuration>
           </plugin>
         </plugins>
       </build>

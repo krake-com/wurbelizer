@@ -17,7 +17,7 @@
  */
 
 
-package org.wurbelizer.wurbile;
+package org.wurbelizer.ant.wurbile;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,9 +29,11 @@ import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.MatchingTask;
 import org.apache.tools.ant.types.Path;
-import org.wurbelizer.misc.AntLogger;
+import org.wurbelizer.ant.misc.AntLogger;
 import org.wurbelizer.misc.Constants;
 import org.wurbelizer.misc.Verbosity;
+import org.wurbelizer.wurbile.DefaultWurbiler;
+import org.wurbelizer.wurbile.WurbileException;
 
 
 /**
