@@ -16,11 +16,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package org.wurbelizer.wurbel;
+package org.wurbelizer.console.wurbel;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.regex.Pattern;
+import org.wurbelizer.wurbel.DefaultWurbler;
 
 /**
  * Invokes the wurbler from the console.

@@ -17,6 +17,6 @@
  */
 
 /**
- * Console app to run wurblets.
+ * Console app to compile wurblets.
  */
-package org.wurbelizer.wurbel;
+package org.wurbelizer.console.wurbile;
