@@ -158,7 +158,7 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
 
       try {
 
-        File wurbletFile = new File(dirName + "/" + fileName);
+        File wurbletFile = new File(dirName + File.separator + fileName);
 
         // set per file extra properties (e.g. for include processing)
         WurbelUtilities.getExtraProperties().setProperty("currentDir", wurbletFile.getParent());
