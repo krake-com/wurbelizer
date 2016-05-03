@@ -17,6 +17,6 @@
  */
 
 /**
- * Ant task to run wurblets.
+ * Ant helper classes.
  */
-package org.wurbelizer.wurbel;
+package org.wurbelizer.ant.misc;

@@ -17,6 +17,6 @@
  */
 
 /**
- * Ant task to compile wurblets.
+ * Console app to run wurblets.
  */
-package org.wurbelizer.wurbile;
+package org.wurbelizer.console.wurbel;

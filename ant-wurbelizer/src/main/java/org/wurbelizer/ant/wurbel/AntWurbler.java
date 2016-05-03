@@ -17,7 +17,7 @@
  */
 
 
-package org.wurbelizer.wurbel;
+package org.wurbelizer.ant.wurbel;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,9 +35,16 @@ import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.MatchingTask;
 import org.apache.tools.ant.types.Path;
-import org.wurbelizer.misc.AntLogger;
+import org.wurbelizer.ant.misc.AntLogger;
 import org.wurbelizer.misc.Constants;
 import org.wurbelizer.misc.Verbosity;
+import org.wurbelizer.wurbel.HeapFileFactory;
+import org.wurbelizer.wurbel.JavaSourceType;
+import org.wurbelizer.wurbel.SourceException;
+import org.wurbelizer.wurbel.SourceWurbler;
+import org.wurbelizer.wurbel.WurbelException;
+import org.wurbelizer.wurbel.WurbelUtilities;
+import org.wurbelizer.wurbel.Wurbler;
 
 
 /**
