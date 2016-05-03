@@ -63,11 +63,7 @@ public class ConsoleWurbler {
   private static void globRun(String glob, String[] args) {
     try {
       // get the list of files
-      int ndx = glob.lastIndexOf('/');    // cut last dir
-      if (ndx < 0) {
-        // try windows
-        ndx = glob.lastIndexOf('\\');
-      }
+      int ndx = glob.lastIndexOf(File.separatorChar);    // cut last dir
       File globDir = new File(ndx > 0 ? glob.substring(0, ndx) : ".");
       if (ndx > 0)  {
         glob = glob.substring(ndx + 1);

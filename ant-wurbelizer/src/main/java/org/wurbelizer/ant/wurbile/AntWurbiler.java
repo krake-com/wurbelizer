@@ -317,7 +317,7 @@ public class AntWurbiler extends MatchingTask {
     for (String file1 : files) {
       if (file1.endsWith(Constants.WURBLET_SOURCE_EXTENSION)) {
         // check if file exists
-        File file = new File(srcDir.getPath() + "/" + file1);
+        File file = new File(srcDir.getPath() + File.separator + file1);
         if (file.exists())  {
           wurbFiles.add(file);
         }

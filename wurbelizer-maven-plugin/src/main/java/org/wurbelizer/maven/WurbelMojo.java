@@ -298,7 +298,7 @@ public class WurbelMojo extends AbstractWurbelizerMojo {
       // local copy, because not final
       String fileName = name;
       // path to source file
-      String filePath = dirName + "/" + fileName;
+      String filePath = dirName + File.separator + fileName;
       // path to wurblet property file, if pathname points to a .wurb-file
       String wurbPath = null;
 

@@ -350,10 +350,10 @@ public class AntWurbler extends MatchingTask {
   protected String checkFileName(File srcDir, String fileName) {
     if (fileName.endsWith(Wurbler.WURBLET_PROPERTIES_EXTENSION)) {
       // replace filetype with java
-      return srcDir.getPath() + "/" + fileName.substring(0, fileName.length() - 5) + Constants.JAVA_SOURCE_EXTENSION;
+      return srcDir.getPath() + File.separator + fileName.substring(0, fileName.length() - 5) + Constants.JAVA_SOURCE_EXTENSION;
     }
     else if (fileName.endsWith(Constants.JAVA_SOURCE_EXTENSION)) {
-      return srcDir.getPath() + "/" + fileName;
+      return srcDir.getPath() + File.separator + fileName;
     }
     return null;
   }
