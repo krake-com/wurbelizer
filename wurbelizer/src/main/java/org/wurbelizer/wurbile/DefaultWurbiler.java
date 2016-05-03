@@ -122,7 +122,7 @@ public class DefaultWurbiler extends AbstractWurbiler {
         String javaDirName = outputJavaDir.getAbsolutePath();
         if (getPackageName() != null)  {
           // add the package name
-          javaDirName += "/" + getPackageName().replace('.', '/');
+          javaDirName += File.separator + getPackageName().replace('.', File.separatorChar);
           outputJavaDir = new File(javaDirName);
         }
         // create if it does not exist
@@ -132,7 +132,7 @@ public class DefaultWurbiler extends AbstractWurbiler {
           throw new WurbileException("output directory missing or " + javaDirName + " isn't a directory");
         }
 
-        javaFileName = javaDirName + "/" + wurbletName + ".java";
+        javaFileName = javaDirName + File.separator + wurbletName + ".java";
 
         writer = new PrintWriter(new BufferedWriter(new FileWriter(javaFileName)));
 
@@ -211,7 +211,7 @@ public class DefaultWurbiler extends AbstractWurbiler {
     String textDirName = outputTextDir.getAbsolutePath();
     if (getPackageName() != null)  {
       // add the package name
-      textDirName += "/" + getPackageName().replace('.', '/');
+      textDirName += File.separator + getPackageName().replace('.', File.separatorChar);
       outputTextDir = new File(textDirName);
     }
     // create if it does not exist
@@ -230,7 +230,7 @@ public class DefaultWurbiler extends AbstractWurbiler {
 
     // write fixed text file
     ObjectOutputStream os = null;
-    String textFileName = textDirName + "/" + wurbletName + Constants.FILE_SOURCE_EXTENSION;
+    String textFileName = textDirName + File.separator + wurbletName + Constants.FILE_SOURCE_EXTENSION;
     try {
       os = new ObjectOutputStream(new FileOutputStream(textFileName));
       os.writeObject(new WurbletData(source, getArgs()));
