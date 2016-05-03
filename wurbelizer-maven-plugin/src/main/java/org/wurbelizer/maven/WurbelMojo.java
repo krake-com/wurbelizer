@@ -311,7 +311,7 @@ public class WurbelMojo extends AbstractWurbelizerMojo {
           fileName = filePath.substring(resourceDirName.length() + 1);  // cut including trailing separator
           fileName = fileName.substring(0, fileName.length() - Wurbler.WURBLET_PROPERTIES_EXTENSION.length()); // cut extension
           fileName += Constants.JAVA_SOURCE_EXTENSION;
-          filePath = sourceDir.getAbsolutePath() + "/" + fileName;
+          filePath = sourceDir.getAbsolutePath() + File.separator + fileName;
         }
         else  {
           // from source dir
