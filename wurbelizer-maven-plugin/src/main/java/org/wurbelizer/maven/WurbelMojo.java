@@ -24,18 +24,14 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -45,8 +41,10 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.wurbelizer.misc.Constants;
 import org.wurbelizer.wurbel.HeapFileFactory;
 import org.wurbelizer.wurbel.JavaSourceType;
@@ -122,27 +120,42 @@ public class WurbelMojo extends AbstractWurbelizerMojo {
   private List<WurbletDependency> wurbletDependencies;
 
 
+  /**
+   * The classrealm.
+   * <p>
+   * Retrieved if {@code configurator = "set-classrealm"} is set in the &#064;Mojo annotation.
+   * @see ClassRealmConfigurator
+   */
+  private ClassRealm classRealm;
 
+
+  /**
+   * Sets the classrealm.
+   *
+   * @param classRealm the realm
+   */
+  public void setClassRealm(ClassRealm classRealm) {
+    this.classRealm = classRealm;
+  }
+
+
+  /**
+   * To create wurblet artifacts.
+   */
   @Component
-  private ArtifactFactory artifactFactory;
+  private RepositorySystem repositorySystem;
 
+  /**
+   * To resolve the wurblet artifacts.
+   */
   @Component
   private ArtifactResolver artifactResolver;
 
   /**
-   * The local repository.
+   * The local repository to resolve the artifacts.
    */
   @Parameter(defaultValue = "${localRepository}")
   private ArtifactRepository localRepository;
-
-  /**
-   * The remote repositories.
-   */
-  @Parameter(defaultValue = "${project.remoteArtifactRepositories}")
-  private List<?> remoteRepositories;
-
-  @Component
-  private ArtifactMetadataSource metadataSource;
 
 
 
@@ -477,28 +490,41 @@ public class WurbelMojo extends AbstractWurbelizerMojo {
 
     if (wurbletDependencies != null) {
       Set<Artifact> wurbletArtifacts = new HashSet<>();
-      try {
-        for (Dependency dep : wurbletDependencies) {
-          Artifact artifact = artifactFactory.createArtifactWithClassifier(dep.getGroupId(), dep.getArtifactId(),
-                                                                           dep.getVersion(), dep.getType(), dep.getClassifier());
-          wurbletArtifacts.add(artifact);
+
+      for (Dependency dep : wurbletDependencies) {
+
+        Artifact artifact = repositorySystem.createArtifactWithClassifier(
+                dep.getGroupId(), dep.getArtifactId(), dep.getVersion(), dep.getType(), dep.getClassifier());
+
+        ArtifactResolutionRequest artifactRequest = new ArtifactResolutionRequest()
+                .setArtifact(artifact)
+                .setResolveTransitively(true)
+                .setLocalRepository(localRepository)
+                .setRemoteRepositories(project.getRemoteArtifactRepositories())
+                .setOffline(true)
+                .setForceUpdate(false)
+                .setManagedVersionMap(project.getManagedVersionMap());
+
+        Set<Artifact> resolvedArtifacts = artifactResolver.resolve(artifactRequest).getArtifacts();
+
+        if (resolvedArtifacts.isEmpty()) {
+          getLog().error("cannot resolve artifact " + artifact);
         }
-        wurbletArtifacts = artifactResolver.resolveTransitively(
-                wurbletArtifacts, project.getArtifact(), Collections.EMPTY_MAP,
-                localRepository, remoteRepositories, metadataSource, null).getArtifacts();
-      }
-      catch (ArtifactResolutionException ex) {
-        getLog().warn("cannot resolve dependency", ex);
-      }
-      catch (ArtifactNotFoundException ex) {
-        getLog().warn("dependency not found", ex);
+        else {
+          wurbletArtifacts.addAll(resolvedArtifacts);
+          if (verbosityLevel.isDebug()) {
+            for (Artifact resolvedArtifact: resolvedArtifacts) {
+              getLog().debug("wurblet artifact " + resolvedArtifact + " added");
+            }
+          }
+        }
       }
 
       // add all the jars we just downloaded to the new child realm
       for (Artifact artifact : wurbletArtifacts) {
         try {
           URL url = artifact.getFile().toURI().toURL();
-          classRealm.addConstituent(url);
+          classRealm.addURL(url);
           if (verbosityLevel.isDebug()) {
             getLog().info("added to classpath: " + url);
           }
@@ -509,7 +535,7 @@ public class WurbelMojo extends AbstractWurbelizerMojo {
       }
 
       // make the child realm the ContextClassLoader
-      Thread.currentThread().setContextClassLoader(classRealm.getClassLoader());
+      Thread.currentThread().setContextClassLoader(classRealm);
     }
   }
 

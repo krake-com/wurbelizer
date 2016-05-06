@@ -29,7 +29,6 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.model.fileset.FileSet;
-import org.codehaus.classworlds.ClassRealm;
 import org.wurbelizer.misc.Verbosity;
 import org.wurbelizer.wurbel.WurbelUtilities;
 
@@ -73,26 +72,6 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
    * List of resource dirs.
    */
   protected List<String> resourceDirs;
-
-
-
-  /**
-   * The classrealm.
-   * <p>
-   * Retrieved if &#64;configurator set-classrealm is set in the class doc of the mojo.
-   */
-  protected ClassRealm classRealm;
-
-
-  /**
-   * Sets the classrealm.
-   *
-   * @param classRealm the realm
-   */
-  public void setClassRealm(ClassRealm classRealm) {
-    this.classRealm = classRealm;
-  }
-
 
 
 

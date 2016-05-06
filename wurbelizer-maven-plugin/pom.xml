@@ -26,7 +26,7 @@
     <!-- plugin dependencies -->
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-project</artifactId>
+      <artifactId>maven-plugin-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
