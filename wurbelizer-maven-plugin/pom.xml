@@ -16,6 +16,10 @@
   <description>Maven Plugin for Wurbelizer</description>
   <url>http://www.wurbelizer.org</url>
 
+  <properties>
+    <rootBasedir>${project.parent.basedir}</rootBasedir>
+  </properties>
+
   <dependencies>
     <!-- dependant modules -->
     <dependency>

@@ -16,6 +16,10 @@
   <description>Some classes to run the wurbelizer from the console.</description>
   <url>http://www.wurbelizer.org</url>
 
+  <properties>
+    <rootBasedir>${project.parent.basedir}</rootBasedir>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>

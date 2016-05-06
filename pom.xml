@@ -43,6 +43,7 @@
   </modules>
 
   <properties>
+    <rootBasedir>${project.basedir}</rootBasedir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -234,7 +235,7 @@
           <artifactId>maven-site-plugin</artifactId>
           <version>3.5.1</version>
           <configuration>
-            <siteDirectory>${project.basedir}/src/site</siteDirectory>
+            <siteDirectory>${rootBasedir}/src/site</siteDirectory>
           </configuration>
           <dependencies>
             <dependency>
@@ -243,6 +244,26 @@
               <version>2.10</version>
             </dependency>
           </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.6</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>2.10</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>2.5.3</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <version>1.8</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -318,6 +339,7 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.10.3</version>
         <configuration>
+          <stylesheetfile>${rootBasedir}/src/site/resources/css/apidocs.css</stylesheetfile>
           <bottom><![CDATA[<a href="${project.url}">Wurbelizer</a> - a lightweight code generator]]></bottom>
         </configuration>
       </plugin>
@@ -333,6 +355,21 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
         <version>2.9</version>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>versions-maven-plugin</artifactId>
+        <version>2.2</version>
+        <reportSets>
+          <reportSet>
+            <id>versions</id>
+            <reports>
+              <report>dependency-updates-report</report>
+              <report>plugin-updates-report</report>
+              <report>property-updates-report</report>
+            </reports>
+          </reportSet>
+        </reportSets>
       </plugin>
     </plugins>
   </reporting>
@@ -377,6 +414,7 @@
                   <goal>jar</goal>
                 </goals>
                 <configuration>
+                  <stylesheetfile>${rootBasedir}/src/site/resources/css/apidocs.css</stylesheetfile>
                   <bottom><![CDATA[<a href="${project.url}">Wurbelizer</a> - a lightweight code generator]]></bottom>
                   <quiet>true</quiet>
                   <archive>

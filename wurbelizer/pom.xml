@@ -17,8 +17,9 @@
   <url>http://www.wurbelizer.org</url>
 
   <properties>
-   <timestamp>${maven.build.timestamp}</timestamp>
-   <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
+    <rootBasedir>${project.parent.basedir}</rootBasedir>
+    <timestamp>${maven.build.timestamp}</timestamp>
+    <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
   </properties>
 
   <build>
