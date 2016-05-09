@@ -34,7 +34,7 @@ import java.util.StringTokenizer;
 import java.util.TreeSet;
 import org.wurbelizer.misc.Logger;
 import org.wurbelizer.misc.Verbosity;
-import org.wurbelizer.wurbel.WurbelUtilities;
+import org.wurbelizer.wurbel.WurbelHelper;
 
 
 /**
@@ -48,7 +48,7 @@ import org.wurbelizer.wurbel.WurbelUtilities;
  * when running the wurblet.<p>
  *
  * By default the input stream starts at the source-level.
- * The backslash is recognized as wurblet-level is entered via {@code &#64;[} and left via {@code ]&#64;}.
+ * The backslash is recognized as wurblet-level is entered via {@code '@['} and left via {@code ']@'}.
  * Wurblet-levels again may contain other wurblet-levels, i.e. they may be nested
  * resulting in a wurblet generating a wurblet which in turn generates java source
  * or even another wurblet.<p>
@@ -89,13 +89,32 @@ import org.wurbelizer.wurbel.WurbelUtilities;
  *
  * {@code @{to <outputstream>}@}: sets the output stream (this is the stream the wurblet
  * will write the generated code to, not the output writer of the compiled wurblet!).
- * {@code @{to out}} resets to the default stream, which is equivalent to {@code @{to}}.
+ * {@code @{to out}} resets to the default stream, which is equivalent to {@code @{to}}.<p>
  *
+ * {@code @{comment ..... }@}: adds the text to the wurblet comment
  *
  * @author harald
  */
 
-public class AbstractWurbiler implements Wurbiler {
+public abstract class AbstractWurbiler implements Wurbiler {
+
+  private static final String OUTNAME      = "out";      // default for outName
+  private static final int WURBLET_NONE    = 0;          // wurblet mode not entered yet
+  private static final int WURBLET_BLOCK   = '[';        // in wurblet block
+  private static final int WURBLET_OBJECT  = '(';        // in wurblet object
+  private static final int WURBLET_COMMAND = '{';        // in wurblet command
+
+  private static final String CMD_INCLUDE     = "include";
+  private static final String CMD_PACKAGE     = "package";
+  private static final String CMD_EXTENDS     = "extends";
+  private static final String CMD_IMPLEMENTS  = "implements";
+  private static final String CMD_IMPORT      = "import";
+  private static final String CMD_INDENT      = "indent";
+  private static final String CMD_TO          = "to";
+  private static final String CMD_ARGS        = "args";
+  private static final String CMD_COMMENT     = "comment";
+
+
 
   private String        packageName;        // package name from @{package}@ command
   private Set<String>   imports;            // all imports form @{import}@ commands
@@ -103,6 +122,7 @@ public class AbstractWurbiler implements Wurbiler {
   private Set<String>   interfaces;         // collection of @{implements}@, null = default
   private String[]      args;               // wurblet arguments from @{args ...}@ command, null = default,
                                             // i.e. from command line, @wurblet, etc...
+  private StringBuilder comment;            // the wurblet comment, null if none
 
   private final List<NestedReader> readers; // Reader list (active reader is always at start of list)
   private final Set<String> paths;          // nested paths to detect include-loops
@@ -125,21 +145,6 @@ public class AbstractWurbiler implements Wurbiler {
   private int           wurbletMode;        // current or previous wurblet mode: one of WURBLET_...
 
 
-  private static final String OUTNAME      = "out";      // default for outName
-  private static final int WURBLET_NONE    = 0;          // wurblet mode not entered yet
-  private static final int WURBLET_BLOCK   = '[';        // in wurblet block
-  private static final int WURBLET_OBJECT  = '(';        // in wurblet object
-  private static final int WURBLET_COMMAND = '{';        // in wurblet command
-
-  private static final String CMD_INCLUDE     = "include";
-  private static final String CMD_PACKAGE     = "package";
-  private static final String CMD_EXTENDS     = "extends";
-  private static final String CMD_IMPLEMENTS  = "implements";
-  private static final String CMD_IMPORT      = "import";
-  private static final String CMD_INDENT      = "indent";
-  private static final String CMD_TO          = "to";
-  private static final String CMD_ARGS        = "args";
-
 
   /**
    * Creates a compiler instance.
@@ -161,10 +166,7 @@ public class AbstractWurbiler implements Wurbiler {
     setOutName();
     setAutoIndent(true);
     setIndent(0);
-    setParentClass(null);
-    setPackageName(null);
     setImports(null);
-    setArgs(null);
   }
 
 
@@ -202,7 +204,8 @@ public class AbstractWurbiler implements Wurbiler {
       char          c           = 0;                    // next character, -1 if EOF
       boolean       inWurblet   = false;                // true if in wurblet level
       int           subWurblets = 0;                    // number of sub-wurblet levels (nested wurblet)
-      StringBuilder wurbletBuf  = new StringBuilder();  // if WURBLET_OBJECT or WURBLET_COMMAND: buffer for text in between @-clause
+      StringBuilder wurbletBuf  = new StringBuilder();  // if WURBLET_OBJECT or WURBLET_COMMAND:
+                                                        // buffer for text in between @-clause
       boolean       dontRead    = false;                // true if don't read from input stream (once)
       boolean       blockStart  = false;                // true = next char is first in wurblet-block
 
@@ -332,7 +335,7 @@ public class AbstractWurbiler implements Wurbiler {
                     out.write(indentStr + outName + ".print(" + wurbletBuf.toString() + ");\n");
                   }
                   else if (wurbletMode == WURBLET_COMMAND) {
-                    StringTokenizer stok = new StringTokenizer(wurbletBuf.toString(), " \t");
+                    StringTokenizer stok = new StringTokenizer(wurbletBuf.toString(), " \t\n\r");
                     if (stok.hasMoreTokens()) {
                       String cmd = stok.nextToken().toLowerCase();
                       boolean cmdOk;
@@ -368,6 +371,10 @@ public class AbstractWurbiler implements Wurbiler {
                         case CMD_ARGS:
                           // set the args command
                           cmdOk = handleArgs(stok);
+                          break;
+                        case CMD_COMMENT:
+                          // add wurblet comment
+                          cmdOk = handleComment(wurbletBuf.toString());
                           break;
                         default:
                           logError("unknown wurblet-command '" + cmd + "' at " + srcLocation());
@@ -491,7 +498,7 @@ public class AbstractWurbiler implements Wurbiler {
   private boolean handleInclude(StringTokenizer stok) {
     if (stok.hasMoreTokens()) {
       try {
-        String path = WurbelUtilities.translateVariables(stok.nextToken(), null);
+        String path = WurbelHelper.translateVariables(stok.nextToken(), null);
         if (paths.add(path))  {
           in = new NestedReader(path);
           readers.add(0, in);
@@ -632,6 +639,28 @@ public class AbstractWurbiler implements Wurbiler {
       args = null;
     }
     return true;
+  }
+
+
+  /**
+   * Handles the comment command.
+   *
+   * @param stok
+   * @return true if ok, false if some error
+   */
+  private boolean handleComment(String buf) {
+    int ndx = buf.indexOf(CMD_COMMENT);
+    if (ndx >= 0) {
+      String cmt = buf.substring(ndx + CMD_COMMENT.length());
+      if (comment == null) {
+        comment = new StringBuilder();
+      }
+      comment.append(cmt).append('\n');
+      logger.info("{" + CMD_COMMENT + " " + cmt + "}");
+      return true;
+    }
+    logError("comment block garbled at " + srcLocation());
+    return false;
   }
 
 
@@ -1072,6 +1101,26 @@ public class AbstractWurbiler implements Wurbiler {
   @Override
   public void setArgs(String[] args) {
     this.args = args;
+  }
+
+  /**
+   * Gets the wurblet comment.
+   *
+   * @return the comment, null if none
+   */
+  @Override
+  public String getComment() {
+    return comment == null ? null : comment.toString();
+  }
+
+  /**
+   * Sets the wurblet comment.
+   *
+   * @param comment the comment, null if none
+   */
+  @Override
+  public void setComment(String comment) {
+    this.comment = comment == null ? null : new StringBuilder(comment);
   }
 
 }

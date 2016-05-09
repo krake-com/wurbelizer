@@ -30,10 +30,10 @@ import java.util.StringTokenizer;
 
 
 /**
- * Utility methods for the Wurbelizer.
+ * Helper methods for the Wurbelizer.
  */
 
-public class WurbelUtilities {
+public class WurbelHelper {
 
   private static final String LINE_DELIM = "\n";
   private static Properties envProperties   = null;     // properties from environment
@@ -377,7 +377,7 @@ public class WurbelUtilities {
 
 
 
-  private WurbelUtilities() {
+  private WurbelHelper() {
   }
 
 }

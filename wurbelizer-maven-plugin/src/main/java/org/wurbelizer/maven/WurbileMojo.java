@@ -29,9 +29,10 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
 import org.wurbelizer.misc.Constants;
-import org.wurbelizer.wurbel.WurbelUtilities;
-import org.wurbelizer.wurbile.DefaultWurbiler;
+import org.wurbelizer.wurbel.WurbelHelper;
+import org.wurbelizer.wurbile.SourceWurbiler;
 import org.wurbelizer.wurbile.WurbileException;
+import org.wurbelizer.wurbile.Wurbiler;
 
 /**
  * Wurbile Wurblets.<br>
@@ -161,11 +162,11 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
         File wurbletFile = new File(dirName + File.separator + fileName);
 
         // set per file extra properties (e.g. for include processing)
-        WurbelUtilities.getExtraProperties().setProperty("currentDir", wurbletFile.getParent());
-        WurbelUtilities.getExtraProperties().setProperty("currentFile", wurbletFile.getName());
+        WurbelHelper.getExtraProperties().setProperty("currentDir", wurbletFile.getParent());
+        WurbelHelper.getExtraProperties().setProperty("currentFile", wurbletFile.getName());
 
         // create wurbiler
-        DefaultWurbiler wurbiler = new DefaultWurbiler(
+        Wurbiler wurbiler = new SourceWurbiler(
                 wurbletFile, wurbletTargetJavaDir, wurbletTargetTextDir, new MavenLogger(getLog()), verbosityLevel);
 
         // set options

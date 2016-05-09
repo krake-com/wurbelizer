@@ -29,7 +29,7 @@ import org.wurbelizer.wurbel.Wurbler;
 public interface Wurblet {
 
   /**
-   * Sets the container.
+   * Sets the container.<br>
    * The wurbler attaches the wurblet before invoking the run-method
    * of the wurblet.
    *
@@ -39,7 +39,7 @@ public interface Wurblet {
 
 
   /**
-   * Gets the current container.
+   * Gets the current container.<br>
    * Wurblets use this method to access the container's utility methods.
    *
    * @return the container, null if detached

@@ -35,7 +35,7 @@ import org.wurbelizer.misc.Verbosity;
  * Because ANT does not provide a foreach "out of the box", the main-method supports
  * file lists as follows:
  * <pre>
- * java org.wurbelizer.DefaultWurbler --glob="blahdir/.*\.map$" &#64;
+ java org.wurbelizer.DefaultWurbler --glob="blahdir/.*\.map$" &#64;
  * </pre>
  * The &#64; will be replaced by the filename and the wurblet is invoked for each such file.
  * Note that it's not a real globbing, but uses regex.
@@ -45,7 +45,6 @@ import org.wurbelizer.misc.Verbosity;
  *
  * @author harald
  */
-
 public class DefaultWurbler extends AbstractWurbler {
 
   private String analyzeDir;      // wurblet extra analyze dir

@@ -22,8 +22,9 @@ import java.io.File;
 import java.io.IOException;
 import org.wurbelizer.misc.DefaultLogger;
 import org.wurbelizer.misc.Verbosity;
-import org.wurbelizer.wurbile.DefaultWurbiler;
+import org.wurbelizer.wurbile.SourceWurbiler;
 import org.wurbelizer.wurbile.WurbileException;
+import org.wurbelizer.wurbile.Wurbiler;
 
 /**
  * Invokes the wurbiler from the console.
@@ -96,7 +97,7 @@ public class ConsoleWurbiler {
         dirname = ".";
       }
       File outputDir = new File(dirname);
-      DefaultWurbiler wurbiler = new DefaultWurbiler(wrblFile, outputDir, outputDir, new DefaultLogger(), verbosity);
+      Wurbiler wurbiler = new SourceWurbiler(wrblFile, outputDir, outputDir, new DefaultLogger(), verbosity);
       // set options
       if (indent != -1)         {
         wurbiler.setIndent(indent);

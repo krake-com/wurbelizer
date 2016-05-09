@@ -51,7 +51,7 @@ import org.wurbelizer.wurbel.JavaSourceType;
 import org.wurbelizer.wurbel.SourceException;
 import org.wurbelizer.wurbel.SourceWurbler;
 import org.wurbelizer.wurbel.WurbelException;
-import org.wurbelizer.wurbel.WurbelUtilities;
+import org.wurbelizer.wurbel.WurbelHelper;
 import org.wurbelizer.wurbel.Wurbler;
 
 /**
@@ -341,8 +341,8 @@ public class WurbelMojo extends AbstractWurbelizerMojo {
 
           // set per file extra properties
           File file = new File(filePath);
-          WurbelUtilities.getExtraProperties().setProperty("currentDir", file.getParent());
-          WurbelUtilities.getExtraProperties().setProperty("currentFile", file.getName());
+          WurbelHelper.getExtraProperties().setProperty("currentDir", file.getParent());
+          WurbelHelper.getExtraProperties().setProperty("currentFile", file.getName());
 
           SourceWurbler sourceWurbler = new SourceWurbler(
                   filePath,
@@ -448,7 +448,7 @@ public class WurbelMojo extends AbstractWurbelizerMojo {
         if (key instanceof String)  {
           Object value = wurbletProperties.get(key);
           if (value instanceof String)  {
-            String strValue = WurbelUtilities.translateVariables((String) value, props);
+            String strValue = WurbelHelper.translateVariables((String) value, props);
             props.setProperty((String) key, strValue);
           }
         }

@@ -39,11 +39,10 @@ import org.wurbelizer.wurblet.WurbletData;
  *
  * @author harald
  */
-
 public abstract class AbstractWurbler implements Wurbler {
 
   private Wurblet wurblet;            // current wurblet
-  private List<Wurblet> wurblets;     // all wurblets invoked during the last wurbel pass
+  private List<Wurblet> wurblets;     // all wurblets invoked during the last run pass
   private Properties otherProps;      // wurblet specific properties
   private String[] source;            // the fixed source
   private PrintStream out;            // the output stream for generated code
@@ -302,10 +301,10 @@ public abstract class AbstractWurbler implements Wurbler {
       return System.getProperties();
     }
     else if (nameSpace.equals(PROPSPACE_ENV))  {
-      return WurbelUtilities.getEnvProperties();
+      return WurbelHelper.getEnvProperties();
     }
     else if (nameSpace.equals(PROPSPACE_EXTRA))  {
-      return WurbelUtilities.getExtraProperties();
+      return WurbelHelper.getExtraProperties();
     }
     else if (nameSpace.equals(PROPSPACE_WURBLET)) {
       return otherProps;

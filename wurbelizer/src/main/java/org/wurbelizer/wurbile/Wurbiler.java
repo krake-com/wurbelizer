@@ -205,4 +205,18 @@ public interface Wurbiler {
    */
   void setArgs(String[] args);
 
+  /**
+   * Gets the wurblet comment.
+   *
+   * @return the comment, null if none
+   */
+  String getComment();
+
+  /**
+   * Sets the wurblet comment.
+   *
+   * @param comment the comment, null if none
+   */
+  void setComment(String comment);
+
 }

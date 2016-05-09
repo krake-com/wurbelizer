@@ -43,7 +43,7 @@ import org.wurbelizer.wurbel.JavaSourceType;
 import org.wurbelizer.wurbel.SourceException;
 import org.wurbelizer.wurbel.SourceWurbler;
 import org.wurbelizer.wurbel.WurbelException;
-import org.wurbelizer.wurbel.WurbelUtilities;
+import org.wurbelizer.wurbel.WurbelHelper;
 import org.wurbelizer.wurbel.Wurbler;
 
 
@@ -326,7 +326,7 @@ public class AntWurbler extends MatchingTask {
         }
       }
     }
-    WurbelUtilities.setExtraProperties(props);
+    WurbelHelper.setExtraProperties(props);
   }
 
 
@@ -469,7 +469,7 @@ public class AntWurbler extends MatchingTask {
                     @Override
                     public String getProperty(String nameSpace, String key) {
                       if (nameSpace != null && nameSpace.equals("ant")) {
-                        return WurbelUtilities.getExtraProperties().getProperty(key);
+                        return WurbelHelper.getExtraProperties().getProperty(key);
                       }
                       return super.getProperty(nameSpace, key);
                     }

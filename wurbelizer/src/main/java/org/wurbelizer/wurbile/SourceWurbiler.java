@@ -39,29 +39,11 @@ import org.wurbelizer.wurblet.WurbletData;
 
 
 /**
- * Default implementation of a wurblet compiler.<p>
- *
- * This wurbiler can be used as a console application (provided for testing purposes only)
- * or from within ant, as implemented in AntWurbiler.<p>
- *
- * It takes the wurbelizable-source as its first argument and
- * creates a java output file together with the serialized fixed
- * source file.
- *
- * Example:
- * <pre>
- * java org.wurbelizer.DefaultWurbiler Test.wrbl
- * </pre>
- * (the extension {@code .wrbl} may be omitted)<p>
- *
- * Creates:
- * {@code Test.java}, the wurblet source ready to be compiled by javac, and
- * {@code Test.ser}, the fixed source.
+ * Default implementation of a wurblet compiler.
  *
  * @author harald
  */
-
-public class DefaultWurbiler extends AbstractWurbiler {
+public class SourceWurbiler extends AbstractWurbiler {
 
   private final File wrblFile;        // input file
   private File outputJavaDir;         // output directory where to put .java-files
@@ -79,7 +61,9 @@ public class DefaultWurbiler extends AbstractWurbiler {
    * @param verbosity the verbosity
    * @throws java.io.FileNotFoundException if file not found
    */
-  public DefaultWurbiler(File wrblFile, File outputJavaDir, File outputTextDir, Logger logger, Verbosity verbosity) throws IOException {
+  public SourceWurbiler(File wrblFile, File outputJavaDir, File outputTextDir, Logger logger, Verbosity verbosity)
+         throws IOException {
+
     super(Files.newBufferedReader(wrblFile.toPath()), wrblFile.getName(), new StringWriter(), null);
     this.wrblFile  = wrblFile;
     this.outputJavaDir = outputJavaDir;
@@ -115,9 +99,7 @@ public class DefaultWurbiler extends AbstractWurbiler {
 
     try {
 
-      // write wurbelizable code and fill tempWriter
       try (Writer tempWriter = getWriter()) {
-        // write wurbelizable code and fill tempWriter
 
         String javaDirName = outputJavaDir.getAbsolutePath();
         if (getPackageName() != null)  {
@@ -155,7 +137,10 @@ public class DefaultWurbiler extends AbstractWurbiler {
           pkgname = "AbstractWurblet";
         }
 
-        writer.write("\n\npublic class " + wurbletName + " extends " + pkgname);
+        writer.write("\n");
+        writer.write(WurbileHelper.toCommentBlock(getComment(), 0));
+
+        writer.write("public class " + wurbletName + " extends " + pkgname);
         Collection<String> interfaces = getInterfaces();
         if (interfaces != null && !interfaces.isEmpty()) {
           writer.write(" implements");
@@ -176,20 +161,24 @@ public class DefaultWurbiler extends AbstractWurbiler {
         writer.write("  public void run() throws WurbelException {\n");
         writer.write("    super.run();\n");
         writer.write("    try {\n");
-        writer.write("      // ----------------- begin wurblet code -----------------\n\n");
+        writer.write("      wurbel();\n");
+        writer.write("    }\n");
+        writer.write("    catch (Throwable t) {\n");
+        writer.write("      if (t instanceof WurbelException) {\n");
+        writer.write("        throw (WurbelException) t;\n");
+        writer.write("      }\n");
+        writer.write("      throw new WurbelException(\"wurblet \" + this + \" failed\", t);\n");
+        writer.write("    }\n");
+        writer.write("  }\n\n");
+        writer.write("  // ----------------- begin wurblet code -----------------\n\n");
 
-        // write wurbelizable code and fill tempWriter
+        // write wurblet code
         writer.write(tempWriter.toString());
       }
 
       // write closing
       writer.write("\n");
-      writer.write("      // ----------------- end wurblet code -----------------\n");
-      writer.write("    }\n");
-      writer.write("    catch (Exception ex) {\n");
-      writer.write("      throw new WurbelException(\"wurblet \" + this + \" failed\", ex);\n");
-      writer.write("    }\n");
-      writer.write("  }\n");
+      writer.write("  // ----------------- end wurblet code -----------------\n");
       writer.write("}\n");
     }
     catch (IOException ex) {
@@ -229,22 +218,12 @@ public class DefaultWurbiler extends AbstractWurbiler {
     }
 
     // write fixed text file
-    ObjectOutputStream os = null;
     String textFileName = textDirName + File.separator + wurbletName + Constants.FILE_SOURCE_EXTENSION;
-    try {
-      os = new ObjectOutputStream(new FileOutputStream(textFileName));
+    try (ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(textFileName))) {
       os.writeObject(new WurbletData(source, getArgs()));
     }
     catch (IOException ex) {
       throw new WurbileException("cannot generate fixed text file " + textFileName, ex);
-    }
-    finally {
-      try {
-        if (os != null) {
-          os.close();
-        }
-      }
-      catch (Exception ex) { }
     }
 
     return errors;

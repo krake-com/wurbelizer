@@ -183,7 +183,7 @@ public class SourceWurbler extends AbstractWurbler {
     guardType = SourceElement.Type.GUARDED_OTHER;    // default type
 
     // settings from extra properties
-    Properties extraProps = WurbelUtilities.getExtraProperties();
+    Properties extraProps = WurbelHelper.getExtraProperties();
     if (extraProps != null) {
       setGuardType(extraProps.getProperty(PROPERTY_GUARDTYPE));
       setDefaultFoldType(extraProps.getProperty(PROPERTY_FOLDTYPE));
@@ -313,8 +313,8 @@ public class SourceWurbler extends AbstractWurbler {
 
         if (element.containsHereDocuments())  {
           for (SourceHereSubElement hereDoc: element.getHereDocuments()) {
-            String hereName = WurbelUtilities.translateVariables(hereDoc.getName(), wurbProps);
-            String hereText = WurbelUtilities.translateVariables(hereDoc.getText(), wurbProps);
+            String hereName = WurbelHelper.translateVariables(hereDoc.getName(), wurbProps);
+            String hereText = WurbelHelper.translateVariables(hereDoc.getText(), wurbProps);
             if (hereName.charAt(0) == '.') {
               // in memory document (only in first loop!)
               if (loopCount == 1) {
@@ -335,8 +335,8 @@ public class SourceWurbler extends AbstractWurbler {
                 // check that both have the same origin, if origin info provided
                 if (orgHereText != null && orgHereText.startsWith(Constants.ORIGIN_INFO_LEAD) &&
                     hereText.startsWith(Constants.ORIGIN_INFO_LEAD)) {
-                  String orgHereInfo = WurbelUtilities.firstLine(orgHereText);
-                  String hereInfo = WurbelUtilities.firstLine(hereText);
+                  String orgHereInfo = WurbelHelper.firstLine(orgHereText);
+                  String hereInfo = WurbelHelper.firstLine(hereText);
                   if (!orgHereInfo.equals(hereInfo)) {
                     throw new WurbelException("heredoc '" + hereName + "' created from more than one sources: " +
                                    orgHereInfo.substring(2) + " != " + hereInfo.substring(2));
@@ -456,7 +456,7 @@ public class SourceWurbler extends AbstractWurbler {
             String srcText = os.toString();
 
             // add fixed indent if option set
-            srcText = WurbelUtilities.indent(srcText, indent);
+            srcText = WurbelHelper.indent(srcText, indent);
 
             // replace and if no success delete
             if (wurblet.isInline()) {
@@ -611,7 +611,7 @@ public class SourceWurbler extends AbstractWurbler {
    * process property line
    */
   private void processPropertyLine(String line) {
-    String key = WurbelUtilities.scanPropertyLine(line, wurbProps);
+    String key = WurbelHelper.scanPropertyLine(line, wurbProps);
     if (key != null && key.equals(PROPERTY_GUARDTYPE)) {
       // overwrite guardtype from wurbfile
       setGuardType(wurbProps.getProperty(PROPERTY_GUARDTYPE));

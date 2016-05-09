@@ -21,7 +21,6 @@ package org.wurbelizer.console.wurbel;
 import java.io.File;
 import java.util.Arrays;
 import java.util.regex.Pattern;
-import org.wurbelizer.wurbel.DefaultWurbler;
 
 /**
  * Invokes the wurbler from the console.
@@ -47,7 +46,7 @@ public class ConsoleWurbler {
    */
   private static void run(String[] args) {
     try {
-      new DefaultWurbler(args).runWurblet();
+      new org.wurbelizer.wurbel.DefaultWurbler(args).runWurblet();
     }
     catch (Exception ex)  {
       System.err.println("/*");

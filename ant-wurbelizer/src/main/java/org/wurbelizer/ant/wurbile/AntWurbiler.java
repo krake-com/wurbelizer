@@ -32,12 +32,13 @@ import org.apache.tools.ant.types.Path;
 import org.wurbelizer.ant.misc.AntLogger;
 import org.wurbelizer.misc.Constants;
 import org.wurbelizer.misc.Verbosity;
-import org.wurbelizer.wurbile.DefaultWurbiler;
+import org.wurbelizer.wurbile.SourceWurbiler;
 import org.wurbelizer.wurbile.WurbileException;
+import org.wurbelizer.wurbile.Wurbiler;
 
 
 /**
- * Ant Task to invoke the DefaultWurbiler.<br>
+ * Ant Task to invoke the SourceWurbiler.<br>
  * This task will recursively scan the sourcedir looking
  * for *.wrbl-files to wurbile.<p>
  *
@@ -378,7 +379,7 @@ public class AntWurbiler extends MatchingTask {
         }
 
         // create wurbiler
-        DefaultWurbiler wurbiler = new DefaultWurbiler(file, outputDir, outputDir, new AntLogger(getProject()), verbosity);
+        Wurbiler wurbiler = new SourceWurbiler(file, outputDir, outputDir, new AntLogger(getProject()), verbosity);
 
         // set options
         if (indent != -1)         {

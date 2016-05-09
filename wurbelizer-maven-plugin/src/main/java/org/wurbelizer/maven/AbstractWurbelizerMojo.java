@@ -30,7 +30,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.wurbelizer.misc.Verbosity;
-import org.wurbelizer.wurbel.WurbelUtilities;
+import org.wurbelizer.wurbel.WurbelHelper;
 
 /**
  * Base class of wurbelizer mojos.
@@ -189,7 +189,7 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
    */
   protected void exportExtraProperties(Properties props) {
 
-    WurbelUtilities.setExtraProperties(props);
+    WurbelHelper.setExtraProperties(props);
 
     if (verbosityLevel.isDebug()) {
       Enumeration<?> keys = props.keys();
