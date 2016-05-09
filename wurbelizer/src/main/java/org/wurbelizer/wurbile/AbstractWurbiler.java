@@ -656,7 +656,9 @@ public abstract class AbstractWurbiler implements Wurbiler {
         comment = new StringBuilder();
       }
       comment.append(cmt).append('\n');
-      logger.info("{" + CMD_COMMENT + " " + cmt + "}");
+      if (verbosity.isDebug()) {
+        logger.info("{" + CMD_COMMENT + " " + cmt + "}");
+      }
       return true;
     }
     logError("comment block garbled at " + srcLocation());
