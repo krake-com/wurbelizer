@@ -243,7 +243,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
                 out.write(nc);
               }
               else  {
-                wurbletBuf.append(c);
+                wurbletBuf.append(nc);
               }
             }
             else        {
