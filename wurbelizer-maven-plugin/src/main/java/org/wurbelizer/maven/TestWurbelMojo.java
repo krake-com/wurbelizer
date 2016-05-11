@@ -1,0 +1,56 @@
+/**
+ * Wurbelizer - http://www.wurbelizer.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
+
+package org.wurbelizer.maven;
+
+import java.io.File;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
+
+/**
+ * Wurbel test sources.<br>
+ * Scans the test sources for &#64;wurblet anchors and executes the wurblets.
+ * The generated code from the wurblets is merged into the test sources.
+ *
+ * @author harald
+ */
+@Mojo(name = "test-wurbel",
+      defaultPhase = LifecyclePhase.PROCESS_TEST_SOURCES,
+      configurator = "set-classrealm",
+      requiresDependencyResolution = ResolutionScope.TEST)
+public class TestWurbelMojo extends AbstractWurbelMojo {
+
+  /**
+   * Directory holding the sources to be wurbelized.<br>
+   * Defaults to all java test sources of the current project.
+   * If this is not desired, filesets must be used.
+   */
+  @Parameter(defaultValue = "${project.build.testSourceDirectory}",
+             property = "wurbel.testSourceDir",
+             required = true)
+  private File sourceDir;
+
+  @Override
+  public File getSourceDir() {
+    return sourceDir;
+  }
+
+}
