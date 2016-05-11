@@ -43,6 +43,8 @@ import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.wurbelizer.misc.Constants;
+import org.wurbelizer.misc.Logger;
+import org.wurbelizer.misc.Verbosity;
 import org.wurbelizer.wurbel.HeapFileFactory;
 import org.wurbelizer.wurbel.JavaSourceType;
 import org.wurbelizer.wurbel.SourceException;
@@ -251,6 +253,31 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
 
 
   /**
+   * Creates a {@link Wurbler}.
+   *
+   * @param filename the full pathname of the java-file
+   * @param wurbFilename optional wurblet properties file, null to check in same dir
+   * @param wurbletPath the list of package names to load wurblets from (if wurblet name is not absolute)
+   * @param analyzeDir the list of directories wurblets load extra information from (usually from apt-runs)
+   * @param verbosity the verbosity
+   * @param logger the logger (can also be used by the wurblets)
+   * @param errorsSoFar a set of errors logged so far, null if no suppression of repeating errors
+   * @throws WurbelException if loading the wurb-file failed
+   */
+  public Wurbler createWurbler(String filename, String wurbFilename, String[] wurbletPath, String analyzeDir,
+                               Logger logger, Verbosity verbosity, Set<String> errorsSoFar) throws WurbelException {
+    return new SourceWurbler(
+            filename,
+            wurbFilename,
+            wurbletPath,
+            analyzeDir,
+            logger,
+            verbosity,
+            errorsSoFar);
+  }
+
+
+  /**
    * Wurbel all files in a fileset.
    *
    * @param fileSet the set of files
@@ -328,7 +355,7 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
           WurbelHelper.getExtraProperties().setProperty("currentDir", file.getParent());
           WurbelHelper.getExtraProperties().setProperty("currentFile", file.getName());
 
-          SourceWurbler sourceWurbler = new SourceWurbler(
+          Wurbler sourceWurbler = createWurbler(
                   filePath,
                   wurbPath,
                   wurbletPathsAsArray(),
@@ -338,7 +365,7 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
                   errorsSoFar);
 
           // wurbelize the source file
-          int errors = sourceWurbler.wurbelize();
+          int errors = sourceWurbler.wurbel();
 
           if (errors > 0) {
             errorFilesCount++;

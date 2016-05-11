@@ -52,22 +52,6 @@ import org.wurbelizer.misc.Verbosity;
 public class SourceWurbler extends AbstractWurbler {
 
   /**
-   * Return code: file was not updated and no errors.
-   */
-  public static final int RC_UNCHANGED = 0;
-
-  /**
-   * Return code: file was updated without errors.
-   */
-  public static final int RC_UPDATED = -1;
-
-  /**
-   * Return code: heredocs in file found and written to disk, file is not updated.
-   */
-  public static final int RC_HEREDOCS = -2;
-
-
-  /**
    * Registered source types.<br>
    * Files not registered will not be processed.
    */
@@ -253,7 +237,8 @@ public class SourceWurbler extends AbstractWurbler {
    * @throws WurbelException if a file- or heapfile operation failed
    * @throws SourceException if source scanning failed
    */
-  public int wurbelize() throws WurbelException, SourceException {
+  @Override
+  public int wurbel() throws WurbelException, SourceException {
 
     SourceFileFactory.initialize();
 

@@ -26,11 +26,9 @@ import org.wurbelizer.misc.Logger;
 import org.wurbelizer.misc.Verbosity;
 
 
-
 /**
  * The wurblet container.
  */
-
 public interface Wurbler {
 
   /**
@@ -52,6 +50,22 @@ public interface Wurbler {
    * extra namespace (used for wurbletProperites in maven poms).
    */
   String PROPSPACE_EXTRA = "extra";
+
+
+  /**
+   * Return code from wurbel(): file was not updated and no errors.
+   */
+  int RC_UNCHANGED = 0;
+
+  /**
+   * Return code from wurbel(): file was updated without errors.
+   */
+  int RC_UPDATED = -1;
+
+  /**
+   * Return code from wurbel(): heredocs in file found and written to disk, file is not updated.
+   */
+  int RC_HEREDOCS = -2;
 
 
 
@@ -82,6 +96,18 @@ public interface Wurbler {
   String WURBLET_WURBLETNAME = "wurbletname";
 
 
+
+  /**
+   * Processes the source file, create here-docs and replace wurblet-guarded sections.
+   *
+   * @return number of errors if &gt; 0,<br>
+   *         {@link #RC_HEREDOCS} = heredocs written and file not modified,<br>
+   *         {@link #RC_UPDATED} = file updated without errors, 0 = no change
+   *
+   * @throws WurbelException if a file- or heapfile operation failed
+   * @throws SourceException if source scanning failed
+   */
+  int wurbel() throws WurbelException, SourceException;
 
 
   /**
