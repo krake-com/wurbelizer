@@ -59,7 +59,7 @@ public class SourceWurbiler extends AbstractWurbiler {
    * @param outputTextDir the output directory getting the fixed text .ser-files.
    * @param logger the logger
    * @param verbosity the verbosity
-   * @throws java.io.FileNotFoundException if file not found
+   * @throws IOException if source file could not be loaded
    */
   public SourceWurbiler(File wrblFile, File outputJavaDir, File outputTextDir, Logger logger, Verbosity verbosity)
          throws IOException {

@@ -29,6 +29,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
 import org.wurbelizer.misc.Constants;
+import org.wurbelizer.misc.Logger;
+import org.wurbelizer.misc.Verbosity;
 import org.wurbelizer.wurbel.WurbelHelper;
 import org.wurbelizer.wurbile.SourceWurbiler;
 import org.wurbelizer.wurbile.WurbileException;
@@ -126,6 +128,23 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
   }
 
 
+
+  /**
+   * Creates an instance of a wurbiler.
+   *
+   * @param wrblFile the input wurbelizer file
+   * @param outputJavaDir the output directory getting the Java-files
+   * @param outputTextDir the output directory getting the fixed text .ser-files.
+   * @param logger the logger
+   * @param verbosity the verbosity
+   * @throws IOException if source file could not be loaded
+   */
+  protected Wurbiler createWurbiler(File wrblFile, File outputJavaDir, File outputTextDir, Logger logger, Verbosity verbosity)
+         throws IOException {
+    return new SourceWurbiler(wrblFile, outputJavaDir, outputTextDir, logger, verbosity);
+  }
+
+
   /**
    * Wurbiles all wurblets in a fileset.
    *
@@ -166,7 +185,7 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
         WurbelHelper.getExtraProperties().setProperty("currentFile", wurbletFile.getName());
 
         // create wurbiler
-        Wurbiler wurbiler = new SourceWurbiler(
+        Wurbiler wurbiler = createWurbiler(
                 wurbletFile, wurbletTargetJavaDir, wurbletTargetTextDir, new MavenLogger(getLog()), verbosityLevel);
 
         // set options
@@ -207,13 +226,12 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
   }
 
 
-
   /**
    * Checks mandatory params.<br>
    *
    * @throws MojoExecutionException if validation fails
    */
-  protected void validate() throws MojoExecutionException {
+  private void validate() throws MojoExecutionException {
     if (wurbletSourceDir == null) {
       throw new MojoExecutionException("missing wurbile.sourceDir");
     }

@@ -474,7 +474,7 @@ public class AntWurbler extends MatchingTask {
                       return super.getProperty(nameSpace, key);
                     }
 
-                  }.wurbelize();
+                  }.wurbel();
 
 
           if (errors > 0) {
