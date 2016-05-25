@@ -6,6 +6,7 @@
         <goals>
           <goal>wurbile</goal>
           <goal>wurbel</goal>
+          <goal>test-wurbel</goal>
         </goals>
       </pluginExecutionFilter>
       <action>
