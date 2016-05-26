@@ -22,9 +22,11 @@ package org.wurbelizer.wurbel;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -174,9 +176,8 @@ public class SourceWurbler extends AbstractWurbler {
 
     // load wurbfile, if any
     if (wurbFilename != null) {
-      BufferedReader in = null;
-      try {
-        in = new BufferedReader(new FileReader(wurbFilename));
+      try (BufferedReader in =
+              new BufferedReader(new InputStreamReader(new FileInputStream(wurbFilename), StandardCharsets.UTF_8))) {
         for (;;) {
           String line = in.readLine();
           if (line == null) {
@@ -187,15 +188,6 @@ public class SourceWurbler extends AbstractWurbler {
       }
       catch (IOException ex) {
         throw new WurbelException("cannot load wurblet properties file: " + wurbFilename, ex);
-      }
-      finally {
-        if (in != null) {
-          try {
-            in.close();
-          }
-          catch (IOException ex) {
-          }
-        }
       }
     }
 
