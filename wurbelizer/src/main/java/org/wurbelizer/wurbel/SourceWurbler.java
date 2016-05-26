@@ -22,7 +22,6 @@ package org.wurbelizer.wurbel;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -247,7 +246,8 @@ public class SourceWurbler extends AbstractWurbler {
     }
 
     // read the source file according to the systems encoding
-    String text = SourceFileFactory.open(filename).getOrgText();
+    SourceFile sourceFile = SourceFileFactory.open(filename);
+    String text = sourceFile.getOrgText();
 
     int errors = 0;                     // > 0: some error during running of wurblets
     boolean updated = false;            // true if updated
@@ -337,7 +337,7 @@ public class SourceWurbler extends AbstractWurbler {
               else if (verbosity.isDebug()) {
                 logger.info("heredoc '" + hereName + "' unchanged");
               }
-              hereDocFile.close();   // flush if changed in case other parts read from this file
+              hereDocFile.flush();   // flush if changed in case other parts read from this file
             }
           }
         }
@@ -475,21 +475,16 @@ public class SourceWurbler extends AbstractWurbler {
         }
       }
 
-      // compare the output with the original
-      String newText = doc.getText().toString();
+      // compare the output with the original (line-endings converted according to source file)
+      String newText = sourceFile.convertLineEndings(doc.getText().toString());
+
       if (newText.equals(orgText)) {
-        break;
+        break;  // nothing updated -> done
       }
       else  {
         // text differs: write output
         updated = true; // file updated
-
-        try (PrintStream ps = new PrintStream(new FileOutputStream(filename))) {
-          ps.print(newText);
-        }
-        catch (IOException ex) {
-          throw new WurbelException("printing to " + filename + " failed", ex);
-        }
+        sourceFile.update(newText);
 
         if (errors > 0)  {
           break;        // abort process due to errors
@@ -498,12 +493,12 @@ public class SourceWurbler extends AbstractWurbler {
         text = newText;  // one more pass to check for more changes
       }
 
-      // rewind all created sources for next loop
+      // rewind all other created sources for next loop
       SourceFileFactory.resetAll();
     }
 
-    // write back all created sources if they differ from original text
-    SourceFileFactory.closeAll();
+    // write back all other created sources if they differ from original text
+    SourceFileFactory.flushAll();
 
     // run the cleanup method on all wurblets of the last pass
     cleanupInvokedWurblets();

@@ -19,18 +19,22 @@
 
 package org.wurbelizer.wurbel;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 
 /**
- * In-memory file to check for changes before close/flush.
+ * In-memory file to check for changes before flush/flush.
  * <p>
  * Manages a static set of such SourceFiles that can be closed
  * and thus released at one (meant to be attached to a single
@@ -47,7 +51,7 @@ public class SourceFile {
   private String orgText;                     // original text
   private ByteArrayOutputStream outStream;    // output stream
   private PrintStream printStream;            // the print output stream
-  private boolean usingCRLF;                  // true if windoze line endings
+  private Boolean usingCRLF;                  // true if windoze line endings, false if unix, null if unknown
 
 
   /**
@@ -60,12 +64,10 @@ public class SourceFile {
     this.filename = filename;
 
     StringBuilder orgBuf = new StringBuilder(BUFSIZE);
-    BufferedReader in = null;
     char[] chars = new char[BUFSIZE];
     int numRead;
-    try {
+    try (Reader in = new InputStreamReader(new FileInputStream(filename), StandardCharsets.UTF_8)) {
       // read the source file according to the systems encoding
-      in = new BufferedReader(new FileReader(filename));
       while((numRead = in.read(chars)) > -1) {
         orgBuf.append(String.valueOf(chars, 0, numRead));
       }
@@ -81,14 +83,6 @@ public class SourceFile {
     }
     catch (IOException ex) {
       throw new WurbelException("reading file " + filename + " failed", ex);
-    }
-    finally {
-      if (in != null) {
-        try {
-          in.close();
-        }
-        catch (Exception ex) {}
-      }
     }
   }
 
@@ -118,13 +112,13 @@ public class SourceFile {
    *
    * @return true if windoze, false if unix
    */
-  public boolean isUsingCRLF() {
+  public Boolean isUsingCRLF() {
     return usingCRLF;
   }
 
 
   /**
-   * Gets a stream for the file to be rewritten.
+   * Gets a stream for the file to be rewritten.<br>
    * This will only create a memory stream for appending data.
    * It does not physically write to the file!
    *
@@ -140,56 +134,65 @@ public class SourceFile {
 
 
   /**
+   * Converts the line-endings if necessary.
+   *
+   * @param str the text
+   * @return the possibly converted text
+   */
+  public String convertLineEndings(String str) {
+    if (usingCRLF != null) {
+      str = usingCRLF ? WurbelHelper.translateLFtoCRLF(str) : WurbelHelper.translateCRLFtoLF(str);
+    }
+    return str;
+  }
+
+
+  /**
    * Gets the new text/contents of the file.
    *
    * @return the new (changed) contents, null = no getStream() invoked.
    */
   public String getNewText()  {
-    String text = null;
-    if (outStream != null) {
-      String str = outStream.toString();
-      text = usingCRLF ? WurbelHelper.translateLFtoCRLF(str) : WurbelHelper.translateCRLFtoLF(str);
-    }
-    return text;
+    return outStream == null ? null : convertLineEndings(outStream.toString());
   }
 
 
   /**
-   * Checks whether the file is changed and needs a flush for persistance.
+   * Updates the file.<br>
+   * Overrides the file's contents with given text.
    *
-   * @return true if newText differs from oldText
+   * @param text the file's contents
+   * @throws WurbelException if file IO failed
    */
-  public boolean needsFlush() {
-    if (orgText == null)  {
-      return outStream != null;
+  public void update(String text) throws WurbelException {
+    File file = new File(filename);
+    File parentFile = file.getParentFile();
+    if (parentFile != null) {
+      parentFile.mkdirs();  // create any missing directories
     }
-    else  {
-      String newText = getNewText();
-      return newText != null && !orgText.equals(newText);
+    try (Writer writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
+      writer.write(text);
+    }
+    catch (IOException ex) {
+      throw new WurbelException("flushing " + filename + " failed", ex);
     }
   }
 
 
   /**
-   * Flushes the file (overwrite existing file or create a new one).
+   * Closes the file.<br>
+   * Updates the file in the filesystem only if changes were detected.
    *
+   * @return true if file was changed
    * @throws WurbelException if flush failed
    */
-  public void flush() throws WurbelException {
-    if (outStream != null) {
-      File file = new File(filename);
-      File parentFile = file.getParentFile();
-      if (parentFile != null) {
-        parentFile.mkdirs();  // create any missing directories
-      }
-
-      try (FileWriter fw = new FileWriter(file)) {
-        fw.write(outStream.toString());
-      }
-      catch (IOException ex) {
-        throw new WurbelException("flushing " + filename + " failed", ex);
-      }
+  public boolean flush() throws WurbelException {
+    String text = getNewText();
+    if (text != null && (orgText == null || !orgText.equals(text))) {
+      update(text);
+      return true;
     }
+    return false;
   }
 
 
@@ -199,19 +202,6 @@ public class SourceFile {
   public void reset() {
     if (outStream != null) {
       outStream.reset();
-    }
-  }
-
-
-  /**
-   * Closes the file.
-   * Will flush if necessary.
-   *
-   * @throws WurbelException if close failed
-   */
-  public void close() throws WurbelException {
-    if (needsFlush()) {
-      flush();
     }
   }
 

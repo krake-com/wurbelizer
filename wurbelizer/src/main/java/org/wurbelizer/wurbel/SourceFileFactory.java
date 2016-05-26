@@ -69,15 +69,20 @@ public class SourceFileFactory {
 
 
   /**
-   * Closes all files and clears the vector
+   * Flushes all files and clears the vector.
    *
+   * @return the number of updated files
    * @throws WurbelException if closing a file failed
    */
-  public static synchronized void closeAll() throws WurbelException {
+  public static synchronized int flushAll() throws WurbelException {
+    int updated = 0;
     for (SourceFile file: FILE_MAP.values())  {
-      file.close();
+      if (file.flush()) {
+        updated++;
+      }
     }
     FILE_MAP.clear();
+    return updated;
   }
 
 
