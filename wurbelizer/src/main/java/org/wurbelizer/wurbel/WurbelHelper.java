@@ -376,6 +376,43 @@ public class WurbelHelper {
   }
 
 
+  /**
+   * Translates a string to CRLF line endings.<br>
+   * Already existing CRLFs are left unchanged.
+   *
+   * @param str the string to translate
+   * @return the translated string
+   */
+  public static String translateLFtoCRLF(String str) {
+    if (str != null && !str.isEmpty()) {
+      StringBuilder buf = new StringBuilder(str.length() << 1);
+      char lastC = 0;
+      for (int i=0; i < str.length(); i++) {
+        char c = str.charAt(i);
+        if (c == '\n' && lastC != '\r') {
+          buf.append('\r');
+        }
+        buf.append(c);
+        lastC = c;
+      }
+      return buf.toString();
+    }
+    return str;
+  }
+
+  /**
+   * Translates a string to LF line endings.
+   *
+   * @param str the string to translate
+   * @return the translated string
+   */
+  public static String translateCRLFtoLF(String str) {
+    if (str != null && !str.isEmpty()) {
+      str = str.replace("\r\n", "\n");
+    }
+    return str;
+  }
+
 
   private WurbelHelper() {
   }

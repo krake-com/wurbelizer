@@ -71,6 +71,7 @@ public class ConsoleWurbler extends AbstractWurbler {
 
     int     wurbArgCount  = 0;
     boolean wurbletLoaded = false;
+    boolean usingCRLF = false;
 
     // parse command line args
     for (int argc=0; argc < args.length; argc++)  {
@@ -86,6 +87,9 @@ public class ConsoleWurbler extends AbstractWurbler {
       else if (arg.startsWith("--analyzedir="))  {
         analyzeDir = arg.substring(10);
         args[argc] = null;    // consumed
+      }
+      else if (arg.startsWith("--crlf")) {
+        usingCRLF = true;
       }
       else if (!wurbletLoaded && !arg.startsWith("--")) {
         // wurblet

@@ -51,7 +51,7 @@ public abstract class AbstractWurbler implements Wurbler {
 
 
   /**
-   * Creates a wurbler.
+   * Creates a wurbler.<br>
    * The output of the wurblet output by default goes to stdout.
    */
   public AbstractWurbler()  {
@@ -62,7 +62,7 @@ public abstract class AbstractWurbler implements Wurbler {
 
 
   /**
-   * Loads the wurblet from persistant storage.
+   * Loads the wurblet from persistant storage.<br>
    * The wurblet's classname may be either absolute or relative. If relative
    * a classpath must be provided. If the wurblet class could be loaded and
    * the wurblet instance created the serialized fixed source will be loaded
@@ -91,7 +91,7 @@ public abstract class AbstractWurbler implements Wurbler {
         // load the class
         clazz = Class.forName(name);
         if (Wurblet.class.isAssignableFrom(clazz))  {
-          setWurblet((Wurblet)clazz.newInstance());
+          setWurblet((Wurblet) clazz.newInstance());
           break;
         }
         else  {
@@ -119,7 +119,7 @@ public abstract class AbstractWurbler implements Wurbler {
     }
 
     try (ObjectInputStream is = new ObjectInputStream(inp)) {
-      WurbletData data = (WurbletData)is.readObject();
+      WurbletData data = (WurbletData) is.readObject();
       setSource(data.getSource());
       setArgs(data.getArgs());
       setFixedArgs(data.getArgs() != null);

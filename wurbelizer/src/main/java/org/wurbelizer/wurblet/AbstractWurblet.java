@@ -68,12 +68,10 @@ public abstract class AbstractWurblet implements Wurblet {
     // do nothing
   }
 
-
   @Override
   public void setContainer(Wurbler container) {
     this.container = container;
   }
-
 
   @Override
   public Wurbler getContainer() {

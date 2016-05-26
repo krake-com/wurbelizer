@@ -34,11 +34,11 @@ import java.io.PrintStream;
  * <p>
  * Manages a static set of such SourceFiles that can be closed
  * and thus released at one (meant to be attached to a single
- * SourceDocument).
+ * SourceDocument).<br>
+ * Handles LF/CRLF mapping according to the original file contents.
  *
  * @author harald
  */
-
 public class SourceFile {
 
   private static final int BUFSIZE = 1024;
@@ -47,6 +47,7 @@ public class SourceFile {
   private String orgText;                     // original text
   private ByteArrayOutputStream outStream;    // output stream
   private PrintStream printStream;            // the print output stream
+  private boolean usingCRLF;                  // true if windoze line endings
 
 
   /**
@@ -69,6 +70,11 @@ public class SourceFile {
         orgBuf.append(String.valueOf(chars, 0, numRead));
       }
       orgText = orgBuf.toString();
+      /**
+       * We cannot just check whether we are on windows or not because VCS like git or subversion
+       * can be configured how to treat line endings. We must determine that from the file contents!
+       */
+      usingCRLF = orgText.contains("\r\n");
     }
     catch (FileNotFoundException e) {
       // not an error
@@ -108,6 +114,16 @@ public class SourceFile {
 
 
   /**
+   * Returns whether the file is using CR+LF as line endings.
+   *
+   * @return true if windoze, false if unix
+   */
+  public boolean isUsingCRLF() {
+    return usingCRLF;
+  }
+
+
+  /**
    * Gets a stream for the file to be rewritten.
    * This will only create a memory stream for appending data.
    * It does not physically write to the file!
@@ -129,7 +145,12 @@ public class SourceFile {
    * @return the new (changed) contents, null = no getStream() invoked.
    */
   public String getNewText()  {
-    return outStream == null ? null : outStream.toString();
+    String text = null;
+    if (outStream != null) {
+      String str = outStream.toString();
+      text = usingCRLF ? WurbelHelper.translateLFtoCRLF(str) : WurbelHelper.translateCRLFtoLF(str);
+    }
+    return text;
   }
 
 

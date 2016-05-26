@@ -484,19 +484,11 @@ public class SourceWurbler extends AbstractWurbler {
         // text differs: write output
         updated = true; // file updated
 
-        PrintStream ps = null;
-        try {
-          ps = new PrintStream(new FileOutputStream(filename));
+        try (PrintStream ps = new PrintStream(new FileOutputStream(filename))) {
           ps.print(newText);
         }
         catch (IOException ex) {
           throw new WurbelException("printing to " + filename + " failed", ex);
-        }
-        finally {
-          try {
-            ps.close();
-          }
-          catch (Exception ex) { }
         }
 
         if (errors > 0)  {

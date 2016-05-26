@@ -158,7 +158,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
 
     this.out = out;
     this.sourceList = sourceList;
-    this.in  = new NestedReader(in, inName);
+    this.in = new NestedReader(in, inName);
 
     readers = new ArrayList<>();
     readers.add(this.in);
@@ -216,7 +216,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
 
       // initialize the source-list if not yet done
       if (sourceList == null) {
-        sourceList  = new ArrayList<>();
+        sourceList = new ArrayList<>();
       }
 
       OUTER:
