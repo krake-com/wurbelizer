@@ -25,10 +25,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import org.wurbelizer.misc.Settings;
 
 
 
@@ -354,7 +354,7 @@ public class WurbelHelper {
     }
     else  {
       try {
-        return new BufferedReader(new InputStreamReader(new FileInputStream(fileName), StandardCharsets.UTF_8));
+        return new BufferedReader(new InputStreamReader(new FileInputStream(fileName), Settings.encodingCharset));
       }
       catch (FileNotFoundException ex) {
         throw new WurbelException("cannot open reader for " + fileName, ex);

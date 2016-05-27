@@ -30,7 +30,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
+import org.wurbelizer.misc.Settings;
 
 
 /**
@@ -66,7 +66,7 @@ public class SourceFile {
     StringBuilder orgBuf = new StringBuilder(BUFSIZE);
     char[] chars = new char[BUFSIZE];
     int numRead;
-    try (Reader in = new InputStreamReader(new FileInputStream(filename), StandardCharsets.UTF_8)) {
+    try (Reader in = new InputStreamReader(new FileInputStream(filename), Settings.encodingCharset)) {
       // read the source file according to the systems encoding
       while((numRead = in.read(chars)) > -1) {
         orgBuf.append(String.valueOf(chars, 0, numRead));
@@ -170,7 +170,7 @@ public class SourceFile {
     if (parentFile != null) {
       parentFile.mkdirs();  // create any missing directories
     }
-    try (Writer writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
+    try (Writer writer = new OutputStreamWriter(new FileOutputStream(file), Settings.encodingCharset)) {
       writer.write(text);
     }
     catch (IOException ex) {

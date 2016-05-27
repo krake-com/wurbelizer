@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
+import org.wurbelizer.misc.Settings;
 
 /**
  * Reader to load source files.
@@ -58,7 +59,7 @@ public class NestedReader {
   public NestedReader(String path) throws IOException {
     file = new File(path);
     name = file.getName();
-    reader = Files.newBufferedReader(file.toPath());
+    reader = Files.newBufferedReader(file.toPath(), Settings.encodingCharset);
   }
 
   /**
@@ -84,7 +85,7 @@ public class NestedReader {
       }
       return -1;    // end of file
     }
-    
+
     lineNo++;
     linePos = 0;
     return read();

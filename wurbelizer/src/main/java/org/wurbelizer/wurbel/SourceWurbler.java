@@ -26,7 +26,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +35,7 @@ import java.util.StringTokenizer;
 import java.util.TreeMap;
 import org.wurbelizer.misc.Constants;
 import org.wurbelizer.misc.Logger;
+import org.wurbelizer.misc.Settings;
 import org.wurbelizer.misc.Verbosity;
 
 
@@ -177,7 +177,7 @@ public class SourceWurbler extends AbstractWurbler {
     // load wurbfile, if any
     if (wurbFilename != null) {
       try (BufferedReader in =
-              new BufferedReader(new InputStreamReader(new FileInputStream(wurbFilename), StandardCharsets.UTF_8))) {
+              new BufferedReader(new InputStreamReader(new FileInputStream(wurbFilename), Settings.encodingCharset))) {
         for (;;) {
           String line = in.readLine();
           if (line == null) {

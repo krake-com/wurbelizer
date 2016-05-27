@@ -92,6 +92,9 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
     // validate configuration
     validate();
 
+    // setup the file charset
+    determineEncoding();
+    
     // get the verbosity
     determineVerbosity();
 

@@ -20,6 +20,8 @@
 package org.wurbelizer.maven;
 
 import java.io.File;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -29,6 +31,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.model.fileset.FileSet;
+import org.wurbelizer.misc.Settings;
 import org.wurbelizer.misc.Verbosity;
 import org.wurbelizer.wurbel.WurbelHelper;
 
@@ -62,6 +65,12 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
   @Parameter(defaultValue = "${wurbel.verbosity}")
   protected String verbosity;
 
+  /**
+   * The charset used to read and write files.
+   */
+  @Parameter(defaultValue = "${project.build.sourceEncoding}")
+  protected String charset;   // don't use the name "encoding" as this is handled by maven
+
 
   /**
    * mapped verbosity level
@@ -73,6 +82,16 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
    */
   protected List<String> resourceDirs;
 
+
+
+  /**
+   * Determines the charset charset.
+   */
+  protected void determineEncoding() {
+    if (charset != null) {
+      Settings.encodingCharset = Charset.forName(charset);
+    }
+  }
 
 
   /**
