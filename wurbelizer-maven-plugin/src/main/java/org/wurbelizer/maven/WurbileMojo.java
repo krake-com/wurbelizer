@@ -94,7 +94,7 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
 
     // setup the file charset
     determineEncoding();
-    
+
     // get the verbosity
     determineVerbosity();
 
@@ -140,6 +140,7 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
    * @param outputTextDir the output directory getting the fixed text .ser-files.
    * @param logger the logger
    * @param verbosity the verbosity
+   * @return the wurbiler
    * @throws IOException if source file could not be loaded
    */
   protected Wurbiler createWurbiler(File wrblFile, File outputJavaDir, File outputTextDir, Logger logger, Verbosity verbosity)
