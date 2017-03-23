@@ -389,6 +389,17 @@ public abstract class AbstractWurbiler implements Wurbiler {
                 }
               }
               else {
+                ic = read();
+                if (ic != -1) {
+                  char nnc = (char) ic;
+                  if (nnc == '(') {    // pathological ...blahhh)@(x==y?"a":"b")@
+                    sourceBuf.append(c);
+                    flushSource();
+                    inWurblet = true;
+                    wurbletMode = WURBLET_OBJECT;
+                    continue;
+                  }
+                }
                 logError("wurblet-level closed unexpectedly on output level '" + getOutName() + "' at " + srcLocation());
                 break;
               }
