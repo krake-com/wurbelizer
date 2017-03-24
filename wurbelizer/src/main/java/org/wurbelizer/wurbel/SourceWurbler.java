@@ -405,7 +405,8 @@ public class SourceWurbler extends AbstractWurbler {
             catch (Exception ex)  {
               errors++;
               // log only exceptions that did not already show up (avoids cluttering output)
-              String errMsg = ExceptionHelper.concatenateMessages(ex);
+              String errMsg = new File(filename).getName() + ":[" + doc.getLineNumber(wurblet.getWurbletBegin()) + "] " +
+                              ExceptionHelper.concatenateMessages(ex);
               boolean doLog = true;
               if (errorsSoFar != null) {
                 doLog = !errorsSoFar.contains(errMsg);
