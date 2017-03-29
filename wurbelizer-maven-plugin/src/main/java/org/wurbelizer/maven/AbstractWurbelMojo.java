@@ -255,6 +255,10 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
         }
       }
 
+      if (dryRun) {
+        break;
+      }
+
       if (hereDocsUpdated) {
         getLog().info("some heredocs were updated -> starting over");
       }
