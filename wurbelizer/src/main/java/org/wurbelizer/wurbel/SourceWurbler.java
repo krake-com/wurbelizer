@@ -79,6 +79,7 @@ public class SourceWurbler extends AbstractWurbler {
   private final Logger logger;                      // the logger
   private final Verbosity verbosity;                // verbosity
   private final Set<String> errorsSoFar;            // old error message list
+  private final boolean dryRun;                     // true if dry run (no wurblets, just parsing)
 
   private SourceElement.Type guardType;             // the guard type
   private SourceDocument.FoldType defaultFoldType;  // the default fold type (null if none)
@@ -98,11 +99,12 @@ public class SourceWurbler extends AbstractWurbler {
    * @param verbosity the verbosity
    * @param logger the logger (can also be used by the wurblets)
    * @param errorsSoFar a set of errors logged so far, null if no suppression of repeating errors
+   * @param dryRun true if don't run any wurblets, just parse the source file
    * @throws WurbelException if loading the wurb-file failed
    */
 
   public SourceWurbler(String filename, String wurbFilename, String[] wurbletPath, String analyzeDir,
-                       Logger logger, Verbosity verbosity, Set<String> errorsSoFar)
+                       Logger logger, Verbosity verbosity, Set<String> errorsSoFar, boolean dryRun)
          throws WurbelException {
 
     this.filename       = filename;
@@ -111,6 +113,7 @@ public class SourceWurbler extends AbstractWurbler {
     this.logger         = logger;
     this.verbosity      = verbosity == null ? Verbosity.DEFAULT : verbosity;
     this.errorsSoFar    = errorsSoFar;
+    this.dryRun         = dryRun;
 
 
     File file = new File(filename);
@@ -339,7 +342,7 @@ public class SourceWurbler extends AbstractWurbler {
           break;
         }
 
-        if (element.containsWurblets()) {
+        if (!dryRun && element.containsWurblets()) {
           // process wurblets in reverse order
           List<SourceWurbletSubElement> wurbletList = element.getWurblets();
           for (int wurbletIndex = wurbletList.size() - 1; wurbletIndex >= 0; wurbletIndex--) {

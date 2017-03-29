@@ -77,6 +77,7 @@ public class AntWurbler extends MatchingTask {
   private boolean printStackTrace;      // true = print stacktrace on each exception
   private Verbosity verbosity;          // tell what's going on
   private boolean runOnce;              // true = don't wurbelize a file more than once within an ant-session
+  private boolean dryRun;               // true = don't run wurblets, just parse
   private File[]  wurbleList;           // list of all java-files that need to be wurbelized
 
   private static Set<String> filesDone; // list of files already processed (for runOnce) within an ant-session
@@ -142,6 +143,25 @@ public class AntWurbler extends MatchingTask {
    */
   public boolean isRunOnce() {
     return runOnce;
+  }
+
+
+  /**
+   * Returns whether this is only a dry run.
+   *
+   * @return true if dry run
+   */
+  public boolean isDryRun() {
+    return dryRun;
+  }
+
+  /**
+   * Sets the dry run property.
+   *
+   * @param dryRun true if don't run any wurblets, just parse
+   */
+  public void setDryRun(boolean dryRun) {
+    this.dryRun = dryRun;
   }
 
 
@@ -456,7 +476,7 @@ public class AntWurbler extends MatchingTask {
                       AntWurbler.this.log(msg, Project.MSG_INFO);
                     }
                   },
-                  verbosity, errorsSoFar) {
+                  verbosity, errorsSoFar, dryRun) {
 
                     /**
                      * gets the property value for a given namespace and key.

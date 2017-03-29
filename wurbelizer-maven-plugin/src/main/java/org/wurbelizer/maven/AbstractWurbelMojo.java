@@ -109,6 +109,13 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
   @Parameter
   private List<WurbletDependency> wurbletDependencies;
 
+  /**
+   * Dry run.<br>
+   * Don't run the wurblets, just parse the files.
+   */
+  @Parameter
+  private boolean dryRun;
+
 
   /**
    * The classrealm.
@@ -281,7 +288,8 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
             analyzeDir,
             logger,
             verbosity,
-            errorsSoFar);
+            errorsSoFar,
+            dryRun);
   }
 
 
