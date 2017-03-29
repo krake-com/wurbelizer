@@ -318,8 +318,8 @@ public class SourceWurbler extends AbstractWurbler {
                   String orgHereInfo = WurbelHelper.firstLine(orgHereText);
                   String hereInfo = WurbelHelper.firstLine(hereText);
                   if (!orgHereInfo.equals(hereInfo)) {
-                    throw new WurbelException("heredoc '" + hereName + "' created from more than one sources: " +
-                                   orgHereInfo.substring(2) + " != " + hereInfo.substring(2));
+                    throw new WurbelException("heredoc '" + hereName + "' created from more than one sources:\n" +
+                                   orgHereInfo.substring(2) + " !=\n" + hereInfo.substring(2));
                   }
                 }
                 hereDocFile.getStream().print(hereText);
