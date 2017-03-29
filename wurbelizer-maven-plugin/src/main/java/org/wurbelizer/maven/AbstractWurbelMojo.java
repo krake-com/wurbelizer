@@ -226,7 +226,9 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
         for (FileSet fileSet: filesets) {
           if (wurbelFileSet(fileSet)) {
             hereDocsUpdated = true;
-            break;
+            if (!dryRun) {
+              break;
+            }
           }
           else  {
             count++;
