@@ -282,11 +282,13 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
    * @param verbosity the verbosity
    * @param logger the logger (can also be used by the wurblets)
    * @param errorsSoFar a set of errors logged so far, null if no suppression of repeating errors
+   * @param dryRun dry run
    * @return the wurbler
    * @throws WurbelException if loading the wurb-file failed
    */
   public Wurbler createWurbler(String filename, String wurbFilename, String[] wurbletPath, String analyzeDir,
-                               Logger logger, Verbosity verbosity, Set<String> errorsSoFar) throws WurbelException {
+                               Logger logger, Verbosity verbosity, Set<String> errorsSoFar,
+                               boolean dryRun) throws WurbelException {
     return new SourceWurbler(
             filename,
             wurbFilename,
@@ -384,7 +386,8 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
                   getAnalyzeDir().getAbsolutePath(),
                   new MavenLogger(getLog()),
                   verbosityLevel,
-                  errorsSoFar);
+                  errorsSoFar,
+                  dryRun);
 
           // wurbelize the source file
           int errors = sourceWurbler.wurbel();
