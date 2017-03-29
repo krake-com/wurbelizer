@@ -456,7 +456,7 @@ public class SourceWurbler extends AbstractWurbler {
         }
       }
 
-      if (hereDocsWritten) {
+      if (dryRun || hereDocsWritten) {
         break;
       }
 
@@ -493,8 +493,10 @@ public class SourceWurbler extends AbstractWurbler {
       SourceFileFactory.resetAll();
     }
 
-    // write back all other created sources if they differ from original text
-    SourceFileFactory.flushAll();
+    if (!dryRun) {
+      // write back all other created sources if they differ from original text
+      SourceFileFactory.flushAll();
+    }
 
     // run the cleanup method on all wurblets of the last pass
     cleanupInvokedWurblets();
