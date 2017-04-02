@@ -16,8 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-// $Id: WurbletDependency.java 97 2016-01-04 11:35:02Z svn $
-
 package org.wurbelizer.maven;
 
 import org.apache.maven.model.Dependency;
