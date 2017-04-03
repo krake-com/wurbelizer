@@ -55,9 +55,9 @@
   </properties>
 
   <scm>
-    <connection>scm:git:ssh://git@bitbucket.org/krake-oss/wurbelizer.git</connection>
+    <connection>scm:git:https://bitbucket.org/krake-oss/wurbelizer.git</connection>
     <developerConnection>scm:git:ssh://git@bitbucket.org/krake-oss/wurbelizer.git</developerConnection>
-    <url>https://bitbucket.org/krake-oss/wurbelizer.git/</url>
+    <url>https://bitbucket.org/krake-oss/wurbelizer/</url>
   </scm>
 
   <issueManagement>
