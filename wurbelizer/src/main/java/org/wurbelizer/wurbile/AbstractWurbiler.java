@@ -87,7 +87,7 @@ import org.wurbelizer.wurbel.WurbelHelper;
  * Thus, if the wurblet needs args, it's a good practice to include an @{args}-line
  * in the wurblet-code.<p>
  *
- * {@code @{phase N}@: sets the execution phase of the wurblet. Default is 1.<p>
+ * {@code @{phase N}@}: sets the execution phase of the wurblet. Default is 1.<p>
  *
  * {@code @{to <outputstream>}@}: sets the output stream (this is the stream the wurblet
  * will write the generated code to, not the output writer of the compiled wurblet!).
