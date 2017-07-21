@@ -219,4 +219,18 @@ public interface Wurbiler {
    */
   void setComment(String comment);
 
+  /**
+   * Gets the execution phase of the compiled wurblet.
+   *
+   * @return the execution phase, null if default
+   */
+  Integer getPhase();
+
+  /**
+   * Sets the execution phase of the compiled wurblet.
+   *
+   * @param phase the execution phase, null or &lt; 0 if default
+   */
+  void setPhase(Integer phase);
+
 }

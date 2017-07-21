@@ -26,6 +26,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import org.wurbelizer.misc.Constants;
 import org.wurbelizer.wurblet.Wurblet;
 import org.wurbelizer.wurblet.WurbletData;
@@ -151,11 +152,19 @@ public abstract class AbstractWurbler implements Wurbler {
   /**
    * Runs the wurblet.
    *
+   * @param phase the execution phase
+   * @param collectedPhases the collected phases so far
+   * @return true if wurblet executed, false if wrong phase
    * @throws WurbelException if running the wurblet failed.
    */
-  public void runWurblet() throws WurbelException {
-    wurblets.add(wurblet);
-    wurblet.run();
+  public boolean runWurblet(int phase, Set<Integer> collectedPhases) throws WurbelException {
+    collectedPhases.add(wurblet.getPhase());    // remember if not yet done
+    if (wurblet.getPhase() == phase) {
+      wurblets.add(wurblet);
+      wurblet.run();
+      return true;
+    }
+    return false;
   }
 
 
@@ -297,17 +306,16 @@ public abstract class AbstractWurbler implements Wurbler {
    */
   @Override
   public Properties getProperties(String nameSpace) {
-    if (nameSpace == null)  {
+    if (null == nameSpace)  {
       return System.getProperties();
     }
-    else if (nameSpace.equals(PROPSPACE_ENV))  {
-      return WurbelHelper.getEnvProperties();
-    }
-    else if (nameSpace.equals(PROPSPACE_EXTRA))  {
-      return WurbelHelper.getExtraProperties();
-    }
-    else if (nameSpace.equals(PROPSPACE_WURBLET)) {
-      return otherProps;
+    else switch (nameSpace) {
+      case PROPSPACE_ENV:
+        return WurbelHelper.getEnvProperties();
+      case PROPSPACE_EXTRA:
+        return WurbelHelper.getExtraProperties();
+      case PROPSPACE_WURBLET:
+        return otherProps;
     }
     return null;
   }

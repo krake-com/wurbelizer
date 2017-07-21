@@ -219,7 +219,7 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
       }
       catch (IOException | WurbileException | RuntimeException ex) {
         totalErrors += errorFilesCount + 1;
-        throw new MojoExecutionException("unable to wurbelize source " + fileName, ex);
+        throw new MojoExecutionException("unable to wurbile source " + fileName, ex);
       }
     }
 

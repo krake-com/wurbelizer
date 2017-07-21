@@ -62,4 +62,19 @@ public interface Wurblet {
    */
   void cleanup() throws WurbelException;
 
+  /**
+   * Returns the phase in which the wurblet runs.<br>
+   * The first and default phase is 1.<br>
+   *
+   * @return the phase
+   */
+  int getPhase();
+
+  /**
+   * Sets the execution phase.
+   *
+   * @param phase the phase &ge; 1
+   */
+  void setPhase(int phase);
+
 }

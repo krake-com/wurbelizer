@@ -52,6 +52,7 @@ import org.wurbelizer.wurbel.Wurbler;
 public abstract class AbstractWurblet implements Wurblet {
 
   protected Wurbler container;      // the container
+  protected int phase = 1;          // the execution phase (default is 1)
   protected PrintStream out;        // the default output stream
   protected String[] source;        // the fixed source
 
@@ -76,6 +77,19 @@ public abstract class AbstractWurblet implements Wurblet {
   @Override
   public Wurbler getContainer() {
     return container;
+  }
+
+  @Override
+  public int getPhase() {
+    return phase;
+  }
+
+  @Override
+  public void setPhase(int phase) {
+    if (phase < 1) {
+      phase = 1;
+    }
+    this.phase = phase;
   }
 
 

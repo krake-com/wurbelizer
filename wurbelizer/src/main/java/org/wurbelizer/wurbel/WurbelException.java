@@ -27,20 +27,59 @@ package org.wurbelizer.wurbel;
 @SuppressWarnings("serial")
 public class WurbelException extends Exception {
 
-  public WurbelException(Throwable cause) {
-    super(cause);
-  }
+  private final boolean sourceInfoIncluded;
 
-  public WurbelException(String message, Throwable cause) {
+  /**
+   * Creates a wurbel exception.
+   *
+   * @param message the error message
+   * @param sourceInfoIncluded true if message contains a hint to the source of the error, false if default to file
+   * containing the wurblet
+   * @param cause the cause
+   */
+  public WurbelException(String message, boolean sourceInfoIncluded, Throwable cause) {
     super(message, cause);
+    this.sourceInfoIncluded = sourceInfoIncluded;
   }
 
-  public WurbelException(String message) {
+  /**
+   * Creates a wurbel exception.
+   *
+   * @param message the error message
+   * @param sourceInfoIncluded true if message contains a hint to the source of the error, false if default to file
+   * containing the wurblet
+   */
+  public WurbelException(String message, boolean sourceInfoIncluded) {
     super(message);
+    this.sourceInfoIncluded = sourceInfoIncluded;
   }
 
-  public WurbelException() {
+  /**
+   * Creates a wurbel exception.
+   *
+   * @param message the error message
+   * @param cause the cause
+   */
+  public WurbelException(String message, Throwable cause) {
+    this(message, false, cause);
   }
 
+  /**
+   * Creates a wurbel exception.
+   *
+   * @param message the error message
+   */
+  public WurbelException(String message) {
+    this(message, false);
+  }
+
+  /**
+   * Returns whether the exception message contains the source info.
+   *
+   * @return true if source info included
+   */
+  public boolean isSourceInfoIncluded() {
+    return sourceInfoIncluded;
+  }
 
 }

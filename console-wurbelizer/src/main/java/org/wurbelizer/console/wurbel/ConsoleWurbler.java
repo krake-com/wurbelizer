@@ -23,6 +23,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 import org.wurbelizer.misc.DefaultLogger;
 import org.wurbelizer.misc.Logger;
@@ -30,6 +32,7 @@ import org.wurbelizer.misc.Verbosity;
 import org.wurbelizer.wurbel.AbstractWurbler;
 import org.wurbelizer.wurbel.SourceException;
 import org.wurbelizer.wurbel.WurbelException;
+import org.wurbelizer.wurbel.WurbelResult;
 
 /**
  * Invokes the wurbler for a single wurblet from the console.
@@ -124,9 +127,11 @@ public class ConsoleWurbler extends AbstractWurbler {
   }
 
   @Override
-  public int wurbel() throws WurbelException, SourceException {
-    runWurblet();
-    return 0;
+  public WurbelResult wurbel(int phase, Set<Integer> collectedPhases) throws WurbelException, SourceException {
+    boolean executed = runWurblet(phase, collectedPhases);
+    return new WurbelResult(executed ? 1 : 0,
+                            0,
+                            executed ? WurbelResult.UpdateType.UPDATED : WurbelResult.UpdateType.UNCHANGED);
   }
 
   @Override
@@ -181,8 +186,17 @@ public class ConsoleWurbler extends AbstractWurbler {
    * single run
    */
   private static void run(String[] args) {
+    TreeSet<Integer> collectedPhases = new TreeSet<>();
     try {
-      new ConsoleWurbler(args).wurbel();
+      int phase = 1;
+      for (;;) {
+        new ConsoleWurbler(args).wurbel(phase, collectedPhases);
+        Integer nextPhase = collectedPhases.higher(phase);
+        if (nextPhase == null) {
+          break;
+        }
+        phase = nextPhase;
+      }
     }
     catch (Exception ex)  {
       System.err.println("/*");

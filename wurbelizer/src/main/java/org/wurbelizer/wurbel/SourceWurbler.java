@@ -102,7 +102,6 @@ public class SourceWurbler extends AbstractWurbler {
    * @param dryRun true if don't run any wurblets, just parse the source file
    * @throws WurbelException if loading the wurb-file failed
    */
-
   public SourceWurbler(String filename, String wurbFilename, String[] wurbletPath, String analyzeDir,
                        Logger logger, Verbosity verbosity, Set<String> errorsSoFar, boolean dryRun)
          throws WurbelException {
@@ -221,18 +220,8 @@ public class SourceWurbler extends AbstractWurbler {
   }
 
 
-  /**
-   * Processes the source file, create here-docs and replace wurblet-guarded sections.
-   *
-   * @return number of errors if &gt; 0,<br>
-   *         {@link #RC_HEREDOCS} = heredocs written and file not modified,<br>
-   *         {@link #RC_UPDATED} = file updated without errors, 0 = no change
-   *
-   * @throws WurbelException if a file- or heapfile operation failed
-   * @throws SourceException if source scanning failed
-   */
   @Override
-  public int wurbel() throws WurbelException, SourceException {
+  public WurbelResult wurbel(int phase, Set<Integer> collectedPhases) throws WurbelException, SourceException {
 
     SourceFileFactory.initialize();
 
@@ -245,10 +234,11 @@ public class SourceWurbler extends AbstractWurbler {
     String text = sourceFile.getOrgText();
 
     int errors = 0;                     // > 0: some error during running of wurblets
+    int wurbletCount = 0;               // number of processed wurblets
     boolean updated = false;            // true if updated
     boolean hereDocsWritten = false;    // true if heredocs written
 
-    for (loopCount=1;;loopCount++) {   // until no more changes
+    for (loopCount=1;;loopCount++) {    // until no more changes
 
       clearInvokedWurblets();
 
@@ -369,6 +359,16 @@ public class SourceWurbler extends AbstractWurbler {
                     foldType = SourceDocument.FoldType.valueOf(val);
                   }
                 }
+                else if (warg.startsWith("phase=")) {
+                  int wurbletPhase = Integer.parseInt(warg.substring(6));
+                  if (wurbletPhase < 1) {
+                    wurbletPhase = 1;
+                  }
+                  collectedPhases.add(wurbletPhase);   // add phase if not yet done
+                  if (wurbletPhase != phase) {
+                    invoke = false;   // skip this wurblet
+                  }
+                }
               }
 
               ByteArrayOutputStream os = new ByteArrayOutputStream(); // holds the data
@@ -399,18 +399,19 @@ public class SourceWurbler extends AbstractWurbler {
                 }
                 setPrintStream(ps);
 
-                if (invoke) {
-                  runWurblet();    // run the wurblet. Errors are catched as exceptions!
+                // run the wurblet
+                if (!invoke || !runWurblet(phase, collectedPhases)) {
+                  continue;
                 }
-                else  {
-                  ps.println("// condition not met");
-                }
+                wurbletCount++;
               }
-              catch (Exception ex)  {
+              catch (WurbelException ex)  {
                 errors++;
                 // log only exceptions that did not already show up (avoids cluttering output)
-                String errMsg = new File(filename).getName() + ":[" + doc.getLineNumber(wurblet.getWurbletBegin()) + "] " +
-                                ExceptionHelper.concatenateMessages(ex);
+                String errMsg = ExceptionHelper.concatenateMessages(ex);
+                if (!ex.isSourceInfoIncluded()) {
+                  errMsg = new File(filename).getName() + ":[" + doc.getLineNumber(wurblet.getWurbletBegin()) + "] " + errMsg;
+                }
                 boolean doLog = true;
                 if (errorsSoFar != null) {
                   doLog = !errorsSoFar.contains(errMsg);
@@ -420,6 +421,10 @@ public class SourceWurbler extends AbstractWurbler {
                 }
                 if (doLog) {
                   logger.error(errMsg);
+                }
+
+                if (ex instanceof WurbelTerminationException) {
+                  throw ex;
                 }
 
                 // place exceptions in comments in output
@@ -433,6 +438,7 @@ public class SourceWurbler extends AbstractWurbler {
                   ps.println("********/");
                 }
               }
+              // any other exception will abort (NPE, whatever)
 
               // build generated text
               String srcText = os.toString();
@@ -503,17 +509,17 @@ public class SourceWurbler extends AbstractWurbler {
     // run the cleanup method on all wurblets of the last pass
     cleanupInvokedWurblets();
 
+    WurbelResult.UpdateType updateType = WurbelResult.UpdateType.UNCHANGED;
     if (errors == 0) {
       if (hereDocsWritten) {
-        return RC_HEREDOCS;
+        updateType = WurbelResult.UpdateType.HEREDOCS;
       }
-      if (updated) {
-        return RC_UPDATED;
+      else if (updated) {
+        updateType = WurbelResult.UpdateType.UPDATED;
       }
-      return RC_UNCHANGED;
     }
 
-    return errors;
+    return new WurbelResult(wurbletCount, errors, updateType);
   }
 
 

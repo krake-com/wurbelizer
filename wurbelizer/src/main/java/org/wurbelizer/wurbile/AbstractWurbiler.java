@@ -87,6 +87,8 @@ import org.wurbelizer.wurbel.WurbelHelper;
  * Thus, if the wurblet needs args, it's a good practice to include an @{args}-line
  * in the wurblet-code.<p>
  *
+ * {@code @{phase N}@: sets the execution phase of the wurblet. Default is 1.<p>
+ *
  * {@code @{to <outputstream>}@}: sets the output stream (this is the stream the wurblet
  * will write the generated code to, not the output writer of the compiled wurblet!).
  * {@code @{to out}} resets to the default stream, which is equivalent to {@code @{to}}.<p>
@@ -113,6 +115,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
   private static final String CMD_TO          = "to";
   private static final String CMD_ARGS        = "args";
   private static final String CMD_COMMENT     = "comment";
+  private static final String CMD_PHASE       = "phase";
 
 
 
@@ -122,6 +125,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
   private Set<String>   interfaces;         // collection of @{implements}@, null = default
   private String[]      args;               // wurblet arguments from @{args ...}@ command, null = default,
                                             // i.e. from command line, @wurblet, etc...
+  private Integer       phase;              // the execution phase if != null
   private StringBuilder comment;            // the wurblet comment, null if none
 
   private final List<NestedReader> readers; // Reader list (active reader is always at start of list)
@@ -371,6 +375,10 @@ public abstract class AbstractWurbiler implements Wurbiler {
                         case CMD_ARGS:
                           // set the args command
                           cmdOk = handleArgs(stok);
+                          break;
+                        case CMD_PHASE:
+                          // set the wurblet's phase
+                          cmdOk = handlePhase(stok);
                           break;
                         case CMD_COMMENT:
                           // add wurblet comment
@@ -695,6 +703,30 @@ public abstract class AbstractWurbiler implements Wurbiler {
       }
       if (verbosity.isDebug()) {
         logger.info("{" + CMD_INDENT + " " + token + "}");
+      }
+    }
+    return true;
+  }
+
+
+  /**
+   * Handles the phase-command.
+   *
+   * @param stok the tokenizer pointing to first arg
+   * @return true if ok, false if some error
+   */
+  private boolean handlePhase(StringTokenizer stok) {
+    if (stok.hasMoreTokens()) {
+      String token = stok.nextToken();
+      int ph = Integer.parseInt(token);
+      if (ph < 1) {
+        setPhase(null);
+      }
+      else {
+        setPhase(ph);
+      }
+      if (verbosity.isDebug()) {
+        logger.info("{" + CMD_PHASE + " " + token + "}");
       }
     }
     return true;
@@ -1134,6 +1166,16 @@ public abstract class AbstractWurbiler implements Wurbiler {
   @Override
   public void setComment(String comment) {
     this.comment = comment == null ? null : new StringBuilder(comment);
+  }
+
+  @Override
+  public Integer getPhase() {
+    return phase;
+  }
+
+  @Override
+  public void setPhase(Integer phase) {
+    this.phase = phase;
   }
 
 }

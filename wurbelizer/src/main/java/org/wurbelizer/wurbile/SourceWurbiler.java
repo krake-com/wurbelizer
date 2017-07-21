@@ -155,6 +155,12 @@ public class SourceWurbiler extends AbstractWurbiler {
           }
         }
         writer.write(" {\n\n");
+
+        if (getPhase() != null) {
+          writer.write("  public " + wurbletName + "() {\n");
+          writer.write("    setPhase(" + getPhase() + ");\n");
+          writer.write("  }\n\n");
+        }
         writer.write("  @Override\n");
         writer.write("  public void run() throws WurbelException {\n");
         writer.write("    super.run();\n");

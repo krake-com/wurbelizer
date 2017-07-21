@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeSet;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
@@ -51,6 +52,7 @@ import org.wurbelizer.wurbel.SourceException;
 import org.wurbelizer.wurbel.SourceWurbler;
 import org.wurbelizer.wurbel.WurbelException;
 import org.wurbelizer.wurbel.WurbelHelper;
+import org.wurbelizer.wurbel.WurbelResult;
 import org.wurbelizer.wurbel.Wurbler;
 
 /**
@@ -212,58 +214,70 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
     }
 
 
-    boolean hereDocsUpdated = true;
+    TreeSet<Integer> collectedPhases = new TreeSet<>();
+    int phase = 0;    // phase 0 is heredocs only (no wurblets processed -> this will update the model first)
 
-    while (hereDocsUpdated)  {   // until no more here docs updated
+    for (;;) {
 
-      totalErrors = 0;
-      hereDocsUpdated = false;
-      HeapFileFactory.initialize();   // clear any heapfiles generated in previous hereDocs loop
+      boolean hereDocsUpdated = true;
 
-      if (filesets != null && filesets.size() > 0) {
-        // explicit filesets given instead of source dir
-        int count = 0;    // fileset count
-        for (FileSet fileSet: filesets) {
-          if (wurbelFileSet(fileSet)) {
-            hereDocsUpdated = true;
-            if (!dryRun) {
-              break;
-            }
-          }
-          else  {
-            count++;
-            if (totalErrors > 0) {
-              int skipped = filesets.size() - count;
-              if (skipped > 0) {
-                getLog().warn("remaining filesets ignored due to wurbel errors: " + skipped);
+      while (hereDocsUpdated)  {   // until no more here docs updated
+
+        totalErrors = 0;
+        hereDocsUpdated = false;
+        HeapFileFactory.initialize();   // clear any heapfiles generated in previous hereDocs loop
+
+        if (filesets != null && filesets.size() > 0) {
+          // explicit filesets given instead of source dir
+          int count = 0;    // fileset count
+          for (FileSet fileSet: filesets) {
+            if (wurbelFileSet(fileSet, phase, collectedPhases)) {
+              hereDocsUpdated = true;
+              if (!dryRun) {
+                break;
               }
-              break;    // don't process any further filesets because they may depend on each other
             }
-          }
-        }
-      }
-      else {
-        // all from source dir with default java-extension
-        if (getSourceDir().isDirectory() && getSourceDir().list().length > 0) {
-          final FileSet fs = new FileSet();
-          fs.setDirectory(getSourceDir().getPath());
-          fs.addInclude("**/*" + Constants.JAVA_SOURCE_EXTENSION);
-          if (wurbelFileSet(fs)) {
-            hereDocsUpdated = true;
+            else  {
+              count++;
+              if (totalErrors > 0) {
+                int skipped = filesets.size() - count;
+                if (skipped > 0) {
+                  getLog().warn("remaining filesets ignored due to wurbel errors: " + skipped);
+                }
+                break;    // don't process any further filesets because they may depend on each other
+              }
+            }
           }
         }
         else {
-          getLog().warn("no or empty wurbel.sourceDir " + getSourceDir().getAbsolutePath());
+          // all from source dir with default java-extension
+          if (getSourceDir().isDirectory() && getSourceDir().list().length > 0) {
+            final FileSet fs = new FileSet();
+            fs.setDirectory(getSourceDir().getPath());
+            fs.addInclude("**/*" + Constants.JAVA_SOURCE_EXTENSION);
+            if (wurbelFileSet(fs, phase, collectedPhases)) {
+              hereDocsUpdated = true;
+            }
+          }
+          else {
+            getLog().warn("no or empty wurbel.sourceDir " + getSourceDir().getAbsolutePath());
+          }
+        }
+
+        if (dryRun) {
+          break;
+        }
+
+        if (hereDocsUpdated) {
+          getLog().info("some heredocs were updated -> starting over");
         }
       }
 
-      if (dryRun) {
+      Integer nextPhase = collectedPhases.higher(phase);
+      if (totalErrors > 0 || nextPhase == null) {
         break;
       }
-
-      if (hereDocsUpdated) {
-        getLog().info("some heredocs were updated -> starting over");
-      }
+      phase = nextPhase;
     }
 
     if (totalErrors > 0) {
@@ -308,7 +322,7 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
    * @return true if heredocs were updated (needs another run)
    * @throws MojoExecutionException
    */
-  private boolean wurbelFileSet(final FileSet fileSet) throws MojoExecutionException {
+  private boolean wurbelFileSet(FileSet fileSet, int phase, Set<Integer> collectedPhases) throws MojoExecutionException {
 
     if (fileSet.getDirectory() == null) {
       // directory missing: use sourceDir as default
@@ -329,6 +343,7 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
 
     int wurbeledFilesCount  = 0;
     int updatedFilesCount   = 0;
+    int wurbletCount        = 0;
     int errorFilesCount     = 0;
     boolean hereDocsUpdated = false;
 
@@ -390,16 +405,16 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
                   dryRun);
 
           // wurbelize the source file
-          int errors = sourceWurbler.wurbel();
+          WurbelResult result = sourceWurbler.wurbel(phase, collectedPhases);
 
-          if (errors > 0) {
+          wurbletCount += result.getWurbletCount();
+
+          if (result.getErrors() > 0) {
             errorFilesCount++;
-            updatedFilesCount++;
-            // file has been modified and there were wurblet error (dump is in source)
-            getLog().warn(fileName + " generated with wurblet errors (" + errors + ")");
+            getLog().warn(fileName + " generated with wurblet errors (" + result.getErrors() + ")");
           }
           else {
-            if (errors == SourceWurbler.RC_UPDATED) {
+            if (result.getUpdateType() == WurbelResult.UpdateType.UPDATED) {
               updatedFilesCount++;
               // file has been modified without errors
               String msg = fileName + (wurbPath == null ? "" : (" (" + wurbPath + ")"));
@@ -410,21 +425,32 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
                 getLog().info(msg);
               }
             }
-            else if (errors == SourceWurbler.RC_HEREDOCS) {
+            else if (result.getUpdateType() == WurbelResult.UpdateType.HEREDOCS) {
               hereDocsUpdated = true;
             }
           }
         }
-        catch (WurbelException | SourceException | RuntimeException ex) {
-          throw new MojoExecutionException("unable to wurbelize source " + fileName, ex);
+        catch (WurbelException wx) {
+          if (wx.isSourceInfoIncluded()) {
+            throw new MojoExecutionException(wx.getMessage(), wx);
+          }
+          else {
+            throw new MojoExecutionException("source " + fileName + " wurbeled with errors", wx);
+          }
+        }
+        catch (SourceException | RuntimeException ex) {
+          throw new MojoExecutionException("unable to wurbel source " + fileName, ex);
         }
       }
     }
 
-    getLog().info(getPathRelativeToBasedir(new File(dirName).getAbsolutePath()) + ": " +
-                  wurbeledFilesCount + " files wurbeled, " +
-                  updatedFilesCount + " updated, " +
-                  errorFilesCount + " errors");
+    if (phase > 0) {
+      getLog().info(getPathRelativeToBasedir(new File(dirName).getAbsolutePath()) + ", phase " + phase + ": " +
+                    wurbletCount + " wurblet" + (wurbletCount == 1 ? "" : "s") + " in " +
+                    wurbeledFilesCount + " file" + (wurbeledFilesCount == 1 ? "" : "s") + " wurbeled, " +
+                    updatedFilesCount + " updated, " +
+                    errorFilesCount + " error" + (errorFilesCount == 1 ? "" : "s"));
+    }
 
     totalErrors += errorFilesCount;
 
