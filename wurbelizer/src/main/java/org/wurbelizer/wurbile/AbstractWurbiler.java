@@ -116,6 +116,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
   private static final String CMD_ARGS        = "args";
   private static final String CMD_COMMENT     = "comment";
   private static final String CMD_PHASE       = "phase";
+  private static final String CMD_CONFIG      = "config";
 
 
 
@@ -127,6 +128,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
                                             // i.e. from command line, @wurblet, etc...
   private Integer       phase;              // the execution phase if != null
   private StringBuilder comment;            // the wurblet comment, null if none
+  private StringBuilder configuration;      // generic wurblet options
 
   private final List<NestedReader> readers; // Reader list (active reader is always at start of list)
   private final Set<String> paths;          // nested paths to detect include-loops
@@ -384,6 +386,10 @@ public abstract class AbstractWurbiler implements Wurbiler {
                           // add wurblet comment
                           cmdOk = handleComment(wurbletBuf.toString());
                           break;
+                        case CMD_CONFIG:
+                          // add wurblet comment
+                          cmdOk = handleConfig(wurbletBuf.toString());
+                          break;
                         default:
                           logError("unknown wurblet-command '" + cmd + "' at " + srcLocation());
                           break OUTER;
@@ -506,333 +512,6 @@ public abstract class AbstractWurbiler implements Wurbiler {
     }
   }
 
-
-
-  /**
-   * Handles the include-command.
-   *
-   * @param stok the tokenizer pointing to first arg
-   * @return true if ok, false if some error
-   */
-  private boolean handleInclude(StringTokenizer stok) {
-    if (stok.hasMoreTokens()) {
-      try {
-        String path = WurbelHelper.translateVariables(stok.nextToken(), null);
-        if (paths.add(path))  {
-          in = new NestedReader(path);
-          readers.add(0, in);
-          sourceLoc = srcLocation();
-          if (verbosity.isDebug()) {
-            logger.info("{" + CMD_INCLUDE + " " + path + "}");
-          }
-        }
-        else  {
-          logError("include-loop while including '" + path + "' at " + srcLocation());
-          return false;
-        }
-      }
-      catch (IOException ex)  {
-        logError(ex.toString());
-        return false;
-      }
-    }
-    else  {
-      logError("filename missing in include command at " + srcLocation());
-      return false;
-    }
-    return true;
-  }
-
-
-  /**
-   * Handles the package-command.
-   *
-   * @param stok the tokenizer pointing to first arg
-   * @return true if ok, false if some error
-   */
-  private boolean handlePackage(StringTokenizer stok) {
-    if (stok.hasMoreTokens()) {
-      String token = stok.nextToken();
-      if (packageName != null && !packageName.equals(token))  {
-        logError("more than one package-command ignored at " + srcLocation());
-        return false;
-      }
-      else  {
-        setPackageName(token);
-          if (verbosity.isDebug()) {
-            logger.info("{" + CMD_PACKAGE + " " + token + "}");
-          }
-      }
-    }
-    return true;
-  }
-
-
-  /**
-   * Handles the extends-command.
-   *
-   * @param stok the tokenizer pointing to first arg
-   * @return true if ok, false if some error
-   */
-  private boolean handleExtends(StringTokenizer stok) {
-    if (stok.hasMoreTokens()) {
-      String token = stok.nextToken();
-      if (parentClass != null && !parentClass.equals(token))  {
-        logError("more than one extends-command ignored at " + srcLocation());
-        return false;
-      }
-      else  {
-        setParentClass(token);
-        if (verbosity.isDebug()) {
-          logger.info("{" + CMD_EXTENDS + " " + token + "}");
-        }
-      }
-    }
-    return true;
-  }
-
-
-  /**
-   * Handles the implements-command.
-   *
-   * @param stok the tokenizer pointing to first arg
-   * @return true if ok, false if some error
-   */
-  private boolean handleImplements(StringTokenizer stok) {
-    while (stok.hasMoreTokens()) {
-      String iface = stok.nextToken();
-      if (!addInterface(iface)) {
-        logError("interface  " + iface + " already added at " + srcLocation());
-        return false;
-      }
-      if (verbosity.isDebug()) {
-        logger.info("{" + CMD_IMPLEMENTS + " " + iface + "}");
-      }
-    }
-    return true;
-  }
-
-
-  /**
-   * Handles the import-command.
-   *
-   * @param stok the tokenizer pointing to first arg
-   * @return true if ok, false if some error
-   */
-  private boolean handleImport(StringTokenizer stok) {
-    if (stok.hasMoreTokens()) {
-      String token = stok.nextToken();
-      imports.add(token);
-      if (verbosity.isDebug()) {
-        logger.info("{" + CMD_IMPORT + " " + token + "}");
-      }
-    }
-    return true;
-  }
-
-
-  /**
-   * Handles the args-command.
-   *
-   * @param stok the tokenizer pointing to first arg
-   * @return true if ok, false if some error
-   */
-  private boolean handleArgs(StringTokenizer stok) {
-    List<String> argList = new ArrayList<>();
-    if (stok.hasMoreTokens()) {
-      String arg = stok.nextToken();
-      argList.add(arg);
-      if (verbosity.isDebug()) {
-        logger.info("{" + CMD_ARGS + " " + arg + "}");
-      }
-    }
-    if (argList.size() > 0) {
-      args = new String[argList.size()];
-      Iterator<String> iter = argList.iterator();
-      int i=0;
-      while (iter.hasNext())  {
-        args[i++] = iter.next();
-      }
-    }
-    else  {
-      args = null;
-    }
-    return true;
-  }
-
-
-  /**
-   * Handles the comment command.
-   *
-   * @param stok
-   * @return true if ok, false if some error
-   */
-  private boolean handleComment(String buf) {
-    int ndx = buf.indexOf(CMD_COMMENT);
-    if (ndx >= 0) {
-      String cmt = buf.substring(ndx + CMD_COMMENT.length());
-      if (comment == null) {
-        comment = new StringBuilder();
-      }
-      comment.append(cmt).append('\n');
-      if (verbosity.isDebug()) {
-        logger.info("{" + CMD_COMMENT + " " + cmt + "}");
-      }
-      return true;
-    }
-    logError("comment block garbled at " + srcLocation());
-    return false;
-  }
-
-
-  /**
-   * Handles the indent-command.
-   *
-   * @param stok the tokenizer pointing to first arg
-   * @return true if ok, false if some error
-   */
-  private boolean handleIndent(StringTokenizer stok) {
-    if (stok.hasMoreTokens()) {
-      String token = stok.nextToken();
-      if (token.equals("auto")) {
-        setAutoIndent(true);
-      }
-      else  {
-        setIndent(Integer.parseInt(token));
-        setAutoIndent(false);
-      }
-      if (verbosity.isDebug()) {
-        logger.info("{" + CMD_INDENT + " " + token + "}");
-      }
-    }
-    return true;
-  }
-
-
-  /**
-   * Handles the phase-command.
-   *
-   * @param stok the tokenizer pointing to first arg
-   * @return true if ok, false if some error
-   */
-  private boolean handlePhase(StringTokenizer stok) {
-    if (stok.hasMoreTokens()) {
-      String token = stok.nextToken();
-      int ph = Integer.parseInt(token);
-      if (ph < 1) {
-        setPhase(null);
-      }
-      else {
-        setPhase(ph);
-      }
-      if (verbosity.isDebug()) {
-        logger.info("{" + CMD_PHASE + " " + token + "}");
-      }
-    }
-    return true;
-  }
-
-
-  /**
-   * Handles the to-command.
-   *
-   * @param stok the tokenizer pointing to first arg
-   * @return true if ok, false if some error
-   */
-  private boolean handleOutName(StringTokenizer stok) {
-    String path = stok.hasMoreTokens() ? stok.nextToken() : null;
-    setOutName(path);
-    if (verbosity.isDebug()) {
-      logger.info("{" + CMD_TO + (path == null ? "" : (" " + path)) + "}");
-    }
-    return true;
-  }
-
-
-  /**
-   * Reads next char from input.
-   * Could be from some inluded file or the main stream.
-   */
-  private int read() throws IOException {
-    int c = in.read();
-    if (c == -1)  {
-      if (readers.size() <= 1) {
-        return -1;   // EOF on main reader
-      }
-      // EOF was on an included reader
-      readers.remove(0);
-      paths.remove(in.getPath());
-      in = readers.get(0);
-      flushSource();
-      return read();
-    }
-    return c;
-  }
-
-
-
-  /**
-   * Flushes the source buffer.
-   */
-  private void flushSource() throws IOException {
-    if (sourceBuf.length() > 0) {
-      // cut first newline, if any (comes from @[ ... newline)
-      if ((wurbletMode == WURBLET_BLOCK || wurbletMode == WURBLET_COMMAND) &&
-          sourceBuf.charAt(0) == '\n')  {
-        sourceBuf.deleteCharAt(0);
-      }
-      if (sourceBuf.length() > 0) {
-        if (isAutoIndent()) {
-          setIndent(autoIndent + (lastWasOpenBlock ? 2 : 0));
-        }
-        out.write(indentStr + outName + ".print(source[" + sourceList.size() + "]); // " +
-                  (in.isIncluded() ? (in + ":") : "") + sourceLoc + " = " + hintString(sourceBuf, 40) + "\n");
-        sourceList.add(sourceBuf.toString());
-        sourceBuf.setLength(0);
-      }
-    }
-    sourceLoc = srcLocation();
-  }
-
-
-  /**
-   * Gets the current location in input source.
-   *
-   * @return the current source-location
-   */
-  private String srcLocation()  {
-    return in.getLineNo() + ":" + in.getLinePos();
-  }
-
-
-  /**
-   * Gets a formatted source string of max length and no control-chars.
-   *
-   * @return the formatted source string
-   */
-  private String hintString(StringBuilder buf, int max)  {
-    int len = buf.length();
-    boolean trailDots = false;
-    if (max > len)  {
-      max = len;
-    }
-    else  {
-      trailDots = true;
-    }
-    StringBuilder nbuf = new StringBuilder();
-    nbuf.append('"');
-    for (int i=0; i < max; i++) {
-      char c = buf.charAt(i);
-      if (!Character.isISOControl(c)) {
-        nbuf.append(c);
-      }
-    }
-    if (trailDots)  {
-      nbuf.append("...");
-    }
-    nbuf.append('"');
-    return nbuf.toString();
-  }
 
 
   /**
@@ -1079,7 +758,6 @@ public abstract class AbstractWurbiler implements Wurbiler {
     return interfaces.add(iface);
   }
 
-
   /**
    * Gets the interface list.
    *
@@ -1090,11 +768,6 @@ public abstract class AbstractWurbiler implements Wurbiler {
   }
 
 
-  /**
-   * Gets the list of imports.
-   *
-   * @return the imports, null if no imports
-   */
   @Override
   public String[] getImports() {
     if (imports.size() > 0) {
@@ -1109,12 +782,6 @@ public abstract class AbstractWurbiler implements Wurbiler {
     return null;
   }
 
-
-  /**
-   * Sets the imports.
-   *
-   * @param imps the imports
-   */
   @Override
   public void setImports(String[] imps) {
     imports = new HashSet<>();
@@ -1123,49 +790,34 @@ public abstract class AbstractWurbiler implements Wurbiler {
     }
   }
 
-
-  /**
-   * Gets the presetted wurblet arguments.
-   *
-   * @return the wurblet args, null = default
-   */
   @Override
   public String[] getArgs() {
     return this.args;
   }
 
-
-  /**
-   * Presets the wurblet arguments.
-   * The default (null) means that the args
-   * are determined at runtime from the wurbler,
-   * i.e. command-line, &#64;wurblet-directive.
-   *
-   * @param args the wurblet args
-   */
   @Override
   public void setArgs(String[] args) {
     this.args = args;
   }
 
-  /**
-   * Gets the wurblet comment.
-   *
-   * @return the comment, null if none
-   */
   @Override
   public String getComment() {
     return comment == null ? null : comment.toString();
   }
 
-  /**
-   * Sets the wurblet comment.
-   *
-   * @param comment the comment, null if none
-   */
   @Override
   public void setComment(String comment) {
     this.comment = comment == null ? null : new StringBuilder(comment);
+  }
+
+  @Override
+  public String getConfiguration() {
+    return configuration == null ? null : configuration.toString();
+  }
+
+  @Override
+  public void setConfiguration(String configuration) {
+    this.configuration = configuration == null ? null : new StringBuilder(configuration);
   }
 
   @Override
@@ -1176,6 +828,365 @@ public abstract class AbstractWurbiler implements Wurbiler {
   @Override
   public void setPhase(Integer phase) {
     this.phase = phase;
+  }
+
+
+
+  /**
+   * Extracts or appends a multiline text.
+   *
+   * @param text the original text including the command
+   * @param cmd the command string
+   * @param buf the string builder
+   * @return the possibly new string builder, null if none
+   */
+  private StringBuilder extractMultiline(String text, String cmd, StringBuilder buf) {
+    int ndx = text.indexOf(cmd);
+    if (ndx >= 0) {
+      String str = text.substring(ndx + cmd.length());
+      if (!str.isEmpty() && Character.isWhitespace(str.charAt(0))) {
+        // cut first whitespace
+        str = str.substring(1);
+      }
+      if (buf == null) {
+        buf = new StringBuilder();
+      }
+      if (buf.length() > 0) {
+        buf.append('\n');
+      }
+      buf.append(str);
+      if (verbosity.isDebug()) {
+        logger.info("{" + cmd + " " + str + "}");
+      }
+    }
+    return buf;
+  }
+
+
+    /**
+   * Handles the include-command.
+   *
+   * @param stok the tokenizer pointing to first arg
+   * @return true if ok, false if some error
+   */
+  private boolean handleInclude(StringTokenizer stok) {
+    if (stok.hasMoreTokens()) {
+      try {
+        String path = WurbelHelper.translateVariables(stok.nextToken(), null);
+        if (paths.add(path))  {
+          in = new NestedReader(path);
+          readers.add(0, in);
+          sourceLoc = srcLocation();
+          if (verbosity.isDebug()) {
+            logger.info("{" + CMD_INCLUDE + " " + path + "}");
+          }
+        }
+        else  {
+          logError("include-loop while including '" + path + "' at " + srcLocation());
+          return false;
+        }
+      }
+      catch (IOException ex)  {
+        logError(ex.toString());
+        return false;
+      }
+    }
+    else  {
+      logError("filename missing in include command at " + srcLocation());
+      return false;
+    }
+    return true;
+  }
+
+
+  /**
+   * Handles the package-command.
+   *
+   * @param stok the tokenizer pointing to first arg
+   * @return true if ok, false if some error
+   */
+  private boolean handlePackage(StringTokenizer stok) {
+    if (stok.hasMoreTokens()) {
+      String token = stok.nextToken();
+      if (packageName != null && !packageName.equals(token))  {
+        logError("more than one package-command ignored at " + srcLocation());
+        return false;
+      }
+      else  {
+        setPackageName(token);
+          if (verbosity.isDebug()) {
+            logger.info("{" + CMD_PACKAGE + " " + token + "}");
+          }
+      }
+    }
+    return true;
+  }
+
+
+  /**
+   * Handles the extends-command.
+   *
+   * @param stok the tokenizer pointing to first arg
+   * @return true if ok, false if some error
+   */
+  private boolean handleExtends(StringTokenizer stok) {
+    if (stok.hasMoreTokens()) {
+      String token = stok.nextToken();
+      if (parentClass != null && !parentClass.equals(token))  {
+        logError("more than one extends-command ignored at " + srcLocation());
+        return false;
+      }
+      else  {
+        setParentClass(token);
+        if (verbosity.isDebug()) {
+          logger.info("{" + CMD_EXTENDS + " " + token + "}");
+        }
+      }
+    }
+    return true;
+  }
+
+
+  /**
+   * Handles the implements-command.
+   *
+   * @param stok the tokenizer pointing to first arg
+   * @return true if ok, false if some error
+   */
+  private boolean handleImplements(StringTokenizer stok) {
+    while (stok.hasMoreTokens()) {
+      String iface = stok.nextToken();
+      if (!addInterface(iface)) {
+        logError("interface  " + iface + " already added at " + srcLocation());
+        return false;
+      }
+      if (verbosity.isDebug()) {
+        logger.info("{" + CMD_IMPLEMENTS + " " + iface + "}");
+      }
+    }
+    return true;
+  }
+
+
+  /**
+   * Handles the import-command.
+   *
+   * @param stok the tokenizer pointing to first arg
+   * @return true if ok, false if some error
+   */
+  private boolean handleImport(StringTokenizer stok) {
+    if (stok.hasMoreTokens()) {
+      String token = stok.nextToken();
+      imports.add(token);
+      if (verbosity.isDebug()) {
+        logger.info("{" + CMD_IMPORT + " " + token + "}");
+      }
+    }
+    return true;
+  }
+
+
+  /**
+   * Handles the args-command.
+   *
+   * @param stok the tokenizer pointing to first arg
+   * @return true if ok, false if some error
+   */
+  private boolean handleArgs(StringTokenizer stok) {
+    List<String> argList = new ArrayList<>();
+    if (stok.hasMoreTokens()) {
+      String arg = stok.nextToken();
+      argList.add(arg);
+      if (verbosity.isDebug()) {
+        logger.info("{" + CMD_ARGS + " " + arg + "}");
+      }
+    }
+    if (argList.size() > 0) {
+      args = new String[argList.size()];
+      Iterator<String> iter = argList.iterator();
+      int i=0;
+      while (iter.hasNext())  {
+        args[i++] = iter.next();
+      }
+    }
+    else  {
+      args = null;
+    }
+    return true;
+  }
+
+
+  /**
+   * Handles the comment command.
+   *
+   * @param stok
+   * @return true if ok, false if some error
+   */
+  private boolean handleComment(String buf) {
+    comment = extractMultiline(buf, CMD_COMMENT, comment);
+    return comment != null;
+  }
+
+
+  /**
+   * Handles the config command.
+   *
+   * @param stok
+   * @return true if ok, false if some error
+   */
+  private boolean handleConfig(String buf) {
+    configuration = extractMultiline(buf, CMD_CONFIG, configuration);
+    return configuration != null;
+  }
+
+
+  /**
+   * Handles the indent-command.
+   *
+   * @param stok the tokenizer pointing to first arg
+   * @return true if ok, false if some error
+   */
+  private boolean handleIndent(StringTokenizer stok) {
+    if (stok.hasMoreTokens()) {
+      String token = stok.nextToken();
+      if (token.equals("auto")) {
+        setAutoIndent(true);
+      }
+      else  {
+        setIndent(Integer.parseInt(token));
+        setAutoIndent(false);
+      }
+      if (verbosity.isDebug()) {
+        logger.info("{" + CMD_INDENT + " " + token + "}");
+      }
+    }
+    return true;
+  }
+
+
+  /**
+   * Handles the phase-command.
+   *
+   * @param stok the tokenizer pointing to first arg
+   * @return true if ok, false if some error
+   */
+  private boolean handlePhase(StringTokenizer stok) {
+    if (stok.hasMoreTokens()) {
+      String token = stok.nextToken();
+      int ph = Integer.parseInt(token);
+      if (ph < 1) {
+        setPhase(null);
+      }
+      else {
+        setPhase(ph);
+      }
+      if (verbosity.isDebug()) {
+        logger.info("{" + CMD_PHASE + " " + token + "}");
+      }
+    }
+    return true;
+  }
+
+
+  /**
+   * Handles the to-command.
+   *
+   * @param stok the tokenizer pointing to first arg
+   * @return true if ok, false if some error
+   */
+  private boolean handleOutName(StringTokenizer stok) {
+    String path = stok.hasMoreTokens() ? stok.nextToken() : null;
+    setOutName(path);
+    if (verbosity.isDebug()) {
+      logger.info("{" + CMD_TO + (path == null ? "" : (" " + path)) + "}");
+    }
+    return true;
+  }
+
+
+  /**
+   * Reads next char from input.
+   * Could be from some inluded file or the main stream.
+   */
+  private int read() throws IOException {
+    int c = in.read();
+    if (c == -1)  {
+      if (readers.size() <= 1) {
+        return -1;   // EOF on main reader
+      }
+      // EOF was on an included reader
+      readers.remove(0);
+      paths.remove(in.getPath());
+      in = readers.get(0);
+      flushSource();
+      return read();
+    }
+    return c;
+  }
+
+
+
+  /**
+   * Flushes the source buffer.
+   */
+  private void flushSource() throws IOException {
+    if (sourceBuf.length() > 0) {
+      // cut first newline, if any (comes from @[ ... newline)
+      if ((wurbletMode == WURBLET_BLOCK || wurbletMode == WURBLET_COMMAND) &&
+          sourceBuf.charAt(0) == '\n')  {
+        sourceBuf.deleteCharAt(0);
+      }
+      if (sourceBuf.length() > 0) {
+        if (isAutoIndent()) {
+          setIndent(autoIndent + (lastWasOpenBlock ? 2 : 0));
+        }
+        out.write(indentStr + outName + ".print(source[" + sourceList.size() + "]); // " +
+                  (in.isIncluded() ? (in + ":") : "") + sourceLoc + " = " + hintString(sourceBuf, 40) + "\n");
+        sourceList.add(sourceBuf.toString());
+        sourceBuf.setLength(0);
+      }
+    }
+    sourceLoc = srcLocation();
+  }
+
+
+  /**
+   * Gets the current location in input source.
+   *
+   * @return the current source-location
+   */
+  private String srcLocation()  {
+    return in.getLineNo() + ":" + in.getLinePos();
+  }
+
+
+  /**
+   * Gets a formatted source string of max length and no control-chars.
+   *
+   * @return the formatted source string
+   */
+  private String hintString(StringBuilder buf, int max)  {
+    int len = buf.length();
+    boolean trailDots = false;
+    if (max > len)  {
+      max = len;
+    }
+    else  {
+      trailDots = true;
+    }
+    StringBuilder nbuf = new StringBuilder();
+    nbuf.append('"');
+    for (int i=0; i < max; i++) {
+      char c = buf.charAt(i);
+      if (!Character.isISOControl(c)) {
+        nbuf.append(c);
+      }
+    }
+    if (trailDots)  {
+      nbuf.append("...");
+    }
+    nbuf.append('"');
+    return nbuf.toString();
   }
 
 }

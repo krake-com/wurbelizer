@@ -47,7 +47,6 @@ public interface Wurbiler {
    */
   List<String> getSourceList();
 
-
   /**
    * Presets the list of invariant wurblet strings of the output level.
    *
@@ -62,7 +61,6 @@ public interface Wurbiler {
    * @return the current indentation
    */
   int getIndent();
-
 
   /**
    * Sets the indentation for code generating the source.
@@ -79,7 +77,6 @@ public interface Wurbiler {
    */
   void setAutoIndent(boolean autoIndent);
 
-
   /**
    * Gets the autoindent feature.
    *
@@ -95,12 +92,10 @@ public interface Wurbiler {
    */
   void setOutName(String outName);
 
-
   /**
    * Sets name of the output stream to the default value (out).
    */
   void setOutName();
-
 
   /**
    * Gets the name of the output stream
@@ -117,7 +112,6 @@ public interface Wurbiler {
    */
   Logger getLogger();
 
-
   /**
    * Sets the logger for warnings and errors.
    *
@@ -125,12 +119,12 @@ public interface Wurbiler {
    */
   void setLogger(Logger logger);
 
+
   /**
    * Gets the verbosity.
    * @return the verbosity
    */
   Verbosity getVerbosity();
-
 
   /**
    * Sets the verbosity.
@@ -145,7 +139,6 @@ public interface Wurbiler {
    * @return the package name, null if default package
    */
   String getPackageName();
-
 
   /**
    * Sets the package name.
@@ -162,7 +155,6 @@ public interface Wurbiler {
    */
   String getParentClass();
 
-
   /**
    * Sets the parent class.
    *
@@ -177,7 +169,6 @@ public interface Wurbiler {
    * @return array of imports
    */
   String[] getImports();
-
 
   /**
    * Sets the imports.
@@ -194,7 +185,6 @@ public interface Wurbiler {
    */
   String[] getArgs();
 
-
   /**
    * Preset wurblet args.
    * The default (null) means that the args
@@ -204,6 +194,7 @@ public interface Wurbiler {
    * @param args the wurblet args
    */
   void setArgs(String[] args);
+
 
   /**
    * Gets the wurblet comment.
@@ -218,6 +209,22 @@ public interface Wurbiler {
    * @param comment the comment, null if none
    */
   void setComment(String comment);
+
+
+  /**
+   * Gets the wurblet specific configuration.
+   *
+   * @return the config, null if none
+   */
+  String getConfiguration();
+
+  /**
+   * Sets the wurblet specific configuration.
+   *
+   * @param config the config, null if none
+   */
+  void setConfiguration(String config);
+
 
   /**
    * Gets the execution phase of the compiled wurblet.

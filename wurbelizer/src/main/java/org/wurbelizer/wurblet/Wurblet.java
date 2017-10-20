@@ -62,6 +62,7 @@ public interface Wurblet {
    */
   void cleanup() throws WurbelException;
 
+
   /**
    * Returns the phase in which the wurblet runs.<br>
    * The first and default phase is 1.<br>
@@ -76,5 +77,20 @@ public interface Wurblet {
    * @param phase the phase &ge; 1
    */
   void setPhase(int phase);
+
+
+  /**
+   * Gets the wurblet specific configuration.
+   *
+   * @return the config, null if none
+   */
+  String getConfiguration();
+
+  /**
+   * Sets the wurblet specific configuration.
+   *
+   * @param config the config, null if none
+   */
+  void setConfiguration(String config);
 
 }

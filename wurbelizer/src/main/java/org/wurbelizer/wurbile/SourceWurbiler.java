@@ -136,7 +136,10 @@ public class SourceWurbiler extends AbstractWurbiler {
         }
 
         writer.write("\n");
-        writer.write(WurbileHelper.toCommentBlock(getComment(), 0));
+        String comment = getComment();
+        if (comment != null) {
+          writer.write(WurbileHelper.toCommentBlock(getComment(), 0));
+        }
 
         writer.write("public class " + wurbletName + " extends " + pkgname);
         Collection<String> interfaces = getInterfaces();
@@ -156,9 +159,45 @@ public class SourceWurbiler extends AbstractWurbiler {
         }
         writer.write(" {\n\n");
 
-        if (getPhase() != null) {
+        Integer phase = getPhase();
+        String config = getConfiguration();
+        if (phase != null || config != null) {
           writer.write("  public " + wurbletName + "() {\n");
-          writer.write("    setPhase(" + getPhase() + ");\n");
+          if (phase != null) {
+            writer.write("    setPhase(" + phase + ");\n");
+          }
+          if (config != null) {
+            writer.write("    setConfiguration(");
+            boolean multiline = false;
+            int ndx;
+            while ((ndx = config.indexOf('\n')) >= 0) {
+              String line = config.substring(0, ndx);
+              config = config.substring(ndx + 1);
+              if (multiline) {
+                writer.write("                     \"");
+              }
+              else {
+                multiline = true;
+                writer.write("\"");
+              }
+              writer.write(line);
+              writer.write("\\n");
+              if (config.isEmpty()) {
+                break;
+              }
+              writer.write("\" +\n");
+            }
+            if (!config.isEmpty()) {
+              if (multiline) {
+                writer.write("                     \"");
+              }
+              else {
+                writer.write("\"");
+              }
+              writer.write(config);
+            }
+            writer.write("\");\n");
+          }
           writer.write("  }\n\n");
         }
         writer.write("  @Override\n");

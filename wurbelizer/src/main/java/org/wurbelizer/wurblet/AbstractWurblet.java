@@ -53,6 +53,7 @@ public abstract class AbstractWurblet implements Wurblet {
 
   protected Wurbler container;      // the container
   protected int phase = 1;          // the execution phase (default is 1)
+  protected String configuration;   // the generic wurblet configuration
   protected PrintStream out;        // the default output stream
   protected String[] source;        // the fixed source
 
@@ -90,6 +91,16 @@ public abstract class AbstractWurblet implements Wurblet {
       phase = 1;
     }
     this.phase = phase;
+  }
+
+  @Override
+  public String getConfiguration() {
+    return configuration;
+  }
+
+  @Override
+  public void setConfiguration(String config) {
+    this.configuration = config;
   }
 
 
