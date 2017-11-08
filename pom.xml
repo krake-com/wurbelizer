@@ -68,7 +68,7 @@
   <distributionManagement>
     <site>
       <id>${site.id}</id>
-      <url>scp://${site.url}/wurbelizer/${project.version}</url>
+      <url>scp:${site.url}/wurbelizer/${project.version}</url>
     </site>
     <repository>
       <id>${repo.id}</id>
