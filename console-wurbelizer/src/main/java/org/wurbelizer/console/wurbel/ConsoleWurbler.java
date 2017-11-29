@@ -19,16 +19,157 @@
 package org.wurbelizer.console.wurbel;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
-import org.wurbelizer.wurbel.DefaultWurbler;
+import org.wurbelizer.misc.DefaultLogger;
+import org.wurbelizer.misc.Logger;
+import org.wurbelizer.misc.Verbosity;
+import org.wurbelizer.wurbel.AbstractWurbler;
+import org.wurbelizer.wurbel.SourceException;
+import org.wurbelizer.wurbel.WurbelException;
+import org.wurbelizer.wurbel.WurbelResult;
 
 /**
- * Invokes the wurbler from the console.
+ * Invokes the wurbler for a single wurblet from the console.
+ * <p>
+ * Because ANT does not provide a foreach "out of the box", the main-method supports
+ * file lists as follows:
+ * <pre>
+ * java org.wurbelizer.console.ConsoleWurbler --glob="blahdir/.*\.map$" &#64;
+ * </pre>
+ * The &#64; will be replaced by the filename and the wurblet is invoked for each such file.
+ * Note that it's not a real globbing, but uses regex.
+ * This is not the most generic solution, but it does the job for wurblets like CreateTableSql.
+ * <p>
+ * Note that this wurbler runs each wurblet only once!
  *
  * @author harald
  */
-public class ConsoleWurbler {
+public class ConsoleWurbler extends AbstractWurbler {
+
+
+  private String analyzeDir;      // wurblet extra analyze dir
+  private final Logger logger;    // the default logger
+  private Verbosity verbosity;    // tell what's going on
+
+
+  /**
+   * Creates an instance of a command line wurbler.
+   *
+   * @param args the command line arguments
+   *
+   * @throws WurbelException if creating the wurbler failed
+   */
+  public ConsoleWurbler(String[] args) throws WurbelException {
+
+    super();
+
+    logger = new DefaultLogger();
+    verbosity = Verbosity.DEFAULT;
+
+    int     wurbArgCount  = 0;
+    boolean wurbletLoaded = false;
+    boolean usingCRLF = false;
+
+    // parse command line args
+    for (int argc=0; argc < args.length; argc++)  {
+      String arg = args[argc];
+      if (arg.startsWith("--out="))  {
+        setPrintStream(createOutputStream(arg.substring(6), false));
+        args[argc] = null;    // consumed
+      }
+      else if (arg.startsWith("++out="))  {
+        setPrintStream(createOutputStream(arg.substring(6), true));
+        args[argc] = null;    // consumed
+      }
+      else if (arg.startsWith("--analyzedir="))  {
+        analyzeDir = arg.substring(10);
+        args[argc] = null;    // consumed
+      }
+      else if (arg.startsWith("--crlf")) {
+        usingCRLF = true;
+      }
+      else if (!wurbletLoaded && !arg.startsWith("--")) {
+        // wurblet
+        loadWurblet(arg, null, null);
+        wurbletLoaded = true;
+        args[argc] = null;    // consumed
+      }
+      else if (arg.startsWith("--verbosity=")) {
+        try {
+          this.verbosity = Verbosity.valueOf(arg.substring(12));
+        }
+        catch (Exception ex) {
+          this.verbosity = Verbosity.DEFAULT;
+        }
+      }
+      else  {
+        wurbArgCount++;
+      }
+    }
+
+    // allocate wurblet args (if container is allowed to)
+    if (!isFixedArgs()) {
+      String[] wurbletArgs = new String[wurbArgCount];
+      wurbArgCount = 0;
+      for (String arg : args) {
+        if (arg != null)  {
+          wurbletArgs[wurbArgCount++] = arg;
+        }
+      }
+      setArgs(wurbletArgs);
+    }
+  }
+
+  @Override
+  public WurbelResult wurbel(int phase, Set<Integer> collectedPhases) throws WurbelException, SourceException {
+    boolean executed = runWurblet(phase, collectedPhases);
+    return new WurbelResult(executed ? 1 : 0,
+                            0,
+                            executed ? WurbelResult.UpdateType.UPDATED : WurbelResult.UpdateType.UNCHANGED);
+  }
+
+  @Override
+  public Verbosity getVerbosity() {
+    return verbosity;
+  }
+
+  @Override
+  public Logger getLogger() {
+    return logger;
+  }
+
+  @Override
+  public int getInvocationCount() {
+    return 1;
+  }
+
+  @Override
+  public File getAnalyzeFile(String name) {
+    return new File(analyzeDir, name);
+  }
+
+
+  /**
+   * Creates the output stream (from --/++out=...)
+   * @param name the name of the output stream
+   * @param append true if append to stream if it exists
+   * @return the stream
+   * @throws WurbelException if creation failed
+   */
+  private PrintStream createOutputStream(String name, boolean append) throws WurbelException {
+    try {
+      return new PrintStream(new FileOutputStream(name, append));
+    }
+    catch (FileNotFoundException ex) {
+      throw new WurbelException("cannot create output stream: " + name, ex);
+    }
+  }
 
 
   /**
@@ -41,13 +182,21 @@ public class ConsoleWurbler {
   }
 
 
-
   /**
    * single run
    */
   private static void run(String[] args) {
+    TreeSet<Integer> collectedPhases = new TreeSet<>();
     try {
-      new DefaultWurbler(args).runWurblet();
+      int phase = 1;
+      for (;;) {
+        new ConsoleWurbler(args).wurbel(phase, collectedPhases);
+        Integer nextPhase = collectedPhases.higher(phase);
+        if (nextPhase == null) {
+          break;
+        }
+        phase = nextPhase;
+      }
     }
     catch (Exception ex)  {
       System.err.println("/*");
@@ -101,7 +250,6 @@ public class ConsoleWurbler {
   }
 
 
-
   /**
    * Invokes the wurbler from the command line.
    *
@@ -135,6 +283,5 @@ public class ConsoleWurbler {
     // single run
     run(args);
   }
-
 
 }

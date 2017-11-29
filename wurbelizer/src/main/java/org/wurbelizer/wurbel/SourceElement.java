@@ -130,7 +130,6 @@ public class SourceElement {
       int start         = 0;
 
       // scan for wurblets
-
       while ((start = text.indexOf("@wurblet", start)) >= 0)  {
         if (start == 0 || (start > 0 && text.charAt(start-1) != '\\')) {  // if not escaped '\@wurblet'
           // determine comment lead
@@ -172,7 +171,8 @@ public class SourceElement {
               break;
             }
             else {
-              if (currentEnd > 0 && text.charAt(currentEnd - 1) == '\\') {
+              if (currentEnd > 0 && text.charAt(currentEnd - 1) == '\\' ||    // unixes
+                  currentEnd > 1 && text.charAt(currentEnd - 2) == '\\' && text.charAt(currentEnd - 1) == '\r') { // windozes
                 // continuation line: check next line
                 currentEnd++;
               }

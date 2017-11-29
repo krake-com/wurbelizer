@@ -72,8 +72,8 @@ public class HeapFileFactory {
     if (heapFile != null) {
       if (heapFile.getSourceName() != null && sourceName != null &&
           !heapFile.getSourceName().equals(sourceName)) {
-        throw new WurbelException("heapfile '" + heapName + "' created from more than one sources: " +
-                                   sourceName + " != " + heapFile.getSourceName());
+        throw new WurbelException("heapfile '" + heapName + "' created from more than one sources:\n" +
+                                   sourceName + " !=\n" + heapFile.getSourceName());
       }
       heapFile.reset();
       if (text != null) {

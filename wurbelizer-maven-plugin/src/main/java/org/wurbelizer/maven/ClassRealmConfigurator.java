@@ -16,11 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-// $Id: ClassRealmConfigurator.java 97 2016-01-04 11:35:02Z svn $
-
 package org.wurbelizer.maven;
 
-import org.codehaus.classworlds.ClassRealm;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.configurator.AbstractComponentConfigurator;
@@ -43,6 +41,7 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
  * the first build of the super-pom will fail.
  *
  * @author harald
+ * @see WurbelMojo#setClassRealm(org.codehaus.plexus.classworlds.realm.ClassRealm)
  */
 @Component(role=ComponentConfigurator.class, hint = "set-classrealm")
 public class ClassRealmConfigurator extends AbstractComponentConfigurator {
@@ -55,8 +54,8 @@ public class ClassRealmConfigurator extends AbstractComponentConfigurator {
                                  ConfigurationListener listener)
          throws ComponentConfigurationException {
 
-    if (component instanceof AbstractWurbelizerMojo) {
-      ((AbstractWurbelizerMojo) component).setClassRealm(containerRealm);
+    if (component instanceof WurbelMojo) {
+      ((WurbelMojo) component).setClassRealm(containerRealm);
     }
     else  {
       throw new ComponentConfigurationException("configurator can only be applied to an AbstractWurbelizerMojo");
@@ -66,7 +65,7 @@ public class ClassRealmConfigurator extends AbstractComponentConfigurator {
 
     ObjectWithFieldsConverter converter = new ObjectWithFieldsConverter();
 
-    converter.processConfiguration(converterLookup, component, containerRealm.getClassLoader(),
+    converter.processConfiguration(converterLookup, component, containerRealm,
                                    configuration, expressionEvaluator, listener);
   }
 

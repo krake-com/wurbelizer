@@ -25,7 +25,6 @@
     <menu ref="modules"/>
     <menu ref="reports"/>
     <menu name="Links">
-      <item name="Wurbelizer Maven Plugin" href="wurbelizer-maven-plugin/plugin-info.html"/>
       <item name="Bitbucket" href="https://bitbucket.org/krake-oss/wurbelizer"/>
       <item name="Tentackle" href="http://www.tentackle.org"/>
     </menu>

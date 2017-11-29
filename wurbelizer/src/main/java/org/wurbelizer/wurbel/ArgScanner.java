@@ -106,7 +106,7 @@ public class ArgScanner {
             if (c == '"') {
               inDoubleQuote = false;
               // translate quoted section and append to arg
-              arg.append(WurbelUtilities.translateVariables(part.toString(), otherProps));
+              arg.append(WurbelHelper.translateVariables(part.toString(), otherProps));
               part = null;
             }
             else  {
@@ -157,7 +157,7 @@ public class ArgScanner {
       }
       else {
         // append translated
-        arg.append(WurbelUtilities.translateVariables(part.toString(), otherProps));
+        arg.append(WurbelHelper.translateVariables(part.toString(), otherProps));
       }
     }
 

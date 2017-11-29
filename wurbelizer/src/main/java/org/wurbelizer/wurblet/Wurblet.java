@@ -29,7 +29,7 @@ import org.wurbelizer.wurbel.Wurbler;
 public interface Wurblet {
 
   /**
-   * Sets the container.
+   * Sets the container.<br>
    * The wurbler attaches the wurblet before invoking the run-method
    * of the wurblet.
    *
@@ -39,7 +39,7 @@ public interface Wurblet {
 
 
   /**
-   * Gets the current container.
+   * Gets the current container.<br>
    * Wurblets use this method to access the container's utility methods.
    *
    * @return the container, null if detached
@@ -61,5 +61,36 @@ public interface Wurblet {
    * @throws WurbelException if cleanup failed
    */
   void cleanup() throws WurbelException;
+
+
+  /**
+   * Returns the phase in which the wurblet runs.<br>
+   * The first and default phase is 1.<br>
+   *
+   * @return the phase
+   */
+  int getPhase();
+
+  /**
+   * Sets the execution phase.
+   *
+   * @param phase the phase &ge; 1
+   */
+  void setPhase(int phase);
+
+
+  /**
+   * Gets the wurblet specific configuration.
+   *
+   * @return the config, null if none
+   */
+  String getConfiguration();
+
+  /**
+   * Sets the wurblet specific configuration.
+   *
+   * @param config the config, null if none
+   */
+  void setConfiguration(String config);
 
 }

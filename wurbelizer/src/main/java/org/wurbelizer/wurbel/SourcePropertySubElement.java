@@ -50,7 +50,7 @@ public class SourcePropertySubElement extends SourceSubElement {
   public void scanTo(Properties props) {
     StringTokenizer stok = new StringTokenizer(getText(), "\n");
     while (stok.hasMoreTokens())  {
-      WurbelUtilities.scanPropertyLine(stok.nextToken(), props);
+      WurbelHelper.scanPropertyLine(stok.nextToken(), props);
     }
   }
 

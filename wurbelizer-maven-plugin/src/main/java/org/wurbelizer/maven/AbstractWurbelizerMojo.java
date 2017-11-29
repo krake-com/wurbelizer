@@ -20,6 +20,7 @@
 package org.wurbelizer.maven;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -29,9 +30,9 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.model.fileset.FileSet;
-import org.codehaus.classworlds.ClassRealm;
+import org.wurbelizer.misc.Settings;
 import org.wurbelizer.misc.Verbosity;
-import org.wurbelizer.wurbel.WurbelUtilities;
+import org.wurbelizer.wurbel.WurbelHelper;
 
 /**
  * Base class of wurbelizer mojos.
@@ -63,6 +64,12 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
   @Parameter(defaultValue = "${wurbel.verbosity}")
   protected String verbosity;
 
+  /**
+   * The charset used to read and write files.
+   */
+  @Parameter(defaultValue = "${project.build.sourceEncoding}")
+  protected String charset;   // don't use the name "encoding" as this is handled by maven
+
 
   /**
    * mapped verbosity level
@@ -77,23 +84,13 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
 
 
   /**
-   * The classrealm.
-   * <p>
-   * Retrieved if &#64;configurator set-classrealm is set in the class doc of the mojo.
+   * Determines the charset charset.
    */
-  protected ClassRealm classRealm;
-
-
-  /**
-   * Sets the classrealm.
-   *
-   * @param classRealm the realm
-   */
-  public void setClassRealm(ClassRealm classRealm) {
-    this.classRealm = classRealm;
+  protected void determineEncoding() {
+    if (charset != null) {
+      Settings.encodingCharset = Charset.forName(charset);
+    }
   }
-
-
 
 
   /**
@@ -210,7 +207,7 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
    */
   protected void exportExtraProperties(Properties props) {
 
-    WurbelUtilities.setExtraProperties(props);
+    WurbelHelper.setExtraProperties(props);
 
     if (verbosityLevel.isDebug()) {
       Enumeration<?> keys = props.keys();

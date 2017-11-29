@@ -19,21 +19,24 @@
 
 package org.wurbelizer.wurbel;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import org.wurbelizer.misc.Settings;
 
 
 
 /**
- * Utility methods for the Wurbelizer.
+ * Helper methods for the Wurbelizer.
  */
 
-public class WurbelUtilities {
+public class WurbelHelper {
 
   private static final String LINE_DELIM = "\n";
   private static Properties envProperties   = null;     // properties from environment
@@ -351,7 +354,7 @@ public class WurbelUtilities {
     }
     else  {
       try {
-        return new FileReader(fileName);
+        return new BufferedReader(new InputStreamReader(new FileInputStream(fileName), Settings.encodingCharset));
       }
       catch (FileNotFoundException ex) {
         throw new WurbelException("cannot open reader for " + fileName, ex);
@@ -376,8 +379,45 @@ public class WurbelUtilities {
   }
 
 
+  /**
+   * Translates a string to CRLF line endings.<br>
+   * Already existing CRLFs are left unchanged.
+   *
+   * @param str the string to translate
+   * @return the translated string
+   */
+  public static String translateLFtoCRLF(String str) {
+    if (str != null && !str.isEmpty()) {
+      StringBuilder buf = new StringBuilder(str.length() << 1);
+      char lastC = 0;
+      for (int i=0; i < str.length(); i++) {
+        char c = str.charAt(i);
+        if (c == '\n' && lastC != '\r') {
+          buf.append('\r');
+        }
+        buf.append(c);
+        lastC = c;
+      }
+      return buf.toString();
+    }
+    return str;
+  }
 
-  private WurbelUtilities() {
+  /**
+   * Translates a string to LF line endings.
+   *
+   * @param str the string to translate
+   * @return the translated string
+   */
+  public static String translateCRLFtoLF(String str) {
+    if (str != null && !str.isEmpty()) {
+      str = str.replace("\r\n", "\n");
+    }
+    return str;
+  }
+
+
+  private WurbelHelper() {
   }
 
 }

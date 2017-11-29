@@ -195,19 +195,21 @@ public class SourceDocument {
     String guardBeginPattern = GUARDED_OTHER_BEGIN;
     String guardEndPattern = GUARDED_OTHER_END;
     if (guardType == SourceElement.Type.GUARDED_NETBEANS) {
-      if (null != foldType) switch (foldType) {
-        case COLLAPSED:
-          guardBeginPattern = GUARDED_NETBEANS_COLLAPSED_BEGIN;
-          guardEndPattern   = GUARDED_NETBEANS_FOLDED_END;
-          break;
-        case EXPANDED:
-          guardBeginPattern = GUARDED_NETBEANS_EXPANDED_BEGIN;
-          guardEndPattern   = GUARDED_NETBEANS_FOLDED_END;
-          break;
-        default:
-          guardBeginPattern = GUARDED_NETBEANS_BEGIN;
-          guardEndPattern   = GUARDED_NETBEANS_END;
-          break;
+      if (null != foldType) {
+        switch (foldType) {
+          case COLLAPSED:
+            guardBeginPattern = GUARDED_NETBEANS_COLLAPSED_BEGIN;
+            guardEndPattern   = GUARDED_NETBEANS_FOLDED_END;
+            break;
+          case EXPANDED:
+            guardBeginPattern = GUARDED_NETBEANS_EXPANDED_BEGIN;
+            guardEndPattern   = GUARDED_NETBEANS_FOLDED_END;
+            break;
+          default:
+            guardBeginPattern = GUARDED_NETBEANS_BEGIN;
+            guardEndPattern   = GUARDED_NETBEANS_END;
+            break;
+        }
       }
     }
 
@@ -570,7 +572,11 @@ public class SourceDocument {
           }
         }
         if (endFound) {
-          elements.add(new SourceElement(this, type, begin, pos + 1, null));
+          SourceElement element = new SourceElement(this, type, begin, pos + 1, null);
+          if (verbosity.isDebug()) {
+            logger.info("adding source element " + element);
+          }
+          elements.add(element);
           begin = pos + 1;
           type  = null;
         }
@@ -599,6 +605,9 @@ public class SourceDocument {
             // block ends here: combine all segments to one guarded segment
             SourceElement guardElem = new SourceElement(this, guardedType, guardedStart.getBegin(), elem.getEnd(), null);
             guardElem.setGuardedName(guardedName);
+            if (verbosity.isDebug()) {
+              logger.info("found guarded section " + guardElem);
+            }
             guardedList.add(guardElem);
             guardedName = null;
             guardedType = null;
@@ -633,6 +642,9 @@ public class SourceDocument {
           }
         }
         if (guardedName == null)  {
+          if (verbosity.isDebug()) {
+            logger.info("found guarded section " + elem);
+          }
           guardedList.add(elem);    // copy to output list
         }
       }
@@ -646,13 +658,21 @@ public class SourceDocument {
     while (iter.hasNext())  {
       SourceElement elem = iter.next();
       if (elem.getBegin() > pos)  {
-        docList.add(new SourceElement(this, SourceElement.Type.CODE, pos, elem.getBegin(), null));
+        SourceElement code = new SourceElement(this, SourceElement.Type.CODE, pos, elem.getBegin(), null);
+        if (verbosity.isDebug()) {
+          logger.info("adding code element " + code);
+        }
+        docList.add(code);
       }
       docList.add(elem);
       pos = elem.getEnd();
     }
     if (pos < text.length())  {
-      docList.add(new SourceElement(this, SourceElement.Type.CODE, pos, text.length(), null));
+      SourceElement code = new SourceElement(this, SourceElement.Type.CODE, pos, text.length(), null);
+      if (verbosity.isDebug()) {
+        logger.info("adding code element " + code);
+      }
+      docList.add(code);
     }
     elements = docList;
   }

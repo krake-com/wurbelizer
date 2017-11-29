@@ -43,7 +43,8 @@ import org.wurbelizer.wurbel.JavaSourceType;
 import org.wurbelizer.wurbel.SourceException;
 import org.wurbelizer.wurbel.SourceWurbler;
 import org.wurbelizer.wurbel.WurbelException;
-import org.wurbelizer.wurbel.WurbelUtilities;
+import org.wurbelizer.wurbel.WurbelHelper;
+import org.wurbelizer.wurbel.WurbelResult;
 import org.wurbelizer.wurbel.Wurbler;
 
 
@@ -77,6 +78,7 @@ public class AntWurbler extends MatchingTask {
   private boolean printStackTrace;      // true = print stacktrace on each exception
   private Verbosity verbosity;          // tell what's going on
   private boolean runOnce;              // true = don't wurbelize a file more than once within an ant-session
+  private boolean dryRun;               // true = don't run wurblets, just parse
   private File[]  wurbleList;           // list of all java-files that need to be wurbelized
 
   private static Set<String> filesDone; // list of files already processed (for runOnce) within an ant-session
@@ -142,6 +144,25 @@ public class AntWurbler extends MatchingTask {
    */
   public boolean isRunOnce() {
     return runOnce;
+  }
+
+
+  /**
+   * Returns whether this is only a dry run.
+   *
+   * @return true if dry run
+   */
+  public boolean isDryRun() {
+    return dryRun;
+  }
+
+  /**
+   * Sets the dry run property.
+   *
+   * @param dryRun true if don't run any wurblets, just parse
+   */
+  public void setDryRun(boolean dryRun) {
+    this.dryRun = dryRun;
   }
 
 
@@ -326,7 +347,7 @@ public class AntWurbler extends MatchingTask {
         }
       }
     }
-    WurbelUtilities.setExtraProperties(props);
+    WurbelHelper.setExtraProperties(props);
   }
 
 
@@ -421,108 +442,124 @@ public class AntWurbler extends MatchingTask {
    */
   protected void wurbelize() {
 
-    boolean hereDocsUpdated = true;
+    int phase = 1;
+    TreeSet<Integer> collectedPhases = new TreeSet<>();
 
-    while (hereDocsUpdated) {
+    for (;;) {
 
-      hereDocsUpdated = false;
-      HeapFileFactory.initialize();
+      boolean hereDocsUpdated = true;
 
-      int wurbeledFilesCount  = 0;
-      int updatedFilesCount   = 0;
-      int errorFilesCount     = 0;
+      while (hereDocsUpdated) {
 
-      Set<String> errorsSoFar = new HashSet<>();
+        hereDocsUpdated = false;
+        HeapFileFactory.initialize();
+
+        int wurbeledFilesCount  = 0;
+        int wurbletCount        = 0;
+        int updatedFilesCount   = 0;
+        int errorFilesCount     = 0;
+
+        Set<String> errorsSoFar = new HashSet<>();
 
 
-      for (File file : wurbleList) {
-        if (runOnce) {
-          if (filesDone == null)  {
-            filesDone = new TreeSet<>();
+        for (File file : wurbleList) {
+          if (runOnce) {
+            if (filesDone == null)  {
+              filesDone = new TreeSet<>();
+            }
+            if (!filesDone.add(file.getAbsolutePath())) {
+              continue;   // skip
+            }
           }
-          if (!filesDone.add(file.getAbsolutePath())) {
-            continue;   // skip
-          }
-        }
 
-        try {
+          try {
 
-          wurbeledFilesCount++;
+            wurbeledFilesCount++;
 
-          int errors = new SourceWurbler (file.getPath(), null, getWurbletPathArray(), analyzeDir,
-                  new AntLogger(getProject()) {
-                    @Override
-                    public void info(String msg) {
-                      AntWurbler.this.log(msg, Project.MSG_INFO);
-                    }
-                  },
-                  verbosity, errorsSoFar) {
-
-                    /**
-                     * gets the property value for a given namespace and key.
-                     * Overwritten from AbstractWurbler to set "ant" synonym for "extra".
-                     * Just to make it easier to remember... ;-)
-                     *
-                     * @param nameSpace use null for the default java-properties.
-                     * @return the value for key, null if no such key
-                     */
-                    @Override
-                    public String getProperty(String nameSpace, String key) {
-                      if (nameSpace != null && nameSpace.equals("ant")) {
-                        return WurbelUtilities.getExtraProperties().getProperty(key);
+            WurbelResult result = new SourceWurbler (file.getPath(), null, getWurbletPathArray(), analyzeDir,
+                    new AntLogger(getProject()) {
+                      @Override
+                      public void info(String msg) {
+                        AntWurbler.this.log(msg, Project.MSG_INFO);
                       }
-                      return super.getProperty(nameSpace, key);
-                    }
+                    },
+                    verbosity, errorsSoFar, dryRun) {
 
-                  }.wurbelize();
+                      /**
+                       * gets the property value for a given namespace and key.
+                       * Overwritten from AbstractWurbler to set "ant" synonym for "extra".
+                       * Just to make it easier to remember... ;-)
+                       *
+                       * @param nameSpace use null for the default java-properties.
+                       * @return the value for key, null if no such key
+                       */
+                      @Override
+                      public String getProperty(String nameSpace, String key) {
+                        if (nameSpace != null && nameSpace.equals("ant")) {
+                          return WurbelHelper.getExtraProperties().getProperty(key);
+                        }
+                        return super.getProperty(nameSpace, key);
+                      }
 
+                    }.wurbel(phase, collectedPhases);
 
-          if (errors > 0) {
-            errorFilesCount++;
-            updatedFilesCount++;
-            // file has been modified and there were wurblet error (dump is in source)
-            log(file.getName() + " generated with wurblet errors (" + errors + ")", Project.MSG_WARN);
-          }
-          else {
-            if (errors == SourceWurbler.RC_UPDATED) {
-              updatedFilesCount++;
-              // file has been modified without errors
-              if (verbosity.isDebug()) {
-                log(">>> " + file.getName() + " <<< UPDATED!");
+            wurbletCount += result.getWurbletCount();
+
+            if (result.getErrors() > 0) {
+              errorFilesCount++;
+              log(file.getName() + " generated with wurblet errors (" + result.getErrors() + ")", Project.MSG_WARN);
+            }
+            else {
+              if (result.getUpdateType() == WurbelResult.UpdateType.UPDATED) {
+                updatedFilesCount++;
+                // file has been modified without errors
+                if (verbosity.isDebug()) {
+                  log(">>> " + file.getName() + " <<< UPDATED!");
+                }
+                else if (verbosity.isInfo()) {
+                  log(file.getName());
+                }
               }
-              else if (verbosity.isInfo()) {
-                log(file.getName());
+              else if (result.getUpdateType() == WurbelResult.UpdateType.HEREDOCS) {
+                hereDocsUpdated = true;
               }
             }
-            else if (errors == SourceWurbler.RC_HEREDOCS) {
-              hereDocsUpdated = true;
+          }
+
+          catch (WurbelException | SourceException | RuntimeException ex)  {
+            String msg = ex instanceof SourceException ? "FAILED" : file.getName();
+            if (printStackTrace) {
+              log(msg, ex, Project.MSG_ERR);
+            }
+            else  {
+              log(msg + ": " + ex, Project.MSG_ERR);
             }
           }
         }
 
-        catch (WurbelException | SourceException | RuntimeException ex)  {
-          String msg = ex instanceof SourceException ? "FAILED" : file.getName();
-          if (printStackTrace) {
-            log(msg, ex, Project.MSG_ERR);
-          }
-          else  {
-            log(msg + ": " + ex, Project.MSG_ERR);
+        if (!hereDocsUpdated) {
+          log("phase " + phase + ", " +
+              wurbletCount + " wurblets processed, " +
+              wurbeledFilesCount + " files wurbeled, " +
+              updatedFilesCount + " updated, " +
+              errorFilesCount + " errors");
+
+          if (errorFilesCount > 0) {
+            if (failOnError) {
+              throw new BuildException(FAIL_MSG, getLocation());
+            }
+            else {
+              log(FAIL_MSG, Project.MSG_ERR);
+            }
           }
         }
       }
 
-      if (!hereDocsUpdated) {
-        log(wurbeledFilesCount + " files wurbeled, " + updatedFilesCount + " updated, " + errorFilesCount + " errors");
-
-        if (errorFilesCount > 0) {
-          if (failOnError) {
-            throw new BuildException(FAIL_MSG, getLocation());
-          }
-          else {
-            log(FAIL_MSG, Project.MSG_ERR);
-          }
-        }
+      Integer nextPhase = collectedPhases.higher(phase);
+      if (nextPhase == null) {
+        break;
       }
+      phase = nextPhase;
     }
   }
 

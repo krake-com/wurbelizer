@@ -22,34 +22,34 @@ package org.wurbelizer.wurbel;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.Properties;
+import java.util.Set;
 import org.wurbelizer.misc.Logger;
 import org.wurbelizer.misc.Verbosity;
-
 
 
 /**
  * The wurblet container.
  */
-
 public interface Wurbler {
 
   /**
-   * file extension for the wurblet source
+   * file extension for the wurblet source.
    */
   String WURBLET_PROPERTIES_EXTENSION = ".wurb";
 
   /**
-   * namespace for the runtime environment
+   * namespace for the runtime environment.
    */
   String PROPSPACE_ENV = "env";
 
   /**
-   * namespace for the wurblet
+   * namespace for the wurblet.
    */
   String PROPSPACE_WURBLET = "wurblet";
 
   /**
-   * extra namespace (used for wurbletProperites in maven poms).
+   * extra namespace.<br>
+   * used for wurbletProperites in maven poms
    */
   String PROPSPACE_EXTRA = "extra";
 
@@ -57,31 +57,44 @@ public interface Wurbler {
 
 
   /**
-   * property in wurblet namespace holding the absolute pathname of the source file
+   * property in wurblet namespace holding the absolute pathname of the source file.
    */
   String WURBLET_FILENAME = "filename";
 
   /**
-   * property in wurblet namespace holding the pathname of the *.wurb-file (additional properties), null if none
+   * property in wurblet namespace holding the pathname of the *.wurb-file (additional properties), null if none.
    */
   String WURBLET_WURBNAME = "wurbname";
 
   /**
-   * property in wurblet namespace holding the directory of the source file
+   * property in wurblet namespace holding the directory of the source file.
    */
   String WURBLET_DIRNAME = "dirname";
 
   /**
-   * property in wurblet namespace holding the guardname of the wurblet anchor (wurblet tag)
+   * property in wurblet namespace holding the guardname of the wurblet anchor.
+   * (wurblet tag)
    */
   String WURBLET_GUARDNAME = "guardname";
 
   /**
-   * property in wurblet namespace holding the name of the wurblet
+   * property in wurblet namespace holding the name of the wurblet.
    */
   String WURBLET_WURBLETNAME = "wurbletname";
 
 
+
+  /**
+   * Processes the source file, create here-docs and replace wurblet-guarded sections.
+   *
+   * @param phase the execution phase, starting at 1
+   * @param collectedPhases the phases of all wurblets detected so far
+   * @return the wurbel result
+   *
+   * @throws WurbelException if a file- or heapfile operation failed
+   * @throws SourceException if source scanning failed
+   */
+  WurbelResult wurbel(int phase, Set<Integer> collectedPhases) throws WurbelException, SourceException;
 
 
   /**
