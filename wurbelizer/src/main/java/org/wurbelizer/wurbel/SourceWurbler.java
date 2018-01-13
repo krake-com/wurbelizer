@@ -233,7 +233,7 @@ public class SourceWurbler extends AbstractWurbler {
     SourceFile sourceFile = SourceFileFactory.open(filename);
     String text = sourceFile.getOrgText();
 
-    int errors = 0;                     // > 0: some error during running of wurblets
+    int errors = 0;                     // > 0: some wurblets failed
     int wurbletCount = 0;               // number of processed wurblets
     boolean updated = false;            // true if updated
     boolean hereDocsWritten = false;    // true if heredocs written
@@ -404,6 +404,11 @@ public class SourceWurbler extends AbstractWurbler {
                   continue;
                 }
                 wurbletCount++;
+              }
+              catch (WurbelDiscardException dx) {
+                // discard wurblet's output and treat as warning
+                logger.warning(ExceptionHelper.concatenateMessages(dx));
+                continue;
               }
               catch (WurbelException ex)  {
                 errors++;
