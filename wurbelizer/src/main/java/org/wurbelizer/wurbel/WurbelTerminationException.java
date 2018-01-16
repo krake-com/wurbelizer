@@ -20,9 +20,13 @@
 package org.wurbelizer.wurbel;
 
 /**
- * Same as {@link WurbelException} but instructs the wurbler to terminate.
+ * Same as {@link WurbelException} but terminates the build process immediately.<br>
+ * Wurblets should throw this exception if the error is severe enough that it doesn't
+ * make sense to execute any further wurblets, because they would fail as well.
  *
  * @author harald
+ * @see WurbelException
+ * @see WurbelDiscardException
  */
 @SuppressWarnings("serial")
 public class WurbelTerminationException extends WurbelException {

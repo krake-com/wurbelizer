@@ -20,11 +20,15 @@
 package org.wurbelizer.wurbel;
 
 /**
- * Same as {@link WurbelException} but instructs the wurbler to discard the generated source.
- * Useful if a wurblet fails but doesn't want to modify anything. Such events are logged
- * as warnings and not counted as an error.
+ * Same as {@link WurbelException} but instructs the wurbler to discard the generated source.<br>
+ * The error is counted as a warning and is treated as if there was no wurblet at all.<br>
+ * Useful if a wurblet fails, but it's smarter to leave the existing code unchanged and continue
+ * with the build process. Requires some management to count those warnings and terminate the
+ * build process in a subsequent phase.
  *
  * @author harald
+ * @see WurbelException
+ * @see WurbelTerminationException
  */
 @SuppressWarnings("serial")
 public class WurbelDiscardException extends WurbelException {
