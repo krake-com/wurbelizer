@@ -122,7 +122,7 @@ public interface Wurbler {
 
 
   /**
-   * Gets the invocation count.
+   * Gets the invocation count.<br>
    * Wurblets are invoked as long as the data changes.
    * Some wurblets need to know how often (i.e. to allocate HeapFiles only once)
    *
@@ -153,7 +153,7 @@ public interface Wurbler {
 
 
   /**
-   * Gets an information file.
+   * Gets an analyze information file.<br>
    * Some wurblets need extra information which is provided in files
    * in the so-called analyzedir (example in ant: analyzedir=${apt})
    *
@@ -165,7 +165,7 @@ public interface Wurbler {
 
 
   /**
-   * Gets the verbosity level.
+   * Gets the verbosity level.<br>
    * @return the verbosity
    */
   Verbosity getVerbosity();

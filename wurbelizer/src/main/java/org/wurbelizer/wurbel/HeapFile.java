@@ -42,6 +42,7 @@ public class HeapFile {
   private int invocationCount;              // the last invocationCounter from wurbler-container (for optional use in wurblets)
   private String sourceName;                // the last heapName of the wurbeled sourcefile
   private byte[] savePoint;                 // last savepoint, null if none
+  private boolean discarded;                // true if wurblets reading this heapfile should throw a WurbelDiscardException
 
 
   /**
@@ -59,6 +60,24 @@ public class HeapFile {
     if (text != null) {
       out.print(text);
     }
+  }
+
+
+  /**
+   * Marks this heapfile as discarded.<br>
+   * Such files should not be used to generate code because their contents are incomplete
+   * because of former errors. Wurblets reading this file should throw a {@link WurbelDiscardException}.
+   */
+  public void discard() {
+    discarded = true;
+  }
+
+  /**
+   * Returns whether this heapfile is ok to use or should be discarded.
+   * @return true wurblets reading this file should throw a {@link WurbelDiscardException}
+   */
+  public boolean isDiscarded() {
+    return discarded;
   }
 
 

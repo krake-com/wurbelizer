@@ -32,6 +32,7 @@ public class HeapStream {
   private final int invocationCount;          // wurbler invocation count
   private final String sourceName;            // name of wurbeled source file
   private final PrintStream codeStream;       // the code stream
+  private final HeapFile heapFile;            // the heap file
 
 
   /**
@@ -45,21 +46,60 @@ public class HeapStream {
     // remember invocation params
     invocationCount = container.getInvocationCount();
     sourceName = container.getProperty(Wurbler.PROPSPACE_WURBLET, Wurbler.WURBLET_FILENAME);
+
     // create remote stream and file
-    codeStream = createStream(heapName);
+    heapFile = createOrGetHeapFile(heapName);
+    codeStream = new PrintStream(heapFile.getPrintStream());
   }
 
 
+  /**
+   * Marks the heapfile or this stream as discarded.<br>
+   * Such files should not be used to generate code because their contents are incomplete
+   * because of former errors. Wurblets reading this file should throw a {@link WurbelDiscardException}.
+   */
+  public void discard() {
+    heapFile.discard();
+  }
 
   /**
-   * Creates a heapfile and its stream.
+   * Returns whether this heapfile is ok to use or should be discarded.
+   * @return true wurblets reading this file should throw a {@link WurbelDiscardException}
+   */
+  public boolean isDiscarded() {
+    return heapFile.isDiscarded();
+  }
+
+
+  /**
+   * Gets the stream.
+   *
+   * @return get the remote stream
+   */
+  public PrintStream getStream()  {
+    return codeStream;
+  }
+
+
+  /**
+   * Appends a text to the stream (without newline).
+   *
+   * @param text the text to append
+   */
+  public void append(String text) {
+    codeStream.print(text);
+  }
+
+
+  /**
+   * Gets the heapfile or creates it if new.
    *
    * @param heapName the name of the heapfile
-   * @return the printstream
+   * @return the heapfile
    *
    * @throws WurbelException if heapfile could not be reverted of created
    */
-  protected PrintStream createStream(String heapName) throws WurbelException {
+  protected HeapFile createOrGetHeapFile(String heapName) throws WurbelException {
     HeapFile file = HeapFileFactory.get(heapName);
     if (file != null)  {
       // heapfile already exists
@@ -83,27 +123,7 @@ public class HeapStream {
 
     file.setInvocationCount(invocationCount);
     file.setSourceName(sourceName);
-
-    return new PrintStream(file.getPrintStream());
+    return file;
   }
 
-
-  /**
-   * Gets the stream.
-   *
-   * @return get the remote stream
-   */
-  public PrintStream getStream()  {
-    return codeStream;
-  }
-
-
-  /**
-   * Appends a text to the stream (without newline).
-   *
-   * @param text the text to append
-   */
-  public void append(String text) {
-    codeStream.print(text);
-  }
 }

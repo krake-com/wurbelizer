@@ -350,6 +350,9 @@ public class WurbelHelper {
         throw new WurbelException("no such heapfile '" + fileName + "'",
                                   new FileNotFoundException(fileName));
       }
+      if (hf.isDiscarded()) {
+        throw new WurbelDiscardException("heapfile '" + fileName + "' discarded");
+      }
       return hf.getReader();
     }
     else  {
