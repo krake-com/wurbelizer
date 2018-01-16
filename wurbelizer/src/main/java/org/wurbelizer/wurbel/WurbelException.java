@@ -20,9 +20,14 @@
 package org.wurbelizer.wurbel;
 
 /**
- * An exception thrown while executing a {@link org.wurbelizer.wurblet.Wurblet}.
+ * An exception thrown while executing a {@link org.wurbelizer.wurblet.Wurblet}.<br>
+ * A {@code WurbelException} is counted as a build error and usually terminates the
+ * build process at the end of the corresponding build phase.
+ * Subclasses are provided for a different behaviour.
  *
  * @author harald
+ * @see WurbelTerminationException
+ * @see WurbelDiscardException
  */
 @SuppressWarnings("serial")
 public class WurbelException extends Exception {
