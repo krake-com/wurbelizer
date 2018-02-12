@@ -92,7 +92,7 @@ public abstract class AbstractWurbler implements Wurbler {
         // load the class
         clazz = Class.forName(name);
         if (Wurblet.class.isAssignableFrom(clazz))  {
-          setWurblet((Wurblet) clazz.newInstance());
+          setWurblet((Wurblet) clazz.getConstructor().newInstance());
           break;
         }
         else  {
