@@ -30,9 +30,6 @@ import java.io.PrintStream;
  */
 public class DefaultLogger implements Logger {
 
-  public DefaultLogger() {
-  }
-
   @Override
   public boolean isDebugLoggable() {
     return true;
