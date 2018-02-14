@@ -504,7 +504,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
         try {
           in.getReader().close();
         }
-        catch (Exception ex) { }
+        catch (IOException ex) { }
         readers.remove(0);
         paths.remove(in.getPath());
         in = readers.get(0);

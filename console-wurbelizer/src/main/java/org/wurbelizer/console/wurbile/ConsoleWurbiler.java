@@ -76,7 +76,7 @@ public class ConsoleWurbiler {
         try {
           verbosity = Verbosity.valueOf(arg.substring(12));
         }
-        catch (Exception ex) {
+        catch (RuntimeException ex) {
           verbosity = Verbosity.DEFAULT;
         }
       }

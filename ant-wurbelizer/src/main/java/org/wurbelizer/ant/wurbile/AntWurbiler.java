@@ -88,7 +88,7 @@ public class AntWurbiler extends MatchingTask {
     try {
       this.verbosity = Verbosity.valueOf(verbosity.toUpperCase());
     }
-    catch (Exception ex) {
+    catch (RuntimeException ex) {
       this.verbosity = Verbosity.DEFAULT;
     }
   }

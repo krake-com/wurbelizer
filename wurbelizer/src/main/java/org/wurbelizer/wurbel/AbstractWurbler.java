@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -92,7 +93,7 @@ public abstract class AbstractWurbler implements Wurbler {
         // load the class
         clazz = Class.forName(name);
         if (Wurblet.class.isAssignableFrom(clazz))  {
-          setWurblet((Wurblet) clazz.getConstructor().newInstance());
+          setWurblet((Wurblet) clazz.getDeclaredConstructor().newInstance());
           break;
         }
         else  {
@@ -102,7 +103,8 @@ public abstract class AbstractWurbler implements Wurbler {
       catch (ClassNotFoundException ex) {
         // try next
       }
-      catch (Exception ex) {
+      catch (IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException |
+             SecurityException | InvocationTargetException | WurbelException ex) {
         throw new WurbelException("cannot initialize wurblet '" + className + "'", ex);
       }
     }

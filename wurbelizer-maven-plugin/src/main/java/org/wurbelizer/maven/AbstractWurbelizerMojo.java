@@ -101,7 +101,7 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
       try {
         verbosityLevel = Verbosity.valueOf(verbosity.toUpperCase());
       }
-      catch (Exception ex) {
+      catch (RuntimeException ex) {
         verbosityLevel = Verbosity.DEFAULT;
       }
     }

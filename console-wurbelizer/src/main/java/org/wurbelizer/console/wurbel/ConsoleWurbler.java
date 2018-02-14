@@ -104,7 +104,7 @@ public class ConsoleWurbler extends AbstractWurbler {
         try {
           this.verbosity = Verbosity.valueOf(arg.substring(12));
         }
-        catch (Exception ex) {
+        catch (RuntimeException ex) {
           this.verbosity = Verbosity.DEFAULT;
         }
       }
@@ -198,7 +198,7 @@ public class ConsoleWurbler extends AbstractWurbler {
         phase = nextPhase;
       }
     }
-    catch (Exception ex)  {
+    catch (SourceException | WurbelException | RuntimeException ex)  {
       System.err.println("/*");
       ex.printStackTrace();
       System.err.println("*/");
@@ -242,7 +242,7 @@ public class ConsoleWurbler extends AbstractWurbler {
         }
       }
     }
-    catch (Exception ex)  {
+    catch (RuntimeException ex)  {
       System.err.println("/*");
       ex.printStackTrace();
       System.err.println("*/");
