@@ -1,4 +1,4 @@
-/**
+/*
  * Wurbelizer - http://www.wurbelizer.org
  *
  * This library is free software; you can redistribute it and/or

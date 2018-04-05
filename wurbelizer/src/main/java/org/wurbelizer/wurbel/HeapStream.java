@@ -1,4 +1,4 @@
-/**
+/*
  * Tentackle - a framework for java desktop applications
  *
  * This library is free software; you can redistribute it and/or
