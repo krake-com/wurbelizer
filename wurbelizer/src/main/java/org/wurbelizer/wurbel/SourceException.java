@@ -29,8 +29,8 @@ package org.wurbelizer.wurbel;
 @SuppressWarnings("serial")
 public class SourceException extends Exception {
 
-  private SourceElement elem;
-  private SourceDocument doc;
+  private final SourceElement elem;
+  private final SourceDocument doc;
 
 
   /**
@@ -42,6 +42,7 @@ public class SourceException extends Exception {
   public SourceException(SourceElement elem, String message) {
     super(message);
     this.elem = elem;
+    this.doc = null;
   }
 
 
@@ -54,6 +55,7 @@ public class SourceException extends Exception {
   public SourceException(SourceDocument doc, String message) {
     super(message);
     this.doc = doc;
+    this.elem = null;
   }
 
 

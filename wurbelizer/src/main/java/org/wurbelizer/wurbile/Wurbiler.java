@@ -166,14 +166,14 @@ public interface Wurbiler {
   /**
    * Gets the list of imports.
    *
-   * @return array of imports
+   * @return array of imports, never null
    */
   String[] getImports();
 
   /**
    * Sets the imports.
    *
-   * @param imports is the array of imports
+   * @param imports is the array of imports, null to clear
    */
   void setImports(String[] imports);
 

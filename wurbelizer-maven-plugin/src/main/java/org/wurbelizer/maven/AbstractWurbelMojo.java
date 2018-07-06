@@ -227,7 +227,7 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
         hereDocsUpdated = false;
         HeapFileFactory.initialize();   // clear any heapfiles generated in previous hereDocs loop
 
-        if (filesets != null && filesets.size() > 0) {
+        if (filesets != null && !filesets.isEmpty()) {
           // explicit filesets given instead of source dir
           int count = 0;    // fileset count
           for (FileSet fileSet: filesets) {

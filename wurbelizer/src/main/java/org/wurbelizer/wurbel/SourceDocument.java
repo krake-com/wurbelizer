@@ -560,11 +560,9 @@ public class SourceDocument {
       else  {
         boolean endFound = false;
         if (type == SourceElement.Type.SINGLE_COMMENT)  {
-          if (text.charAt(pos) == '\n') {
-            // group several single line comments together
-            if (remains < 2 || text.charAt(pos+1) != '/' || text.charAt(pos+2) != '/')  {
-              endFound = true;
-            }
+          if (text.charAt(pos) == '\n' && // group several single line comments together
+              (remains < 2 || text.charAt(pos+1) != '/' || text.charAt(pos+2) != '/'))  {
+            endFound = true;
           }
         }
         else {

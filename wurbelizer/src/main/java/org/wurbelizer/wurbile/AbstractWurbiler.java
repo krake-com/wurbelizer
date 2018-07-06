@@ -765,16 +765,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
 
   @Override
   public String[] getImports() {
-    if (imports.size() > 0) {
-      String[] imps = new String[imports.size()];
-      Iterator<String> iter = imports.iterator();
-      int i = 0;
-      while (iter.hasNext())  {
-        imps[i++] = iter.next();
-      }
-      return imps;
-    }
-    return null;
+    return imports.toArray(new String[0]);
   }
 
   @Override
@@ -996,7 +987,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
         logger.info("{" + CMD_ARGS + " " + arg + "}");
       }
     }
-    if (argList.size() > 0) {
+    if (!argList.isEmpty()) {
       args = new String[argList.size()];
       Iterator<String> iter = argList.iterator();
       int i=0;

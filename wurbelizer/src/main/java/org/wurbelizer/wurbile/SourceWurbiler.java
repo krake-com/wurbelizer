@@ -123,11 +123,9 @@ public class SourceWurbiler extends AbstractWurbiler {
         if (getPackageName() != null)  {
           writer.write("package " + getPackageName() + ";\n\n");
         }
-        String[] imports = getImports();
-        if (imports != null)  {
-          for (String imp : imports) {
-            writer.write("import " + imp + ";\n");
-          }
+
+        for (String imp : getImports()) {
+          writer.write("import " + imp + ";\n");
         }
 
         String pkgname = getParentClass();
