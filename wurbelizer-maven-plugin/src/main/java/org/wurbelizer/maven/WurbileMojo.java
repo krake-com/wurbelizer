@@ -114,7 +114,7 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
     }
     else {
       // all from wurblet source dir with default extension
-      if (wurbletSourceDir.isDirectory() && wurbletSourceDir.list().length > 0) {
+      if (wurbletSourceDir.isDirectory() && wurbletSourceDir.list() != null && wurbletSourceDir.list().length > 0) {
         final FileSet fs = new FileSet();
         fs.setDirectory(wurbletSourceDir.getPath());
         fs.addInclude("**/*" + Constants.WURBLET_SOURCE_EXTENSION);

@@ -251,7 +251,7 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
         }
         else {
           // all from source dir with default java-extension
-          if (getSourceDir().isDirectory() && getSourceDir().list().length > 0) {
+          if (getSourceDir().isDirectory() && getSourceDir().list() != null && getSourceDir().list().length > 0) {
             final FileSet fs = new FileSet();
             fs.setDirectory(getSourceDir().getPath());
             fs.addInclude("**/*" + Constants.JAVA_SOURCE_EXTENSION);
@@ -320,7 +320,7 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
    *
    * @param fileSet the set of files
    * @return true if heredocs were updated (needs another run)
-   * @throws MojoExecutionException
+   * @throws MojoExecutionException if failed
    */
   private boolean wurbelFileSet(FileSet fileSet, int phase, Set<Integer> collectedPhases) throws MojoExecutionException {
 
@@ -465,7 +465,7 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
    * @return the paths as a string array
    */
   private String[] wurbletPathsAsArray() {
-    return wurbletPaths.toArray(new String[wurbletPaths.size()]);
+    return wurbletPaths.toArray(new String[0]);
   }
 
 

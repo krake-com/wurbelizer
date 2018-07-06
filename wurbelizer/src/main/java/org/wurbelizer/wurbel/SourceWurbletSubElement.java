@@ -87,7 +87,7 @@ public class SourceWurbletSubElement extends SourceSubElement {
         start = wend + 1;
       }
     }
-    setWurblerArgs(wrgList.toArray(new String[wrgList.size()]));
+    setWurblerArgs(wrgList.toArray(new String[0]));
 
     // scan for args
     List<String> argList = new ArrayList<>();   // wurblet args (args for wurblet)
@@ -123,7 +123,7 @@ public class SourceWurbletSubElement extends SourceSubElement {
     setWurbletName(currentWurbletName);
 
     // set the wurblet argument list (may be empty)
-    setWurbletArgs(argList.toArray(new String[argList.size()]));
+    setWurbletArgs(argList.toArray(new String[0]));
   }
 
 
@@ -291,7 +291,7 @@ public class SourceWurbletSubElement extends SourceSubElement {
         }
         int ndx = line.indexOf('\n');
         if (ndx >= 0) {
-          buf.append(line.substring(0, ndx + 1));
+          buf.append(line, 0, ndx + 1);
           line = line.substring(ndx + 1);
         }
         else {

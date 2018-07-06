@@ -12,10 +12,10 @@
 
   <name>Wurbelizer Parent</name>
   <description>Parent pom.xml for the Wurbelizer modules.</description>
-  <url>http://www.wurbelizer.org</url>
+  <url>https://wurbelizer.org</url>
   <organization>
     <name>Krake Softwaretechnik</name>
-    <url>http://www.krake.de</url>
+    <url>https://krake.de</url>
   </organization>
 
   <licenses>
@@ -30,7 +30,7 @@
     <developer>
       <email>harald@krake.de</email>
       <name>Harald Krake</name>
-      <url>http://www.krake.de</url>
+      <url>https://krake.de</url>
       <id>hkr</id>
     </developer>
   </developers>

@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
@@ -74,7 +75,6 @@ public class ConsoleWurbler extends AbstractWurbler {
 
     int     wurbArgCount  = 0;
     boolean wurbletLoaded = false;
-    boolean usingCRLF = false;
 
     // parse command line args
     for (int argc=0; argc < args.length; argc++)  {
@@ -90,9 +90,6 @@ public class ConsoleWurbler extends AbstractWurbler {
       else if (arg.startsWith("--analyzedir="))  {
         analyzeDir = arg.substring(10);
         args[argc] = null;    // consumed
-      }
-      else if (arg.startsWith("--crlf")) {
-        usingCRLF = true;
       }
       else if (!wurbletLoaded && !arg.startsWith("--")) {
         // wurblet
@@ -224,7 +221,7 @@ public class ConsoleWurbler extends AbstractWurbler {
 
       if (files != null) {
         // sort by name
-        Arrays.sort(files, (File o1, File o2) -> o1.getPath().compareTo(o2.getPath()));
+        Arrays.sort(files, Comparator.comparing(File::getPath));
 
         for (File file: files) {
           // replace the file's name with the @, if found

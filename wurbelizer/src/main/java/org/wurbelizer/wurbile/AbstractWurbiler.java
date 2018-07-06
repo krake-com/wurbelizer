@@ -288,10 +288,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
                 out.write(nc);
               }
               else  {
-                /**
-                 * we are on source-level: close current source buffer
-                 * and enter wurblet-level.
-                 */
+                // we are on source-level: close current source buffer and enter wurblet-level
                 flushSource();
                 wurbletMode = nc;
                 inWurblet = true;
@@ -483,9 +480,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
         }
       }
 
-      /**
-       * if there's something left in the source-buffer, append that and write closing line
-       */
+      // if there's something left in the source-buffer, append that and write closing line
       flushSource();
 
       // do some checks
@@ -1019,7 +1014,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
   /**
    * Handles the comment command.
    *
-   * @param stok
+   * @param buf the comment text
    * @return true if ok, false if some error
    */
   private boolean handleComment(String buf) {
@@ -1031,7 +1026,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
   /**
    * Handles the config command.
    *
-   * @param stok
+   * @param buf the configuration text
    * @return true if ok, false if some error
    */
   private boolean handleConfig(String buf) {

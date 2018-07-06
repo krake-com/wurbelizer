@@ -271,7 +271,7 @@ public class SourceDocument {
       if (elem.isGuarded() && elem.getGuardedName().equals(guardedName)) {
         // found
         deleteElement(i);
-        /**
+        /*
          * Because the guarded blocks begin with a single line comment which is
          * indendet by a newline + <spaces> the code-block before must be made
          * smaller to cut off this garbage. Otherwise the generated sources

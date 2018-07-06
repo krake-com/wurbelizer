@@ -252,7 +252,7 @@ public class SourceWurbler extends AbstractWurbler {
         for (String key: sourceProps.stringPropertyNames()) {
           String value = sourceProps.getProperty(key);
           Object oldValue = wurbProps.setProperty(key, value);
-          if (oldValue == null || !(oldValue instanceof String) || !oldValue.equals(value)) {
+          if (!(oldValue instanceof String) || !oldValue.equals(value)) {
             foundProps = true;
             if (verbosity.isDebug()) {
               logger.info(key + ": " + value);

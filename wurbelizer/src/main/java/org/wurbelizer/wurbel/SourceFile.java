@@ -72,7 +72,7 @@ public class SourceFile {
         orgBuf.append(String.valueOf(chars, 0, numRead));
       }
       orgText = orgBuf.toString();
-      /**
+      /*
        * We cannot just check whether we are on windows or not because VCS like git or subversion
        * can be configured how to treat line endings. We must determine that from the file contents!
        */
