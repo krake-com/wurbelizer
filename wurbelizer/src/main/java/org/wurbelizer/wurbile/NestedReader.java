@@ -18,12 +18,13 @@
 
 package org.wurbelizer.wurbile;
 
+import org.wurbelizer.misc.Settings;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
-import org.wurbelizer.misc.Settings;
 
 /**
  * Reader to load source files.

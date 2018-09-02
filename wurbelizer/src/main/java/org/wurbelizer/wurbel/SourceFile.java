@@ -19,6 +19,8 @@
 
 package org.wurbelizer.wurbel;
 
+import org.wurbelizer.misc.Settings;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,7 +32,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.io.Writer;
-import org.wurbelizer.misc.Settings;
 
 
 /**

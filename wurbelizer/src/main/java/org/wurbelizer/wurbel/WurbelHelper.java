@@ -19,28 +19,64 @@
 
 package org.wurbelizer.wurbel;
 
+import org.wurbelizer.misc.Settings;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.ServiceLoader;
 import java.util.StringTokenizer;
-import org.wurbelizer.misc.Settings;
-
 
 
 /**
  * Helper methods for the Wurbelizer.
  */
-
 public class WurbelHelper {
 
   private static final String LINE_DELIM = "\n";
-  private static Properties envProperties   = null;     // properties from environment
-  private static Properties extraProperties = null;     // extra properties (e.g. from ant)
+  private static Properties envProperties   = null;         // properties from environment
+  private static Properties extraProperties = null;         // extra properties (e.g. from ant)
+
+  private static Map<String, SourceRegion> sourceRegions;   // map of available regions <type : SourceRegion>
+  private static SourceRegion defaultRegion;                // the default region
+
+  /**
+   * Lazily gets the map of source regions.<br>
+   * The key is the region type (name), the value is the {@link SourceRegion}.
+   *
+   * @return the region map, never null
+   */
+  public static Map<String, SourceRegion> getSourceRegionMap() {
+    if (sourceRegions == null) {
+      sourceRegions = new HashMap<>();
+      for (Iterator<SourceRegion> regionIter = ServiceLoader.load(SourceRegion.class).iterator(); regionIter.hasNext(); ) {
+        SourceRegion region = regionIter.next();
+        sourceRegions.put(region.type(), region);
+        if (defaultRegion == null && region.isDefault()) {
+          // pick first default region
+          defaultRegion = region;
+        }
+      }
+    }
+    return sourceRegions;
+  }
+
+  /**
+   * Gets the default source region.
+   *
+   * @return the default region, null if none
+   */
+  public static SourceRegion getDefaultRegion() {
+    getSourceRegionMap();
+    return defaultRegion;
+  }
 
 
   /**

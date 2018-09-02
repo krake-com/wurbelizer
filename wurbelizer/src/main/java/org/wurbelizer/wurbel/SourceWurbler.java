@@ -19,6 +19,11 @@
 
 package org.wurbelizer.wurbel;
 
+import org.wurbelizer.misc.Constants;
+import org.wurbelizer.misc.Logger;
+import org.wurbelizer.misc.Settings;
+import org.wurbelizer.misc.Verbosity;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -33,10 +38,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
-import org.wurbelizer.misc.Constants;
-import org.wurbelizer.misc.Logger;
-import org.wurbelizer.misc.Settings;
-import org.wurbelizer.misc.Verbosity;
 
 
 
@@ -81,8 +82,8 @@ public class SourceWurbler extends AbstractWurbler {
   private final Set<String> errorsSoFar;            // old error message list
   private final boolean dryRun;                     // true if dry run (no wurblets, just parsing)
 
-  private SourceElement.Type guardType;             // the guard type
-  private SourceDocument.FoldType defaultFoldType;  // the default fold type (null if none)
+  private SourceRegion guardType;                   // the guard type
+  private SourceRegion.FoldType defaultFoldType;    // the default fold type (null if none)
   private Properties wurbProps;                     // properties from wurb-file
   private int loopCount;                            // loop counter
   private SourceType sourceType;                    // type of this source file
@@ -166,8 +167,8 @@ public class SourceWurbler extends AbstractWurbler {
     wurbProps.setProperty(WURBLET_FILENAME, filename);    // full pathname
     wurbProps.setProperty(WURBLET_DIRNAME, dirname);      // directory name
 
-    // get the guarded type
-    guardType = SourceElement.Type.GUARDED_OTHER;    // default type
+    // get the guarded region type
+    guardType = SourceRegion.get(null); // default type
 
     // settings from extra properties
     Properties extraProps = WurbelHelper.getExtraProperties();
@@ -343,7 +344,7 @@ public class SourceWurbler extends AbstractWurbler {
               // parse container options (wurbler args)
               int indent = 0;                                       // extra indentation
               boolean invoke = true;                                // run the wurblet
-              SourceDocument.FoldType foldType = defaultFoldType;   // the fold type (default none)
+              SourceRegion.FoldType foldType = defaultFoldType;     // the fold type (default none)
 
               // parse wurbler args
               for (String warg: wurblet.getWurblerArgs()) {
@@ -356,7 +357,7 @@ public class SourceWurbler extends AbstractWurbler {
                 else if (warg.startsWith("fold=")) {
                   String val = warg.substring(5).toUpperCase();
                   if (!val.equals("NONE")) {
-                    foldType = SourceDocument.FoldType.valueOf(val);
+                    foldType = SourceRegion.FoldType.valueOf(val);
                   }
                 }
                 else if (warg.startsWith("phase=")) {
@@ -567,13 +568,12 @@ public class SourceWurbler extends AbstractWurbler {
 
   /**
    * Set guardtype from string
+   *
+   * @throws WurbelException if no matching guard type
    */
-  private void setGuardType(String value)  {
+  private void setGuardType(String value) throws WurbelException {
     // overwrite guardtype from wurbfile
-    if (value != null && value.equalsIgnoreCase("netbeans")) {
-      guardType = SourceElement.Type.GUARDED_NETBEANS;
-    }
-    // else if other guarded types to come...
+    guardType = SourceRegion.get(value);
   }
 
 
@@ -584,7 +584,7 @@ public class SourceWurbler extends AbstractWurbler {
     if (value != null) {
       value = value.toUpperCase();
       if (!value.equals("none")) {
-        defaultFoldType = SourceDocument.FoldType.valueOf(value);
+        defaultFoldType = SourceRegion.FoldType.valueOf(value);
       }
     }
   }
@@ -592,8 +592,10 @@ public class SourceWurbler extends AbstractWurbler {
 
   /**
    * process property line
+   *
+   * @throws WurbelException if no matching guard type
    */
-  private void processPropertyLine(String line) {
+  private void processPropertyLine(String line) throws WurbelException {
     String key = WurbelHelper.scanPropertyLine(line, wurbProps);
     if (key != null && key.equals(PROPERTY_GUARDTYPE)) {
       // overwrite guardtype from wurbfile

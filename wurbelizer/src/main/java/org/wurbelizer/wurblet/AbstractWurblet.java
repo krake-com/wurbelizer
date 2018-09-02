@@ -19,10 +19,11 @@
 
 package org.wurbelizer.wurblet;
 
-import java.io.PrintStream;
 import org.wurbelizer.wurbel.JavaSourceType;
 import org.wurbelizer.wurbel.WurbelException;
 import org.wurbelizer.wurbel.Wurbler;
+
+import java.io.PrintStream;
 
 
 /**

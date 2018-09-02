@@ -128,12 +128,12 @@ public class SourceWurbletSubElement extends SourceSubElement {
 
 
   /**
-   * Gets the parent wurblet that generated the code for this wurblet.
+   * Gets the parent wurblet element that generated the code for this wurblet element.
    *
-   * @return the parent wurblet, null if none
+   * @return the parent wurblet element, null if none
    */
-  public SourceWurbletSubElement getParentWurblet() {
-    return getElement().getParentWurblet();
+  public SourceWurbletSubElement getParentWurbletElement() {
+    return getElement().getParentWurbletElement();
   }
 
 

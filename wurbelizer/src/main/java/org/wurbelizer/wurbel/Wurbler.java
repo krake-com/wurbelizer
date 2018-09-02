@@ -19,12 +19,13 @@
 
 package org.wurbelizer.wurbel;
 
+import org.wurbelizer.misc.Logger;
+import org.wurbelizer.misc.Verbosity;
+
 import java.io.File;
 import java.io.PrintStream;
 import java.util.Properties;
 import java.util.Set;
-import org.wurbelizer.misc.Logger;
-import org.wurbelizer.misc.Verbosity;
 
 
 /**
