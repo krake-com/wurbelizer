@@ -19,15 +19,13 @@
 
 package org.wurbelizer.ant.misc;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import org.apache.tools.ant.Project;
 import org.wurbelizer.misc.Logger;
 
-import static org.apache.tools.ant.Project.MSG_DEBUG;
-import static org.apache.tools.ant.Project.MSG_ERR;
-import static org.apache.tools.ant.Project.MSG_INFO;
-import static org.apache.tools.ant.Project.MSG_WARN;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
+import static org.apache.tools.ant.Project.*;
 
 /**
  * Ant logger.<br>

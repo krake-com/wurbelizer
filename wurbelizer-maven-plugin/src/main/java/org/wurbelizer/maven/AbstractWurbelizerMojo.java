@@ -19,12 +19,6 @@
 
 package org.wurbelizer.maven;
 
-import java.io.File;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Properties;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -33,6 +27,13 @@ import org.apache.maven.shared.model.fileset.FileSet;
 import org.wurbelizer.misc.Settings;
 import org.wurbelizer.misc.Verbosity;
 import org.wurbelizer.wurbel.WurbelHelper;
+
+import java.io.File;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Base class of wurbelizer mojos.

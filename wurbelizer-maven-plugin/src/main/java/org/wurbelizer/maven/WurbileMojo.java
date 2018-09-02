@@ -19,8 +19,6 @@
 
 package org.wurbelizer.maven;
 
-import java.io.File;
-import java.io.IOException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -35,6 +33,9 @@ import org.wurbelizer.wurbel.WurbelHelper;
 import org.wurbelizer.wurbile.SourceWurbiler;
 import org.wurbelizer.wurbile.WurbileException;
 import org.wurbelizer.wurbile.Wurbiler;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Wurbile Wurblets.<br>
