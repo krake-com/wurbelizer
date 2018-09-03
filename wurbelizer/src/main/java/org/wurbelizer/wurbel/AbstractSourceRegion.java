@@ -63,6 +63,27 @@ public abstract class AbstractSourceRegion implements SourceRegion {
     return buf.toString();
   }
 
+  /**
+   * Checks for the token and assert it's not a region name.
+   *
+   * @param comment the comment string to check
+   * @param token the begin or end token
+   * @return true if token found
+   */
+  protected boolean matches(String comment, String token) {
+    boolean match = false;
+    int ndx;
+    while ((ndx = comment.indexOf(token)) > 0) {   // never 0
+      if (comment.charAt(ndx - 1) != '\'') {    // not 'token (see createCommentGeneratedBy above)
+        match = true;
+        break;
+      }
+      // was a region name, check next
+      comment = comment.substring(ndx + token.length());
+    }
+    return match;
+  }
+
   @Override
   public String toString() {
     return type();

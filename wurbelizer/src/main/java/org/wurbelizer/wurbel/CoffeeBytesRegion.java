@@ -55,7 +55,7 @@ public class CoffeeBytesRegion extends AbstractSourceRegion {
   @Override
   public String getBeginName(String comment) {
     String name = null;
-    if (comment.contains(MATCH_BEGIN)) {
+    if (matches(comment, MATCH_BEGIN)) {
       int ndx = comment.indexOf(GUARD_BEGIN);
       if (ndx >= 0) {
         name = comment.substring(ndx + GUARD_BEGIN.length()).trim();
@@ -66,8 +66,7 @@ public class CoffeeBytesRegion extends AbstractSourceRegion {
 
   @Override
   public boolean isEnd(String comment, String name) {
-    System.out.println(comment);
-    return comment.contains(MATCH_END) && comment.contains(GUARD_END + name);
+    return matches(comment, MATCH_END) && comment.contains(GUARD_END + name);
   }
 
 }
