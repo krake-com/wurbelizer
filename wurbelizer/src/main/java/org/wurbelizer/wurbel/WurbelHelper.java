@@ -28,7 +28,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
@@ -56,8 +55,7 @@ public class WurbelHelper {
   public static Map<String, SourceRegion> getSourceRegionMap() {
     if (sourceRegions == null) {
       sourceRegions = new HashMap<>();
-      for (Iterator<SourceRegion> regionIter = ServiceLoader.load(SourceRegion.class).iterator(); regionIter.hasNext(); ) {
-        SourceRegion region = regionIter.next();
+      for (SourceRegion region : ServiceLoader.load(SourceRegion.class)) {
         sourceRegions.put(region.type(), region);
         if (defaultRegion == null && region.isDefault()) {
           // pick first default region

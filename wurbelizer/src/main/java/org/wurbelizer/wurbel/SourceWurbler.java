@@ -556,7 +556,7 @@ public class SourceWurbler extends AbstractWurbler {
             if (stok.hasMoreTokens()) {
               String str2 = stok.nextToken();
               boolean rv = str1.equals(str2);
-              return invert ? !rv : rv;
+              return invert != rv;   // invert ? !rv : rv
             }
           }
         }

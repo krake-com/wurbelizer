@@ -32,10 +32,12 @@ public interface SourceRegion {
    * Editor fold type.
    */
   enum FoldType {
-    /** editor fold which is collapsed by default */
+
+    /** editor fold which is collapsed by default. */
     COLLAPSED,
-    /** editor fold which is expanded by default */
-    EXPANDED;
+
+    /** editor fold which is expanded by default. */
+    EXPANDED
   }
 
 
