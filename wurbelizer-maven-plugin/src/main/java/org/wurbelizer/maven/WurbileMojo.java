@@ -107,7 +107,7 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
 
     totalErrors = 0;
 
-    if (filesets != null && filesets.size() > 0) {
+    if (filesets != null && !filesets.isEmpty()) {
       // explicit filesets given instead of wurblet source dir
       for (FileSet fileSet: filesets) {
         wurbileFileSet(fileSet);

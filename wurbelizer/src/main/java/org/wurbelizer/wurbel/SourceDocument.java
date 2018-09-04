@@ -516,18 +516,16 @@ public class SourceDocument {
       SourceElement elem = iter.next();
       if (guardedName != null)  {
         // looking for end of guarded block (guarded types are not mixed within a single file!)
-        if (elem.getType() == SourceElement.Type.SINGLE_COMMENT)  {
-          if (guardedType.isEnd(elem.getText(), guardedName)) {
-            // block ends here: combine all segments to one guarded segment
-            SourceElement guardElem = new SourceElement(this, SourceElement.Type.GUARDED, guardedStart.getBegin(), elem.getEnd(), null);
-            guardElem.setGuardedName(guardedName);
-            if (verbosity.isDebug()) {
-              logger.info("found guarded section " + guardElem);
-            }
-            guardedList.add(guardElem);
-            guardedName = null;
-            guardedType = null;
+        if (elem.getType() == SourceElement.Type.SINGLE_COMMENT && guardedType.isEnd(elem.getText(), guardedName)) {
+          // block ends here: combine all segments to one guarded segment
+          SourceElement guardElem = new SourceElement(this, SourceElement.Type.GUARDED, guardedStart.getBegin(), elem.getEnd(), null);
+          guardElem.setGuardedName(guardedName);
+          if (verbosity.isDebug()) {
+            logger.info("found guarded section " + guardElem);
           }
+          guardedList.add(guardElem);
+          guardedName = null;
+          guardedType = null;
         }
       }
       else  {

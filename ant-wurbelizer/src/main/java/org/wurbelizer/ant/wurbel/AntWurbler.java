@@ -85,9 +85,6 @@ public class AntWurbler extends MatchingTask {
   private static Set<String> filesDone; // list of files already processed (for runOnce) within an ant-session
 
 
-
-
-
   /**
    * Creates an instanceof of a wurbler for wurbelization of source files from within ant.
    */
@@ -99,8 +96,6 @@ public class AntWurbler extends MatchingTask {
     runOnce         = true;
     wurbleList      = new File[0];
   }
-
-
 
 
   /**
@@ -295,11 +290,11 @@ public class AntWurbler extends MatchingTask {
 
   /**
    * Executes the task.
-   *
-   * @exception BuildException if an error occurs
+   * <p>
+   * Throws {@link BuildException} if an error occurs.
    */
   @Override
-  public void execute() throws BuildException {
+  public void execute() {
 
     checkParameters();
     registerSourceTypes();
@@ -425,10 +420,10 @@ public class AntWurbler extends MatchingTask {
   /**
    * Checks that all required attributes have been set and nothing
    * silly has been entered.
-   *
-   * @exception BuildException if an error occurs
+   * <p>
+   * Throws {@link BuildException} if an error occurs.
    */
-  protected void checkParameters() throws BuildException {
+  protected void checkParameters() {
     if (src == null) {
       throw new BuildException("srcdir attribute must be set!", getLocation());
     }
