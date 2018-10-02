@@ -48,9 +48,11 @@
     <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <dependency.locations.enabled>false</dependency.locations.enabled>
-    <javac.version.src>10</javac.version.src>
+    <javac.version.src>10</javac.version.src>     <!-- stick to 10 bytecode cause maven plugin tools are still using ASM5 -->
     <javac.version.target>10</javac.version.target>
-    <java.version>10.0.1</java.version>
+    <java.version>11</java.version>
+    <javafx.version>11</javafx.version>
+    <ow2.asm.version>6.2.1</ow2.asm.version>    <!-- change this to 7.0.x when maven plugin tools switched to ASM7 -->
     <maven.version>3.5.4</maven.version>
     <netbeans.hint.license>wurbelizer</netbeans.hint.license>
   </properties>
@@ -147,7 +149,7 @@
             <dependency>
               <groupId>org.ow2.asm</groupId>
               <artifactId>asm</artifactId>
-              <version>6.2</version> <!-- Use newer version of ASM -->
+              <version>${ow2.asm.version}</version> <!-- Use newer version of ASM -->
             </dependency>
           </dependencies>
         </plugin>
@@ -159,7 +161,7 @@
             <dependency>
               <groupId>org.ow2.asm</groupId>
               <artifactId>asm</artifactId>
-              <version>6.2</version> <!-- Use newer version of ASM -->
+              <version>${ow2.asm.version}</version> <!-- Use newer version of ASM -->
             </dependency>
           </dependencies>
         </plugin>
@@ -186,7 +188,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.7.0</version>
+          <version>3.8.0</version>
           <configuration>
             <encoding>UTF-8</encoding>
             <source>${javac.version.src}</source>
@@ -199,7 +201,7 @@
             <dependency>
               <groupId>org.ow2.asm</groupId>
               <artifactId>asm</artifactId>
-              <version>6.2</version> <!-- Use newer version of ASM -->
+              <version>${ow2.asm.version}</version> <!-- Use newer version of ASM -->
             </dependency>
           </dependencies>
         </plugin>
@@ -216,6 +218,13 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.22.0</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.ow2.asm</groupId>
+              <artifactId>asm</artifactId>
+              <version>${ow2.asm.version}</version> <!-- Use newer version of ASM -->
+            </dependency>
+          </dependencies>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
