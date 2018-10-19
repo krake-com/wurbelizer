@@ -87,6 +87,7 @@ public interface SourceRegion {
    * Returns whether this is the end comment for the given region's name.
    *
    * @param comment the comment string
+   * @param name the region's name
    * @return true if matching end comment
    */
   boolean isEnd(String comment, String name);
