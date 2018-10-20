@@ -60,7 +60,7 @@ public class NestedReader {
   public NestedReader(String path) throws IOException {
     file = new File(path);
     name = file.getName();
-    reader = Files.newBufferedReader(file.toPath(), Settings.encodingCharset);
+    reader = Files.newBufferedReader(file.toPath(), Settings.getEncodingCharset());
   }
 
   /**

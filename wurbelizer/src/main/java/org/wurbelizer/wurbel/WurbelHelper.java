@@ -391,7 +391,7 @@ public class WurbelHelper {
     }
     else  {
       try {
-        return new BufferedReader(new InputStreamReader(new FileInputStream(fileName), Settings.encodingCharset));
+        return new BufferedReader(new InputStreamReader(new FileInputStream(fileName), Settings.getEncodingCharset()));
       }
       catch (FileNotFoundException ex) {
         throw new WurbelException("cannot open reader for " + fileName, ex);

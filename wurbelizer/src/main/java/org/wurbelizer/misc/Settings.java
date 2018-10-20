@@ -28,17 +28,29 @@ import java.nio.charset.StandardCharsets;
  */
 public class Settings {
 
-  /**
-   * The encoding used to read and write files.<br>
-   * Defaults to "UTF-8".
-   * <p>
-   * Usually set by the maven plugins from "project.build.sourceEncoding".
-   */
-  public static Charset encodingCharset = StandardCharsets.UTF_8;
+  private static Charset encodingCharset = StandardCharsets.UTF_8;
 
+
+  /**
+   * Gets the encoding used to read and write files.<br>
+   * Usually set by the maven plugins from "project.build.sourceEncoding".
+   *
+   * @return the charset, default is {@link StandardCharsets#UTF_8}
+   */
+  public static Charset getEncodingCharset() {
+    return encodingCharset;
+  }
+
+  /**
+   * Sets the encoding used to read and write files.
+   *
+   * @param encodingCharset the charset, default is {@link StandardCharsets#UTF_8}
+   */
+  public static void setEncodingCharset(Charset encodingCharset) {
+    Settings.encodingCharset = encodingCharset;
+  }
 
 
   private Settings() {
   }
-
 }

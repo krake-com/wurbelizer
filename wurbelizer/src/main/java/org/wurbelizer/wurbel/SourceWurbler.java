@@ -180,7 +180,7 @@ public class SourceWurbler extends AbstractWurbler {
     // load wurbfile, if any
     if (wurbFilename != null) {
       try (BufferedReader in =
-              new BufferedReader(new InputStreamReader(new FileInputStream(wurbFilename), Settings.encodingCharset))) {
+              new BufferedReader(new InputStreamReader(new FileInputStream(wurbFilename), Settings.getEncodingCharset()))) {
         for (;;) {
           String line = in.readLine();
           if (line == null) {

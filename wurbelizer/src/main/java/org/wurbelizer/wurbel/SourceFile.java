@@ -67,7 +67,7 @@ public class SourceFile {
     StringBuilder orgBuf = new StringBuilder(BUFSIZE);
     char[] chars = new char[BUFSIZE];
     int numRead;
-    try (Reader in = new InputStreamReader(new FileInputStream(filename), Settings.encodingCharset)) {
+    try (Reader in = new InputStreamReader(new FileInputStream(filename), Settings.getEncodingCharset())) {
       // read the source file according to the systems encoding
       while((numRead = in.read(chars)) > -1) {
         orgBuf.append(String.valueOf(chars, 0, numRead));
@@ -171,7 +171,7 @@ public class SourceFile {
     if (parentFile != null) {
       parentFile.mkdirs();  // create any missing directories
     }
-    try (Writer writer = new OutputStreamWriter(new FileOutputStream(file), Settings.encodingCharset)) {
+    try (Writer writer = new OutputStreamWriter(new FileOutputStream(file), Settings.getEncodingCharset())) {
       writer.write(text);
     }
     catch (IOException ex) {

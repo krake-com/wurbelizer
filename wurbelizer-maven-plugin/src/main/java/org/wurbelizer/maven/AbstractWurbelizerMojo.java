@@ -89,7 +89,7 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
    */
   protected void determineEncoding() {
     if (charset != null) {
-      Settings.encodingCharset = Charset.forName(charset);
+      Settings.setEncodingCharset(Charset.forName(charset));
     }
   }
 
