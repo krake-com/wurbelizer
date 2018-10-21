@@ -12,7 +12,7 @@
   <version>2.2-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
   <name>Wurbelizer Maven Plugin</name>
-  <description>Maven Plugin for Wurbelizer</description>
+  <description>Maven Plugin for the Wurbelizer</description>
   <url>https://wurbelizer.org</url>
 
   <properties>

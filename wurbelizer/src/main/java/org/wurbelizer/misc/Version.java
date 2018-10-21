@@ -1,5 +1,5 @@
 /*
- * Wurbelizer - http://www.wurbelizer.org
+ * Wurbelizer - https://wurbelizer.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -53,7 +53,7 @@ public class Version {
    */
   public static void main(String[] args) {
     System.out.println(
-"\nWurbelizer - http://www.wurbelizer.org" +
+"\nWurbelizer - https://wurbelizer.org" +
 "\n\nVersion " + RELEASE + " (" + DATE + ")\n\n" +
 "This library is free software; you can redistribute it and/or\n" +
 "modify it under the terms of the GNU Lesser General Public\n" +

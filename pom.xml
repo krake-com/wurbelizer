@@ -11,7 +11,7 @@
   <packaging>pom</packaging>
 
   <name>Wurbelizer Parent</name>
-  <description>Parent pom.xml for the Wurbelizer modules.</description>
+  <description>Parent Project for the Wurbelizer Modules</description>
   <url>https://wurbelizer.org</url>
   <organization>
     <name>Krake Softwaretechnik</name>
@@ -393,14 +393,14 @@
             <additionalOption>-html5</additionalOption>
           </additionalOptions>
           <stylesheetfile>${rootBasedir}/src/site/resources/css/apidocs.css</stylesheetfile>
-          <bottom><![CDATA[<a href="${project.url}">Wurbelizer</a> - a lightweight code generator]]></bottom>
+          <bottom><![CDATA[<a href="${project.url}">Wurbelizer</a> - Agility in Code Generation]]></bottom>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jxr-plugin</artifactId>
         <configuration>
-          <bottom><![CDATA[<a href="${project.url}">Wurbelizer</a> - a lightweight code generator]]></bottom>
+          <bottom><![CDATA[<a href="${project.url}">Wurbelizer</a> - Agility in Code Generation]]></bottom>
         </configuration>
       </plugin>
       <plugin>
@@ -468,7 +468,7 @@
                     <additionalOption>-html5</additionalOption>
                   </additionalOptions>
                   <stylesheetfile>${rootBasedir}/src/site/resources/css/apidocs.css</stylesheetfile>
-                  <bottom><![CDATA[<a href="${project.url}">Wurbelizer</a> - a lightweight code generator]]></bottom>
+                  <bottom><![CDATA[<a href="${project.url}">Wurbelizer</a> - Agility in Code Generation]]></bottom>
                   <quiet>true</quiet>
                   <archive>
                     <manifest>

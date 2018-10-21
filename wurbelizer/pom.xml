@@ -12,7 +12,7 @@
   <version>2.2-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>Wurbelizer</name>
-  <description>Code Generator</description>
+  <description>Code Generator Core</description>
   <url>https://wurbelizer.org</url>
 
   <properties>
