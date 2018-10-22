@@ -9,7 +9,7 @@
   <bannerRight>
     <name>Krake Softwaretechnik</name>
     <src>images/krake.png</src>
-    <href>http://www.krake.de</href>
+    <href>https://krake.de</href>
   </bannerRight>
   <skin>
     <groupId>org.apache.maven.skins</groupId>
