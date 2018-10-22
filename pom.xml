@@ -51,7 +51,6 @@
     <javac.version.src>10</javac.version.src>     <!-- stick to 10 bytecode cause maven plugin tools are still using ASM5 -->
     <javac.version.target>10</javac.version.target>
     <java.version>11</java.version>
-    <javafx.version>11</javafx.version>
     <ow2.asm.version>6.2.1</ow2.asm.version>    <!-- change this to 7.0.x when maven plugin tools switched to ASM7 -->
     <maven.version>3.5.4</maven.version>
     <netbeans.hint.license>wurbelizer</netbeans.hint.license>
