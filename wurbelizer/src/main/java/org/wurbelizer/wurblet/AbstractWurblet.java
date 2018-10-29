@@ -72,6 +72,11 @@ public abstract class AbstractWurblet implements Wurblet {
   }
 
   @Override
+  public String process(String generatedCode) {
+    return generatedCode;   // the default does nothing
+  }
+
+  @Override
   public void setContainer(Wurbler container) {
     this.container = container;
   }

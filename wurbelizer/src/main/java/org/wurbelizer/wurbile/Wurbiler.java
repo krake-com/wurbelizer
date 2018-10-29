@@ -213,6 +213,21 @@ public interface Wurbiler {
 
 
   /**
+   * Gets the extra code.
+   *
+   * @return the extra code, null if none
+   */
+  String getExtraCode();
+
+  /**
+   * Sets the extra code.
+   *
+   * @param code the extra code, null if none
+   */
+  void setExtraCode(String code);
+
+
+  /**
    * Gets the wurblet specific configuration.
    *
    * @return the config, null if none

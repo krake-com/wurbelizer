@@ -94,7 +94,10 @@ import java.util.TreeSet;
  * will write the generated code to, not the output writer of the compiled wurblet!).
  * {@code @{to out}} resets to the default stream, which is equivalent to {@code @{to}}.<p>
  *
- * {@code @{comment ..... }@}: adds the text to the wurblet comment
+ * {@code @{comment ..... }@}: adds the text to the wurblet comment<p>
+ *
+ * {@code @{code ...}@}: adds the code to the class level code. This code is appended to the
+ * end of the wurblet's java code and can be used to override or implement wurblet methods.<p>
  *
  * @author harald
  */
@@ -118,6 +121,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
   private static final String CMD_COMMENT     = "comment";
   private static final String CMD_PHASE       = "phase";
   private static final String CMD_CONFIG      = "config";
+  private static final String CMD_CODE        = "code";
 
 
 
@@ -129,6 +133,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
                                             // i.e. from command line, @wurblet, etc...
   private Integer       phase;              // the execution phase if != null
   private StringBuilder comment;            // the wurblet comment, null if none
+  private StringBuilder code;               // extra top level code, null if none
   private StringBuilder configuration;      // generic wurblet options
 
   private final List<NestedReader> readers; // Reader list (active reader is always at start of list)
@@ -383,6 +388,10 @@ public abstract class AbstractWurbiler implements Wurbiler {
                         case CMD_COMMENT:
                           // add wurblet comment
                           cmdOk = handleComment(wurbletBuf.toString());
+                          break;
+                        case CMD_CODE:
+                          // add wurblet code
+                          cmdOk = handleCode(wurbletBuf.toString());
                           break;
                         case CMD_CONFIG:
                           // add wurblet comment
@@ -798,6 +807,16 @@ public abstract class AbstractWurbiler implements Wurbiler {
   }
 
   @Override
+  public String getExtraCode() {
+    return code == null ? null : code.toString();
+  }
+
+  @Override
+  public void setExtraCode(String code) {
+    this.code = code == null ? null : new StringBuilder(code);
+  }
+
+  @Override
   public String getConfiguration() {
     return configuration == null ? null : configuration.toString();
   }
@@ -1014,6 +1033,16 @@ public abstract class AbstractWurbiler implements Wurbiler {
     return comment != null;
   }
 
+  /**
+   * Handles the code command.
+   *
+   * @param buf the code
+   * @return true if ok, false if some error
+   */
+  private boolean handleCode(String buf) {
+    code = extractMultiline(buf, CMD_CODE, code);
+    return code != null;
+  }
 
   /**
    * Handles the config command.

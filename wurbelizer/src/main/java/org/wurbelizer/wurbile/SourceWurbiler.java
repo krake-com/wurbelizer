@@ -221,6 +221,10 @@ public class SourceWurbiler extends AbstractWurbiler {
       // write closing
       writer.write("\n");
       writer.write("  // ----------------- end wurblet code -----------------\n");
+      String extraCode = getExtraCode();
+      if (extraCode != null) {
+        writer.write(extraCode);
+      }
       writer.write("}\n");
     }
     catch (IOException ex) {

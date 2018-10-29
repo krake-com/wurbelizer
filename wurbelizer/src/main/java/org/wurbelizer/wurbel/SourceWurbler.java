@@ -339,7 +339,7 @@ public class SourceWurbler extends AbstractWurbler {
             List<SourceWurbletSubElement> wurbletList = element.getWurblets();
             for (int wurbletIndex = wurbletList.size() - 1; wurbletIndex >= 0; wurbletIndex--) {
 
-              SourceWurbletSubElement wurblet = wurbletList.get(wurbletIndex);
+              SourceWurbletSubElement wurbletElement = wurbletList.get(wurbletIndex);
 
               // parse container options (wurbler args)
               int indent = 0;                                       // extra indentation
@@ -347,7 +347,7 @@ public class SourceWurbler extends AbstractWurbler {
               SourceRegion.FoldType foldType = defaultFoldType;     // the fold type (default none)
 
               // parse wurbler args
-              for (String warg: wurblet.getWurblerArgs()) {
+              for (String warg: wurbletElement.getWurblerArgs()) {
                 if (warg.startsWith("indent=")) {
                   indent = Integer.parseInt(warg.substring(7));
                 }
@@ -377,14 +377,14 @@ public class SourceWurbler extends AbstractWurbler {
 
               try {
 
-                String currentGuardName = wurblet.getName();
+                String currentGuardName = wurbletElement.getName();
 
-                if (!wurblet.isInline() && !guardedNames.add(currentGuardName)) {
+                if (!wurbletElement.isInline() && !guardedNames.add(currentGuardName)) {
                   throw new WurbelException("guarded name '" + currentGuardName + "' not unique");
                 }
 
                 wurbProps.setProperty(WURBLET_GUARDNAME, currentGuardName);
-                String wurbletName = wurblet.getWurbletName();
+                String wurbletName = wurbletElement.getWurbletName();
                 wurbProps.setProperty(WURBLET_WURBLETNAME, wurbletName);
 
                 if (verbosity.isDebug()) {
@@ -396,7 +396,7 @@ public class SourceWurbler extends AbstractWurbler {
 
                 // get arguments if not fixed
                 if (!isFixedArgs()) {
-                  setArgs(wurblet.getWurbletArgs());
+                  setArgs(wurbletElement.getWurbletArgs());
                 }
                 setPrintStream(ps);
 
@@ -416,7 +416,7 @@ public class SourceWurbler extends AbstractWurbler {
                 // log only exceptions that did not already show up (avoids cluttering output)
                 String errMsg = ExceptionHelper.concatenateMessages(ex);
                 if (!ex.isSourceInfoIncluded()) {
-                  errMsg = new File(filename).getName() + ":[" + doc.getLineNumber(wurblet.getWurbletBegin()) + "] " + errMsg;
+                  errMsg = new File(filename).getName() + ":[" + doc.getLineNumber(wurbletElement.getWurbletBegin()) + "] " + errMsg;
                 }
                 boolean doLog = true;
                 if (errorsSoFar != null) {
@@ -434,7 +434,7 @@ public class SourceWurbler extends AbstractWurbler {
                 }
 
                 // place exceptions in comments in output
-                if (wurblet.isInline()) {
+                if (wurbletElement.isInline()) {
                   // print only a single line as newlines would break the insertion point
                   ps.print(" { " + ex.getMessage() + " } ");
                 }
@@ -447,22 +447,22 @@ public class SourceWurbler extends AbstractWurbler {
               // any other exception will abort (NPE, whatever)
 
               // build generated text
-              String srcText = os.toString();
+              String srcText = getWurblet().process(os.toString());
 
               // add fixed indent if option set
               srcText = WurbelHelper.indent(srcText, indent);
 
               // replace and if no success delete
-              if (wurblet.isInline()) {
+              if (wurbletElement.isInline()) {
                 // inline wurblet: replace text between two consecutive /**/
                 // within the next source element
-                doc.replaceInline(srcText, elementIndex, wurblet);
+                doc.replaceInline(srcText, elementIndex, wurbletElement);
               }
               else  {
                 // generate text into guarded section
-                if (doc.replaceGuarded(guardType, foldType, wurblet.getName(), srcText, wurblet) == -1) {
+                if (doc.replaceGuarded(guardType, foldType, wurbletElement.getName(), srcText, wurbletElement) == -1) {
                   // insert the wurblet output
-                  doc.insertGuarded(guardType, foldType, wurblet.getName(), srcText, elementIndex + 1, wurblet);
+                  doc.insertGuarded(guardType, foldType, wurbletElement.getName(), srcText, elementIndex + 1, wurbletElement);
                 }
               }
             }

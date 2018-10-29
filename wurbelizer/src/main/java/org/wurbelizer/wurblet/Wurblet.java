@@ -37,7 +37,6 @@ public interface Wurblet {
    */
   void setContainer(Wurbler container);
 
-
   /**
    * Gets the current container.<br>
    * Wurblets use this method to access the container's utility methods.
@@ -54,6 +53,14 @@ public interface Wurblet {
    */
   void run() throws WurbelException;
 
+  /**
+   * Processes the generated code.<br>
+   * Used to filter, translater, etc... before being applied to the file.
+   *
+   * @param generatedCode the generated code
+   * @return the processed generated code
+   */
+  String process(String generatedCode);
 
   /**
    * Performs any cleanup necessary after last invocation of a wurblet.
