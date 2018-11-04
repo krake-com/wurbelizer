@@ -48,7 +48,7 @@
     <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <dependency.locations.enabled>false</dependency.locations.enabled>
-    <javac.version.src>11</javac.version.src>     <!-- stick to 10 bytecode cause maven plugin tools are still using ASM5 -->
+    <javac.version.src>11</javac.version.src>
     <javac.version.target>11</javac.version.target>
     <java.version>11</java.version>
     <ow2.asm.version>7.0</ow2.asm.version>
