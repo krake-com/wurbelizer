@@ -5,11 +5,11 @@
   <parent>
     <groupId>org.wurbelizer</groupId>
     <artifactId>wurbelizer-parent</artifactId>
-    <version>2.2-SNAPSHOT</version>
+    <version>2.3-SNAPSHOT</version>
   </parent>
 
   <artifactId>wurbelizer-maven-plugin</artifactId>
-  <version>2.2-SNAPSHOT</version>
+  <version>2.3-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
   <name>Wurbelizer Maven Plugin</name>
   <description>Maven Plugin for the Wurbelizer</description>
