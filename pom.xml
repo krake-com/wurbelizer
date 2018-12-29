@@ -7,7 +7,7 @@
 
   <groupId>org.wurbelizer</groupId>
   <artifactId>wurbelizer-parent</artifactId>
-  <version>2.1.1</version>
+  <version>8.2.1.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Wurbelizer Parent</name>
