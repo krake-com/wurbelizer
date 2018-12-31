@@ -306,11 +306,23 @@ public class SourceWurbler extends AbstractWurbler {
                 // check that both have the same origin, if origin info provided
                 if (orgHereText != null && orgHereText.startsWith(Constants.ORIGIN_INFO_LEAD) &&
                     hereText.startsWith(Constants.ORIGIN_INFO_LEAD)) {
-                  String orgHereInfo = WurbelHelper.firstLine(orgHereText);
-                  String hereInfo = WurbelHelper.firstLine(hereText);
+                  String orgHereInfo = WurbelHelper.firstLine(orgHereText).substring(Constants.ORIGIN_INFO_LEAD.length());
+                  String hereInfo = WurbelHelper.firstLine(hereText).substring(Constants.ORIGIN_INFO_LEAD.length());
                   if (!orgHereInfo.equals(hereInfo)) {
-                    throw new WurbelException("heredoc '" + hereName + "' created from more than one sources:\n" +
-                                   orgHereInfo.substring(2) + " !=\n" + hereInfo.substring(2));
+                    String orgHereInfoName = getHereInfoName(orgHereInfo);
+                    int orgHereInfoLine = getHereInfoLine(orgHereInfo);
+                    int orgHereLineCount = orgHereText.split("\n").length;
+                    String hereInfoName = getHereInfoName(hereInfo);
+                    int hereInfoLine = getHereInfoLine(hereInfo);
+                    int hereLineCount = hereText.split("\n").length;
+                    if (orgHereInfoLine < 0 || hereInfoLine < 0 ||    // no linenumber info at all
+                        !orgHereInfoName.equals(hereInfoName) ||      // names differ
+                        orgHereInfoLine + orgHereLineCount <= hereInfoLine ||   // moved non-overlapping after old location
+                        hereInfoLine + hereLineCount <= orgHereInfoLine) {      // moved non-overlapping before old location
+
+                      throw new WurbelException("heredoc '" + hereName + "' created from more than one sources:\n" +
+                                                    orgHereInfo + " !=\n" + hereInfo);
+                    }
                   }
                 }
                 hereDocFile.getStream().print(hereText);
@@ -601,6 +613,40 @@ public class SourceWurbler extends AbstractWurbler {
       // overwrite guardtype from wurbfile
       setGuardType(wurbProps.getProperty(PROPERTY_GUARDTYPE));
     }
+  }
+
+  /**
+   * Gets the filename of the hereinfo part.
+   *
+   * @param hereInfo the hereinfo
+   * @return the hereinfo without linenumber
+   */
+  private String getHereInfoName(String hereInfo) {
+    int ndx = hereInfo.lastIndexOf(':');
+    if (ndx >= 0) {
+      return hereInfo.substring(0, ndx);    // cut off linenumber
+    }
+    return hereInfo;
+  }
+
+  /**
+   * Gets the linenumber of the hereinfo part.
+   *
+   * @param hereInfo the hereinfo
+   * @return the linenumber, -1 if hereinfo does not contain a linenumber
+   */
+  private int getHereInfoLine(String hereInfo) {
+    int ndx = hereInfo.lastIndexOf(':');
+    if (ndx >= 0 && ndx < hereInfo.length() - 1) {
+      String nstr = hereInfo.substring(ndx + 1);
+      try {
+        return Integer.parseInt(nstr);
+      }
+      catch (NumberFormatException nx) {
+        return -1;
+      }
+    }
+    return -1;
   }
 
 }
