@@ -19,14 +19,15 @@
 
 package org.wurbelizer.wurbel;
 
+import org.wurbelizer.misc.Logger;
+import org.wurbelizer.misc.Verbosity;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
-import org.wurbelizer.misc.Logger;
-import org.wurbelizer.misc.Verbosity;
 
 
 /**
@@ -556,11 +557,8 @@ public class SourceDocument {
       else  {
         boolean endFound = false;
         if (type == SourceElement.Type.SINGLE_COMMENT)  {
-          if (text.charAt(pos) == '\n') {
-            // group several single line comments together
-            if (remains < 2 || text.charAt(pos+1) != '/' || text.charAt(pos+2) != '/')  {
-              endFound = true;
-            }
+          if (text.charAt(pos) == '\n')  {
+            endFound = true;
           }
         }
         else {
@@ -583,13 +581,31 @@ public class SourceDocument {
       }
     }
 
+    // concat single-line comments if ended with a backslash
+    SourceElement lastElem = null;    // != null if SINGLE_COMMENT and ends with backslash
+    for (Iterator<SourceElement> iter = elements.iterator(); iter.hasNext(); ) {
+      SourceElement elem = iter.next();
+      if (elem.getType() == SourceElement.Type.SINGLE_COMMENT) {
+        if (lastElem != null) {
+          lastElem.setEnd(elem.getEnd());
+          lastElem.scan();
+          iter.remove();
+          elem = lastElem;
+        }
+        String str = elem.getText();
+        lastElem = str.endsWith("\\\n") || str.endsWith("\\\r\n") ? elem : null;
+      }
+      else {
+        lastElem = null;
+      }
+    }
+
     // now check single-line comments for guarded patterns
-    Iterator<SourceElement> iter = elements.iterator();
     List<SourceElement> guardedList = new ArrayList<>();   // new created guarded list
     String guardedName = null;                // != null if in guarded section
     SourceElement guardedStart = null;        // != null if first guarded start element
     SourceElement.Type guardedType = null;    // netbeans or other
-    while (iter.hasNext())  {
+    for (Iterator<SourceElement> iter = elements.iterator(); iter.hasNext(); ) {
       SourceElement elem = iter.next();
       if (guardedName != null)  {
         // looking for end of guarded block (guarded types are not mixed within a single file!)
@@ -652,10 +668,9 @@ public class SourceDocument {
     elements = guardedList;
 
     // phase 3: insert CODE-elements for the rest
-    iter = elements.iterator();
     List<SourceElement> docList = new ArrayList<>();
     int pos = 0;      // position in text
-    while (iter.hasNext())  {
+    for (Iterator<SourceElement> iter = elements.iterator(); iter.hasNext(); ) {
       SourceElement elem = iter.next();
       if (elem.getBegin() > pos)  {
         SourceElement code = new SourceElement(this, SourceElement.Type.CODE, pos, elem.getBegin(), null);

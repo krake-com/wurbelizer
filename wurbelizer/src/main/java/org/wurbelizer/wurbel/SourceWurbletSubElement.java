@@ -98,15 +98,17 @@ public class SourceWurbletSubElement extends SourceSubElement {
     ArgScanner scanner = new ArgScanner(wurbletText, props);
     String arg;
     while ((arg = scanner.next()) != null)  {
-      if (currentGuardedName == null) {
-        currentGuardedName = arg; // first is guardedName
-      }
-      else if (currentWurbletName == null) {
-        currentWurbletName = arg; // second is wurbletName
-      }
-      else  {
-        // others are arguments
-        argList.add(arg);
+      if (!"//".equals(arg)) {    // if not single line comment continuation
+        if (currentGuardedName == null) {
+          currentGuardedName = arg; // first is guardedName
+        }
+        else if (currentWurbletName == null) {
+          currentWurbletName = arg; // second is wurbletName
+        }
+        else {
+          // others are arguments
+          argList.add(arg);
+        }
       }
     }
 

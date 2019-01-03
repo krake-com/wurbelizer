@@ -19,11 +19,12 @@
 
 package org.wurbelizer.wurbel;
 
+import org.wurbelizer.misc.Constants;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
-import org.wurbelizer.misc.Constants;
 
 /**
  * A {@code SourceElement} represents a section within a {@link SourceDocument}.
@@ -40,7 +41,7 @@ import org.wurbelizer.misc.Constants;
  * There are two kinds of sub elements: single-line and multi-line.
  * Single line sub elements end at the end of the line where they started. A wurblet
  * anchor is a single line sub element. Single line sub elements may be enlarged
- * beyond the end of the line by a continuation line (double backslash at the end of line).
+ * beyond the end of the line by a continuation line (backslash at the end of line).
  * Multi-line sub elements like here- or property-documents are terminated a special
  * control sequence. Furthermore, all leading comment text starting each line will
  * be cut off and will not become part of the contents of the sub element (works like a
@@ -162,6 +163,7 @@ public class SourceElement {
               }
             }
           }
+
           // find end which is max up to line-end or concatenated lines via backslash
           int currentEnd = start;
           for (;;)  {
@@ -182,6 +184,7 @@ public class SourceElement {
               }
             }
           }
+
           // create new wurblet directive
           wurblets.add(new SourceWurbletSubElement(this, commentLead, begin + start, begin + currentEnd));
           start = currentEnd;
