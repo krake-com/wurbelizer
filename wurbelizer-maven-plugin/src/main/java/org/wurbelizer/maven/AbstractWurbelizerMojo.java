@@ -151,12 +151,10 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
    */
   protected void findResourceDirs() {
     resourceDirs = new ArrayList<>();
-    for (Object resource: project.getBuild().getResources()) {
-      if (resource instanceof Resource) {
-        String name = ((Resource)resource).getDirectory();
-        if (name != null) {
-          resourceDirs.add(name);
-        }
+    for (Resource resource: project.getBuild().getResources()) {
+      String name = resource.getDirectory();
+      if (name != null) {
+        resourceDirs.add(name);
       }
     }
   }
