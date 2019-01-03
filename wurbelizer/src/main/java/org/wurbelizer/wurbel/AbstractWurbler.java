@@ -309,18 +309,25 @@ public abstract class AbstractWurbler implements Wurbler {
    */
   @Override
   public Properties getProperties(String nameSpace) {
-    if (null == nameSpace)  {
+    if (null == nameSpace || nameSpace.isEmpty())  {
       return System.getProperties();
     }
-    else switch (nameSpace) {
-      case PROPSPACE_ENV:
-        return WurbelHelper.getEnvProperties();
-      case PROPSPACE_EXTRA:
-        return WurbelHelper.getExtraProperties();
-      case PROPSPACE_WURBLET:
-        return otherProps;
+    else {
+      switch (nameSpace) {
+        case PROPSPACE_ENV:
+          return WurbelHelper.getEnvProperties();
+
+        case PROPSPACE_EXTRA:
+          return WurbelHelper.getExtraProperties();
+
+        case PROPSPACE_WURBLET:
+          return otherProps;
+
+        default:
+          getLogger().warning("invalid properties namespace: " + nameSpace);
+          return null;
+      }
     }
-    return null;
   }
 
 

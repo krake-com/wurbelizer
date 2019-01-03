@@ -122,7 +122,7 @@ public class JavaSourceType implements SourceType {
           code = code.substring(matcher.end());
           int ndx = code.lastIndexOf('{');
           if (ndx > 0) {
-            code = code.substring(0, ndx);    // cut everything after the {
+            code = code.substring(0, ndx);    // cut everything after the '{'
           }
           code = code.trim();
           props.setProperty(DEFINITION, code);
@@ -140,7 +140,7 @@ public class JavaSourceType implements SourceType {
           code = code.substring(matcher.end());
           int ndx = code.lastIndexOf('{');
           if (ndx > 0) {
-            code = code.substring(0, ndx);    // cut everything after the {
+            code = code.substring(0, ndx);    // cut everything after the '{'
           }
           code = code.trim();
           props.setProperty(DEFINITION, code);

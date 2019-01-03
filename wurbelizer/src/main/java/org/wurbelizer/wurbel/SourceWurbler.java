@@ -428,7 +428,12 @@ public class SourceWurbler extends AbstractWurbler {
                 // log only exceptions that did not already show up (avoids cluttering output)
                 String errMsg = ExceptionHelper.concatenateMessages(ex);
                 if (!ex.isSourceInfoIncluded()) {
-                  errMsg = new File(filename).getName() + ":[" + doc.getLineNumber(wurbletElement.getWurbletBegin()) + "] " + errMsg;
+                  errMsg = new StringBuilder().append(new File(filename).getName())
+                                              .append(":[")
+                                              .append(doc.getLineNumber(wurbletElement.getWurbletBegin()))
+                                              .append("] ")
+                                              .append(errMsg)
+                                              .toString();
                 }
                 boolean doLog = true;
                 if (errorsSoFar != null) {
