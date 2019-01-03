@@ -107,7 +107,7 @@ public class WurbelHelper {
             // token embraced as ${key}...
             int curlyNdx = token.indexOf('}');
             if (curlyNdx > 2) {
-              token = token.substring(0, curlyNdx + 1); // cut after }
+              token = token.substring(0, curlyNdx + 1); // cut after '}'
               key = token.substring(2, curlyNdx);
             }
           }

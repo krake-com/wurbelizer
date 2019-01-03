@@ -29,8 +29,8 @@ package org.wurbelizer.wurbel;
 @SuppressWarnings("serial")
 public class SourceException extends Exception {
 
-  private final SourceElement elem;
-  private final SourceDocument doc;
+  private final transient SourceElement elem;
+  private final transient SourceDocument doc;
 
 
   /**

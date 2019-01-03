@@ -237,7 +237,9 @@ public class SourceWurbiler extends AbstractWurbiler {
           writer.close();
         }
       }
-      catch (IOException ex) { }
+      catch (IOException ex) {
+        // ignored
+      }
     }
 
 

@@ -69,8 +69,10 @@ import java.util.TreeSet;
 
 public class AntWurbler extends MatchingTask {
 
-  private static final String FAIL_MSG =
-      "Wurbelization failed! See the wurbelizers error output for details.";
+  private static final String FAIL_MSG = "Wurbelization failed! See the wurbelizers error output for details.";
+
+  // list of files already processed (for runOnce) within an ant-session
+  private static final Set<String> filesDone = new TreeSet<>();
 
   private         Path src;             // source path (must be the same for java and wurb-files!)
   private         String[] wurbletPath; // classpath for loading the wurblets
@@ -82,7 +84,6 @@ public class AntWurbler extends MatchingTask {
   private boolean dryRun;               // true = don't run wurblets, just parse
   private File[]  wurbleList;           // list of all java-files that need to be wurbelized
 
-  private static Set<String> filesDone; // list of files already processed (for runOnce) within an ant-session
 
 
   /**
@@ -459,17 +460,12 @@ public class AntWurbler extends MatchingTask {
 
 
         for (File file : wurbleList) {
-          if (runOnce) {
-            if (filesDone == null)  {
-              filesDone = new TreeSet<>();
-            }
-            if (!filesDone.add(file.getAbsolutePath())) {
-              continue;   // skip
-            }
+
+          if (runOnce && !filesDone.add(file.getAbsolutePath())) {
+            continue;   // skip
           }
 
           try {
-
             wurbeledFilesCount++;
 
             WurbelResult result = new SourceWurbler (file.getPath(), null, getWurbletPathArray(), analyzeDir,

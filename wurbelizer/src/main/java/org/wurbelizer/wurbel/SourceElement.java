@@ -267,8 +267,13 @@ public class SourceElement {
                     // add the here-Document (escapes of wurblet-characters removed)
                     String hereText = body.replace("\\@", "@");
                     if (hereOption == null || !hereOption.equals("--nosource")) {
-                      hereText = Constants.ORIGIN_INFO_LEAD + doc.getName() + ":" +
-                                      doc.getLineNumber(begin + hereStart) + "\n" + hereText;
+                      hereText = new StringBuilder().append(Constants.ORIGIN_INFO_LEAD)
+                                                    .append(doc.getName())
+                                                    .append(":")
+                                                    .append(doc.getLineNumber(begin + hereStart))
+                                                    .append("\n")
+                                                    .append(hereText)
+                                                    .toString();
                     }
                     hereDocuments.add(new SourceHereSubElement(this, filename, hereText));
                   }

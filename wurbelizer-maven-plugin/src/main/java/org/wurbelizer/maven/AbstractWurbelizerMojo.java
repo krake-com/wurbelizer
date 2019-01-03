@@ -190,9 +190,9 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
     props.setProperty("project", project.getBasedir().getPath());
     // create parentProject, parentParentProject, etc...
     MavenProject parentProject = project.getParent();
-    String projectKey = "";
+    StringBuilder projectKey = new StringBuilder();
     while (parentProject != null) {
-      projectKey += "Parent";
+      projectKey.append("Parent");
       props.setProperty(Character.toLowerCase(projectKey.charAt(0)) + projectKey.substring(1) + "Project",
                         parentProject.getBasedir().getPath());
       parentProject = parentProject.getParent();
