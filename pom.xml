@@ -48,10 +48,10 @@
     <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <dependency.locations.enabled>false</dependency.locations.enabled>
-    <javac.version.src>11</javac.version.src>
-    <javac.version.target>11</javac.version.target>
-    <java.version>11</java.version>
-    <ow2.asm.version>7.0</ow2.asm.version>
+    <javac.version.src>12</javac.version.src>
+    <javac.version.target>12</javac.version.target>
+    <java.version>12</java.version>
+    <ow2.asm.version>7.1</ow2.asm.version>
     <maven.version>3.6.0</maven.version>
     <netbeans.hint.license>wurbelizer</netbeans.hint.license>
   </properties>
