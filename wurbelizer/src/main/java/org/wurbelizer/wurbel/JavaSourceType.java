@@ -39,6 +39,13 @@ public class JavaSourceType implements SourceType {
   public static final String CLASS_NAME = "classname";
 
   /**
+   * property holding the modifiers.<br>
+   * The first starts with 0, i.e. the application
+   * has to loop on {@code getProperty(MODIFIERS + ndx)}.
+   */
+  public static final String MODIFIERS = "modifiers_";
+
+  /**
    * property holding the java interface-name of the source file, if it is an interface (without package).<br>
    * For classes this property remains unset.
    */
@@ -84,13 +91,14 @@ public class JavaSourceType implements SourceType {
   private static final Pattern PACKAGE_PATTERN = Pattern.compile("^\\s*package\\s+([\\w\\.]+)\\s*;");
   private static final Pattern ANNOTATION_PATTERN = Pattern.compile("(@\\w+[^\\n\\r]*)");  // only 1-line annos for now
   // the following row patterns work because they are applied only on the first matching code block
-  private static final Pattern CLASS_PATTERN = Pattern.compile("\\sclass\\s+(\\w+)");
-  private static final Pattern INTERFACE_PATTERN = Pattern.compile("\\sinterface\\s+(\\w+)");
+  private static final Pattern CLASS_PATTERN = Pattern.compile("(^|\\s)class\\s+(\\w+)");
+  private static final Pattern INTERFACE_PATTERN = Pattern.compile("(^|\\s)interface\\s+(\\w+)");
   // the following patterns work because they are applied to the block containing the CLASS or INTERFACE pattern
   private static final Pattern EXTENDS_PATTERN = Pattern.compile("\\s*(<.*>)*\\s*extends\\s+(\\w+((<.*>)*))");
   private static final Pattern IMPLEMENTS_PATTERN = Pattern.compile("\\s*(<.*>)*\\s*implements\\s+(\\w+((<.*>)*))");
   private static final Pattern MORE_PATTERN = Pattern.compile("\\s*,\\s*(\\w+((<.*>)*))");
-
+  // modifiers
+  private static final Pattern MODIFIER_PATTERN = Pattern.compile("(^|\\s)(abstract|public|private|protected|final)\\s");
 
 
   @Override
@@ -117,7 +125,8 @@ public class JavaSourceType implements SourceType {
 
         Matcher matcher = CLASS_PATTERN.matcher(code);
         if (matcher.find()) {
-          props.setProperty(CLASS_NAME, matcher.group(1));
+          props.setProperty(CLASS_NAME, matcher.group(2));
+          extractModifiers(props, code);
           extractAnnotations(props, code.substring(0, matcher.end()));
           code = code.substring(matcher.end());
           int ndx = code.lastIndexOf('{');
@@ -133,9 +142,10 @@ public class JavaSourceType implements SourceType {
 
         matcher = INTERFACE_PATTERN.matcher(code);
         if (matcher.find()) {
-          String ifName = matcher.group(1);
+          String ifName = matcher.group(2);
           props.setProperty(INTERFACE_NAME, ifName);
           props.setProperty(CLASS_NAME, ifName);
+          extractModifiers(props, code);
           extractAnnotations(props, code.substring(0, matcher.end()));
           code = code.substring(matcher.end());
           int ndx = code.lastIndexOf('{');
@@ -153,6 +163,22 @@ public class JavaSourceType implements SourceType {
       }
     }
     return props;
+  }
+
+  /**
+   * Extracts the modifiers.
+   *
+   * @param props the properties
+   * @param code the source code
+   */
+  private void extractModifiers(Properties props, String code) {
+    Matcher matcher = MODIFIER_PATTERN.matcher(code);
+    int ndx = 0;
+    int start = 0;
+    while (matcher.find(start)) {
+      start = matcher.start() + 1;
+      props.setProperty(MODIFIERS + (ndx++), matcher.group(2));
+    }
   }
 
 
