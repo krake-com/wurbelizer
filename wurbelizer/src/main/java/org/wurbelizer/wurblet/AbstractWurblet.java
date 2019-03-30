@@ -19,7 +19,6 @@
 
 package org.wurbelizer.wurblet;
 
-import org.wurbelizer.wurbel.JavaSourceType;
 import org.wurbelizer.wurbel.WurbelException;
 import org.wurbelizer.wurbel.Wurbler;
 
@@ -111,54 +110,6 @@ public abstract class AbstractWurblet implements Wurblet {
 
 
   /**
-   * Gets the classname (from container).<br>
-   * This is the baseclassname (not containing the package!)
-   * @return the class basename
-   * @throws WurbelException if classname could not be determined
-   */
-  public String getClassName() throws WurbelException {
-    String className = getContainer().getProperty(Wurbler.PROPSPACE_WURBLET, JavaSourceType.CLASS_NAME);
-    if (className == null) {
-      throw new WurbelException("can't determine classname");
-    }
-    return className;
-  }
-
-  /**
-   * Gets the super-classname (from container).<br>
-   *
-   * @return the super class
-   * @throws WurbelException if classname could not be determined
-   */
-  public String getSuperClassName() throws WurbelException {
-    String superClassName = getContainer().getProperty(Wurbler.PROPSPACE_WURBLET, JavaSourceType.EXTENDS);
-    if (superClassName == null) {
-      // try interface: they are numbered starting at 0
-      superClassName = getContainer().getProperty(Wurbler.PROPSPACE_WURBLET, JavaSourceType.EXTENDS + "0");
-    }
-    if (superClassName == null) {
-      throw new WurbelException("can't determine super-classname");
-    }
-    return superClassName;
-  }
-
-
-  /**
-   * Gets the packagename (from container).
-   * @return the package name
-   * @throws WurbelException if packagename could not be determined
-   */
-  public String getPackageName() throws WurbelException {
-    String packageName = getContainer().getProperty(Wurbler.PROPSPACE_WURBLET, JavaSourceType.PACKAGE_NAME);
-    if (packageName == null) {
-      throw new WurbelException("can't determine packagename");
-    }
-    return packageName;
-  }
-
-
-
-  /**
    * Gets the guardname
    * @return the guardname
    * @throws WurbelException if guardname could not be determined
@@ -179,14 +130,8 @@ public abstract class AbstractWurblet implements Wurblet {
     if (ndx >= 0) {
       name = name.substring(ndx + 1);
     }
-    StringBuilder buf = new StringBuilder(name);
-    try {
-      String className = getClassName();
-      buf.append(" in ").append(className);
-    }
-    catch (WurbelException wex) {
-      // ignore
-    }
+    StringBuilder buf = new StringBuilder();
+    buf.append(name);
     try {
       String guardName = getGuardName();
       buf.append(" generating ").append(guardName);
