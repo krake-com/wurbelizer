@@ -19,12 +19,6 @@
 
 package org.wurbelizer.maven;
 
-import java.io.File;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Properties;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -33,6 +27,13 @@ import org.apache.maven.shared.model.fileset.FileSet;
 import org.wurbelizer.misc.Settings;
 import org.wurbelizer.misc.Verbosity;
 import org.wurbelizer.wurbel.WurbelHelper;
+
+import java.io.File;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Base class of wurbelizer mojos.
@@ -191,9 +192,14 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
     MavenProject parentProject = project.getParent();
     String projectKey = "";
     while (parentProject != null) {
+      File baseDir = parentProject.getBasedir();
+      if (baseDir == null) {
+        getLog().warn("parent project " + parentProject.getName() + " not in filesystem");
+        break;
+      }
       projectKey += "Parent";
       props.setProperty(Character.toLowerCase(projectKey.charAt(0)) + projectKey.substring(1) + "Project",
-                        parentProject.getBasedir().getPath());
+                        baseDir.getPath());
       parentProject = parentProject.getParent();
     }
     return props;
