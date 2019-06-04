@@ -36,7 +36,6 @@ import org.wurbelizer.misc.Constants;
 import org.wurbelizer.misc.Logger;
 import org.wurbelizer.misc.Verbosity;
 import org.wurbelizer.wurbel.HeapFileFactory;
-import org.wurbelizer.wurbel.JavaSourceType;
 import org.wurbelizer.wurbel.SourceException;
 import org.wurbelizer.wurbel.SourceWurbler;
 import org.wurbelizer.wurbel.WurbelException;
@@ -177,9 +176,6 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
 
     // get the verbosity
     determineVerbosity();
-
-    // register source types
-    registerSourceTypes();
 
     // process properties
     exportExtraProperties(createExtraProperties());
@@ -467,16 +463,6 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
    */
   private String[] wurbletPathsAsArray() {
     return wurbletPaths.toArray(new String[0]);
-  }
-
-
-
-  /**
-   * Registers all known source types.<br>
-   * By default the {@link JavaSourceType} is registered.
-   */
-  protected void registerSourceTypes() {
-    SourceWurbler.registerSourceType(new JavaSourceType());
   }
 
 

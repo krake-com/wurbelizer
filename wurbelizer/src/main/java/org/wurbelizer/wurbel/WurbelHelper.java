@@ -44,6 +44,7 @@ public class WurbelHelper {
   private static Properties extraProperties = null;         // extra properties (e.g. from ant)
 
   private static Map<String, SourceRegion> sourceRegions;   // map of available regions <type : SourceRegion>
+  private static Map<String, SourceType> sourceTypes;       // map of available file types <extension : SourceType>
   private static SourceRegion defaultRegion;                // the default region
 
   /**
@@ -74,6 +75,23 @@ public class WurbelHelper {
   public static SourceRegion getDefaultRegion() {
     getSourceRegionMap();
     return defaultRegion;
+  }
+
+
+  /**
+   * Lazily gets the map of source types.<br>
+   * The key is the file extension, the value is the {@link SourceType}.
+   *
+   * @return the type map, never null
+   */
+  public static Map<String, SourceType> getSourceTypeMap() {
+    if (sourceTypes == null) {
+      sourceTypes = new HashMap<>();
+      for (SourceType type : ServiceLoader.load(SourceType.class)) {
+        sourceTypes.put(type.getFileExtension(), type);
+      }
+    }
+    return sourceTypes;
   }
 
 
