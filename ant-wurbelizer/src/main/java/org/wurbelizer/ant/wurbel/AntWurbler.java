@@ -28,7 +28,6 @@ import org.wurbelizer.ant.misc.AntLogger;
 import org.wurbelizer.misc.Constants;
 import org.wurbelizer.misc.Verbosity;
 import org.wurbelizer.wurbel.HeapFileFactory;
-import org.wurbelizer.wurbel.JavaSourceType;
 import org.wurbelizer.wurbel.SourceException;
 import org.wurbelizer.wurbel.SourceWurbler;
 import org.wurbelizer.wurbel.WurbelException;
@@ -298,7 +297,6 @@ public class AntWurbler extends MatchingTask {
   public void execute() {
 
     checkParameters();
-    registerSourceTypes();
     resetFileLists();
     exportProperties();
 
@@ -319,14 +317,6 @@ public class AntWurbler extends MatchingTask {
     wurbelize();
   }
 
-
-  /**
-   * Registers all known source types.<br>
-   * By default the {@link JavaSourceType} is registered.
-   */
-  protected void registerSourceTypes() {
-    SourceWurbler.registerSourceType(new JavaSourceType());
-  }
 
   /**
    * Extracts all ant-properties to make them available in wurblet-args.

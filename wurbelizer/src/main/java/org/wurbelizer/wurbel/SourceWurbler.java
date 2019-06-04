@@ -33,11 +33,9 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.TreeMap;
 
 
 
@@ -52,23 +50,6 @@ import java.util.TreeMap;
  */
 
 public class SourceWurbler extends AbstractWurbler {
-
-  /**
-   * Registered source types.<br>
-   * Files not registered will not be processed.
-   */
-  private static final Map<String,SourceType> SOURCE_TYPES = new TreeMap<>();
-
-  /**
-   * Registers a source type.<br>
-   *
-   * @param type the source type
-   */
-  public static void registerSourceType(SourceType type) {
-    SOURCE_TYPES.put(type.getFileExtension(), type);
-  }
-
-
 
   private static final String PROPERTY_GUARDTYPE = "guardtype";
   private static final String PROPERTY_FOLDTYPE  = "foldtype";
@@ -125,15 +106,14 @@ public class SourceWurbler extends AbstractWurbler {
     }
 
     // determine source type
+    String fileExtension = "";    // NoneSourceType
     int ndx = filename.lastIndexOf('.');
-    if (ndx < 0) {
-      throw new WurbelException("cannot determine source type from filename: " + filename);
+    if (ndx >= 0) {
+      fileExtension = filename.substring(ndx).toLowerCase();    // e.g. ".java"
     }
-    String fileExtension = filename.substring(ndx);
-
-    sourceType = SOURCE_TYPES.get(fileExtension);
+    sourceType = WurbelHelper.getSourceTypeMap().get(fileExtension);
     if (sourceType == null) {
-      throw new WurbelException("unknown file extension: " + fileExtension);
+      throw new WurbelException("unknown file extension: '" + fileExtension + "'");
     }
 
     wurbProps = new Properties();
