@@ -53,7 +53,9 @@ public interface SourceRegion {
    *
    * @return true if default
    */
-  boolean isDefault();
+  default boolean isDefault() {
+    return false;
+  }
 
   /**
    * Creates the begin comment.
@@ -112,7 +114,7 @@ public interface SourceRegion {
   static SourceRegion get(String type) throws WurbelException {
     SourceRegion region;
     if (type == null) {
-      region = WurbelHelper.getDefaultRegion();
+      region = WurbelHelper.getDefaultSourceRegion();
     }
     else {
       region = WurbelHelper.getSourceRegionMap().get(type);

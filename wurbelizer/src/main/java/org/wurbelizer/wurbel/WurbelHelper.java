@@ -44,8 +44,10 @@ public class WurbelHelper {
   private static Properties extraProperties = null;         // extra properties (e.g. from ant)
 
   private static Map<String, SourceRegion> sourceRegions;   // map of available regions <type : SourceRegion>
+  private static SourceRegion defaultSourceRegion;          // the default source region
+
   private static Map<String, SourceType> sourceTypes;       // map of available file types <extension : SourceType>
-  private static SourceRegion defaultRegion;                // the default region
+  private static SourceType defaultSourceType;              // the default source type
 
   /**
    * Lazily gets the map of source regions.<br>
@@ -57,10 +59,10 @@ public class WurbelHelper {
     if (sourceRegions == null) {
       sourceRegions = new HashMap<>();
       for (SourceRegion region : ServiceLoader.load(SourceRegion.class)) {
-        sourceRegions.put(region.type(), region);
-        if (defaultRegion == null && region.isDefault()) {
+        if (sourceRegions.putIfAbsent(region.type(), region) == null &&   // if added
+            defaultSourceRegion == null && region.isDefault()) {          // and no default yet and region is default
           // pick first default region
-          defaultRegion = region;
+          defaultSourceRegion = region;
         }
       }
     }
@@ -72,9 +74,9 @@ public class WurbelHelper {
    *
    * @return the default region, null if none
    */
-  public static SourceRegion getDefaultRegion() {
+  public static SourceRegion getDefaultSourceRegion() {
     getSourceRegionMap();
-    return defaultRegion;
+    return defaultSourceRegion;
   }
 
 
@@ -88,12 +90,23 @@ public class WurbelHelper {
     if (sourceTypes == null) {
       sourceTypes = new HashMap<>();
       for (SourceType type : ServiceLoader.load(SourceType.class)) {
-        sourceTypes.put(type.getFileExtension(), type);
+        if (sourceTypes.putIfAbsent(type.getFileExtension(), type) == null &&
+            defaultSourceType == null && type.isDefault()) {
+          defaultSourceType = type;
+        }
       }
     }
     return sourceTypes;
   }
 
+  /**
+   * Gets the default source type.
+   *
+   * @return the default type, null if none
+   */
+  public static SourceType getDefaultSourceType() {
+    return defaultSourceType;
+  }
 
   /**
    * Translates variables using StringBuilder.
