@@ -92,7 +92,7 @@ public interface SourceType {
         if (comma) {
           buf.append(", ");
         }
-        buf.append(sourceType);
+        buf.append("'").append(sourceType.getFileExtension()).append("'");
         comma = true;
       }
       throw new WurbelTerminationException(buf.toString());
