@@ -37,11 +37,6 @@ public class CoffeeBytesRegion extends AbstractSourceRegion {
   }
 
   @Override
-  public boolean isDefault() {
-    return false;
-  }
-
-  @Override
   public String createBegin(FoldType foldType, String guardName, SourceWurbletSubElement wurbletElement) {
     // there is no initial fold type in eclipse / coffeebytes plugin
     return REGION_BEGIN_1 + createCommentGeneratedBy(guardName, wurbletElement) + REGION_BEGIN_2 + guardName;

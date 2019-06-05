@@ -38,4 +38,8 @@ public class NoneSourceType implements SourceType {
     return new Properties();
   }
 
+  @Override
+  public boolean isDefault() {
+    return true;
+  }
 }

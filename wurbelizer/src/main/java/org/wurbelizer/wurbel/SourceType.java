@@ -19,6 +19,7 @@
 
 package org.wurbelizer.wurbel;
 
+import java.util.Collection;
 import java.util.Properties;
 
 /**
@@ -42,5 +43,61 @@ public interface SourceType {
    * @return the properties, never null
    */
   Properties extractProperties(SourceDocument document);
+
+  /**
+   * Returns whether this is the default source type.
+   *
+   * @return true if default
+   */
+  default boolean isDefault() {
+    return false;
+  }
+
+
+  /**
+   * Gets all registered source types.
+   *
+   * @return the source types
+   */
+  static Collection<SourceType> getAll() {
+    return WurbelHelper.getSourceTypeMap().values();
+  }
+
+  /**
+   * Gets the source type of given extension.
+   *
+   * @param extension the file extension, null if default type
+   * @return the source type
+   * @throws WurbelException if no matching source type configured
+   */
+  static SourceType get(String extension) throws WurbelException {
+    SourceType type;
+    if (extension == null) {
+      type = WurbelHelper.getDefaultSourceType();
+    }
+    else {
+      type = WurbelHelper.getSourceTypeMap().get(extension);
+    }
+    if (type == null) {
+      StringBuilder buf = new StringBuilder();
+      if (extension == null) {
+        buf.append("no default source type");
+      }
+      else {
+        buf.append("no source type '").append(extension).append("'");
+      }
+      buf.append(" configured. Available are: ");
+      boolean comma = false;
+      for (SourceType sourceType: getAll()) {
+        if (comma) {
+          buf.append(", ");
+        }
+        buf.append(sourceType);
+        comma = true;
+      }
+      throw new WurbelTerminationException(buf.toString());
+    }
+    return type;
+  }
 
 }

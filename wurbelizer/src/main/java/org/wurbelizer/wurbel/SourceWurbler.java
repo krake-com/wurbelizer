@@ -106,15 +106,12 @@ public class SourceWurbler extends AbstractWurbler {
     }
 
     // determine source type
-    String fileExtension = "";    // NoneSourceType
+    String fileExtension = null;    // default type
     int ndx = filename.lastIndexOf('.');
     if (ndx >= 0) {
       fileExtension = filename.substring(ndx).toLowerCase();    // e.g. ".java"
     }
-    sourceType = WurbelHelper.getSourceTypeMap().get(fileExtension);
-    if (sourceType == null) {
-      throw new WurbelException("unknown file extension: '" + fileExtension + "'");
-    }
+    sourceType = SourceType.get(fileExtension);
 
     wurbProps = new Properties();
 
