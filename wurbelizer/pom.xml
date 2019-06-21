@@ -9,7 +9,6 @@
   </parent>
 
   <artifactId>wurbelizer</artifactId>
-  <version>11.2.3.2-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>Wurbelizer</name>
   <description>Code Generator Core</description>

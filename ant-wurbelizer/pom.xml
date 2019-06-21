@@ -9,7 +9,6 @@
   </parent>
 
   <artifactId>ant-wurbelizer</artifactId>
-  <version>11.2.3.2-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>Wurbelizer Ant Wrapper</name>
   <description>A Wrapper to Use the Wurbelizer with Apache Ant</description>

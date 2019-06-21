@@ -9,7 +9,6 @@
   </parent>
 
   <artifactId>console-wurbelizer</artifactId>
-  <version>11.2.3.2-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>Wurbelizer Console</name>
   <description>Run the Wurbelizer from the Console</description>
