@@ -88,7 +88,7 @@ public interface Wurbler {
   /**
    * Processes the source file, create here-docs and replace wurblet-guarded sections.
    *
-   * @param phase the execution phase, starting at 1
+   * @param phase the wurbel phase, 0 for heredocs, wurblets start at 1
    * @param collectedPhases the phases of all wurblets detected so far
    * @return the wurbel result
    *

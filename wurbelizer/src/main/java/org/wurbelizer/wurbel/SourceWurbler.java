@@ -318,8 +318,8 @@ public class SourceWurbler extends AbstractWurbler {
         }
 
         if (!dryRun) {
-          if (hereDocsWritten) {
-            // some heredocs updated: process wurblets later
+          if (hereDocsWritten && phase > 0) {
+            // some heredocs updated by wurblets: start over and process wurblets later
             break;
           }
 
@@ -464,7 +464,7 @@ public class SourceWurbler extends AbstractWurbler {
         }
       }
 
-      if (dryRun || hereDocsWritten) {
+      if (dryRun || (hereDocsWritten && phase > 0)) {
         break;
       }
 

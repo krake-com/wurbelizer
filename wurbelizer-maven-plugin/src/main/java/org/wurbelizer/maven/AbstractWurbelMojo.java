@@ -316,6 +316,8 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
    * Wurbel all files in a fileset.
    *
    * @param fileSet the set of files
+   * @param phase the wurbel phase, 0 for heredocs, wurblets start at 1
+   * @param collectedPhases wurbeled phases so far
    * @return true if heredocs were updated (needs another run)
    * @throws MojoExecutionException if failed
    */
