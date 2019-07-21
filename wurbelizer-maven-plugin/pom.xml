@@ -10,7 +10,6 @@
 
   <groupId>org.wurbelizer</groupId>
   <artifactId>wurbelizer-maven-plugin</artifactId>
-  <version>8.2.2.2-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
   <name>Wurbelizer Maven Plugin</name>
   <description>Maven Plugin for Wurbelizer</description>

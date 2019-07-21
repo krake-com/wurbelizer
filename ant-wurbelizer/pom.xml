@@ -10,7 +10,6 @@
 
   <groupId>org.wurbelizer</groupId>
   <artifactId>ant-wurbelizer</artifactId>
-  <version>8.2.2.2-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>Wurbelizer Ant Wrapper</name>
   <description>A wrapper for the wurbelizer to be used by ant</description>

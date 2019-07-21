@@ -10,7 +10,6 @@
 
   <groupId>org.wurbelizer</groupId>
   <artifactId>console-wurbelizer</artifactId>
-  <version>8.2.2.2-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>Wurbelizer Console</name>
   <description>Some classes to run the wurbelizer from the console.</description>
