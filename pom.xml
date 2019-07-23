@@ -238,7 +238,6 @@
             <archive>
               <manifest>
                 <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
               </manifest>
               <manifestEntries>
                 <Implementation-Build-Date>${maven.build.timestamp}</Implementation-Build-Date>
