@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.wurbelizer</groupId>
     <artifactId>wurbelizer-parent</artifactId>
-    <version>11.2.3.2-SNAPSHOT</version>
+    <version>11.2.3.2</version>
   </parent>
 
   <artifactId>wurbelizer</artifactId>
@@ -17,7 +17,6 @@
   <properties>
     <rootBasedir>${project.parent.basedir}</rootBasedir>
     <timestamp>${maven.build.timestamp}</timestamp>
-    <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
   </properties>
 
   <build>
