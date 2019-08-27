@@ -24,8 +24,10 @@ import org.wurbelizer.misc.Verbosity;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 
@@ -72,6 +74,8 @@ public class SourceDocument {
 
     // parse the document
     setText(text);
+
+    checkGuardedElements();
   }
 
 
@@ -601,6 +605,32 @@ public class SourceDocument {
    */
   public List<SourceElement> getElements() {
     return elements;
+  }
+
+
+  /**
+   * Checks that the guarded blocks are unique among the whole document.
+   *
+   * @throws SourceException if not unique
+   */
+  public void checkGuardedElements() throws SourceException {
+    StringBuilder buf = new StringBuilder();
+    Map<String, SourceElement> guardedElements = new HashMap<>();
+    for (SourceElement elem : elements) {
+      if (elem.isGuarded()) {
+        String guardName = elem.getGuardedName();
+        if (guardName != null && !guardName.isBlank()) {
+          SourceElement other = guardedElements.put(guardName, elem);
+          if (other != null) {
+            buf.append("\nguarded block '").append(guardName).append("' found in ")
+               .append(other).append(" and ").append(elem);
+          }
+        }
+      }
+    }
+    if (buf.length() > 0) {
+      throw new SourceException(buf.toString());
+    }
   }
 
 
