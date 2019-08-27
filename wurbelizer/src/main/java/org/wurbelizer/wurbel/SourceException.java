@@ -61,6 +61,8 @@ public class SourceException extends Exception {
 
   /**
    * Constructs an {@code SourceException} with the specified detail message.
+   *
+   * @param message the detail message
    */
   public SourceException(String message) {
     super(message);
