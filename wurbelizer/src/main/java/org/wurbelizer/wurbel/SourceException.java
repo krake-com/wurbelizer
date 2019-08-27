@@ -59,6 +59,16 @@ public class SourceException extends Exception {
   }
 
 
+  /**
+   * Constructs an {@code SourceException} with the specified detail message.
+   */
+  public SourceException(String message) {
+    super(message);
+    doc = null;
+    elem = null;
+  }
+
+
   @Override
   public String getMessage() {
     if (elem != null) {
