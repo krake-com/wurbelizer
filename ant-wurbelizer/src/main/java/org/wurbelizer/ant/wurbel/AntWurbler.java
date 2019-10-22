@@ -458,32 +458,34 @@ public class AntWurbler extends MatchingTask {
           try {
             wurbeledFilesCount++;
 
-            WurbelResult result = new SourceWurbler (file.getPath(), null, getWurbletPathArray(), analyzeDir,
-                    new AntLogger(getProject()) {
-                      @Override
-                      public void info(String msg) {
-                        AntWurbler.this.log(msg, Project.MSG_INFO);
-                      }
-                    },
-                    verbosity, errorsSoFar, null, dryRun) {
+            WurbelResult result = new SourceWurbler (
+                file.getPath(), null, getWurbletPathArray(), analyzeDir, phase, null, dryRun,
 
-                      /**
-                       * gets the property value for a given namespace and key.
-                       * Overwritten from AbstractWurbler to set "ant" synonym for "extra".
-                       * Just to make it easier to remember... ;-)
-                       *
-                       * @param nameSpace use null for the default java-properties.
-                       * @return the value for key, null if no such key
-                       */
-                      @Override
-                      public String getProperty(String nameSpace, String key) {
-                        if (nameSpace != null && nameSpace.equals("ant")) {
-                          return WurbelHelper.getExtraProperties().getProperty(key);
-                        }
-                        return super.getProperty(nameSpace, key);
-                      }
+                new AntLogger(getProject()) {
+                  @Override
+                  public void info(String msg) {
+                    AntWurbler.this.log(msg, Project.MSG_INFO);
+                  }
+                },
+                verbosity, errorsSoFar, collectedPhases) {
 
-                    }.wurbel(phase, collectedPhases);
+              /**
+               * gets the property value for a given namespace and key.
+               * Overwritten from AbstractWurbler to set "ant" synonym for "extra".
+               * Just to make it easier to remember... ;-)
+               *
+               * @param nameSpace use null for the default java-properties.
+               * @return the value for key, null if no such key
+               */
+              @Override
+              public String getProperty(String nameSpace, String key) {
+                if (nameSpace != null && nameSpace.equals("ant")) {
+                  return WurbelHelper.getExtraProperties().getProperty(key);
+                }
+                return super.getProperty(nameSpace, key);
+              }
+
+            }.wurbel();
 
             wurbletCount += result.getWurbletCount();
 

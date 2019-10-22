@@ -25,7 +25,6 @@ import org.wurbelizer.misc.Verbosity;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.Properties;
-import java.util.Set;
 
 
 /**
@@ -88,14 +87,12 @@ public interface Wurbler {
   /**
    * Processes the source file, create here-docs and replace wurblet-guarded sections.
    *
-   * @param phase the wurbel phase, 0 for heredocs, wurblets start at 1
-   * @param collectedPhases the phases of all wurblets detected so far
    * @return the wurbel result
    *
    * @throws WurbelException if a file- or heapfile operation failed
    * @throws SourceException if source scanning failed
    */
-  WurbelResult wurbel(int phase, Set<Integer> collectedPhases) throws WurbelException, SourceException;
+  WurbelResult wurbel() throws WurbelException, SourceException;
 
 
   /**
