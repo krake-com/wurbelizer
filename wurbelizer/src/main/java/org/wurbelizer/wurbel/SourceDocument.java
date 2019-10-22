@@ -533,9 +533,8 @@ public class SourceDocument {
     String guardedName = null;                              // != null if in guarded region
     SourceElement guardedStart = null;                      // != null if first guarded start element
     SourceRegion guardedType = null;                        // != null if in guarded region
-    for (Iterator<SourceElement> iter = elements.iterator(); iter.hasNext(); ) {
-      SourceElement elem = iter.next();
-      if (guardedName != null)  {
+    for (SourceElement elem : elements) {
+      if (guardedName != null) {
         // looking for end of guarded block (guarded types are not mixed within a single file!)
         if (elem.getType() == SourceElement.Type.SINGLE_COMMENT && guardedType.isEnd(elem.getText(), guardedName)) {
           // block ends here: combine all segments to one guarded segment
@@ -549,11 +548,11 @@ public class SourceDocument {
           guardedType = null;
         }
       }
-      else  {
+      else {
         // looking for start of next guarded block
-        if (elem.getType() == SourceElement.Type.SINGLE_COMMENT)  {
+        if (elem.getType() == SourceElement.Type.SINGLE_COMMENT) {
           String elemText = elem.getText();
-          for (SourceRegion region: SourceRegion.getAll()) {
+          for (SourceRegion region : SourceRegion.getAll()) {
             guardedName = region.getBeginName(elemText);
             if (guardedName != null) {
               guardedType = region;
@@ -562,7 +561,7 @@ public class SourceDocument {
             }
           }
         }
-        if (guardedName == null)  {
+        if (guardedName == null) {
           if (verbosity.isDebug()) {
             logger.info("found guarded section " + elem);
           }
@@ -575,9 +574,8 @@ public class SourceDocument {
     // phase 3: insert CODE-elements for the rest
     List<SourceElement> docList = new ArrayList<>();
     int pos = 0;      // position in text
-    for (Iterator<SourceElement> iter = elements.iterator(); iter.hasNext(); ) {
-      SourceElement elem = iter.next();
-      if (elem.getBegin() > pos)  {
+    for (SourceElement elem : elements) {
+      if (elem.getBegin() > pos) {
         SourceElement code = new SourceElement(this, SourceElement.Type.CODE, pos, elem.getBegin(), null);
         if (verbosity.isDebug()) {
           logger.info("adding code element " + code);

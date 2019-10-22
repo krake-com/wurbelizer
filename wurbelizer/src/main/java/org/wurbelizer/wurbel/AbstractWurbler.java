@@ -30,6 +30,7 @@ import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 
@@ -271,13 +272,7 @@ public abstract class AbstractWurbler implements Wurbler {
    */
   public void setArgs(String[] args)  {
     // assure not null
-    if (args == null) {
-      this.args = new String[0];
-    }
-    else  {
-      // translate runtime variables
-      this.args = args;
-    }
+    this.args = Objects.requireNonNullElseGet(args, () -> new String[0]);
   }
 
 

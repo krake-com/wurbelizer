@@ -115,14 +115,20 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
     }
     else {
       // all from wurblet source dir with default extension
-      if (wurbletSourceDir.isDirectory() && wurbletSourceDir.list() != null && wurbletSourceDir.list().length > 0) {
-        final FileSet fs = new FileSet();
-        fs.setDirectory(wurbletSourceDir.getPath());
-        fs.addInclude("**/*" + Constants.WURBLET_SOURCE_EXTENSION);
-        wurbileFileSet(fs);
+      if (wurbletSourceDir.isDirectory()) {
+        String[] files = wurbletSourceDir.list();
+        if (files != null && files.length > 0) {
+          final FileSet fs = new FileSet();
+          fs.setDirectory(wurbletSourceDir.getPath());
+          fs.addInclude("**/*" + Constants.WURBLET_SOURCE_EXTENSION);
+          wurbileFileSet(fs);
+        }
+        else {
+          getLog().warn("empty wurbile.sourceDir " + wurbletSourceDir.getAbsolutePath());
+        }
       }
       else {
-        getLog().warn("no or empty wurbile.sourceDir " + wurbletSourceDir.getAbsolutePath());
+        getLog().warn("missing wurbile.sourceDir " + wurbletSourceDir.getAbsolutePath());
       }
     }
 

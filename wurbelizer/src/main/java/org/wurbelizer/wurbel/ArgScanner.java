@@ -149,7 +149,7 @@ public class ArgScanner {
       ndx++;
     }
 
-    if (part != null) {
+    if (part != null && arg != null) {
       // append last pending part
       if (inSingleQuote)  {
         // append untranslated

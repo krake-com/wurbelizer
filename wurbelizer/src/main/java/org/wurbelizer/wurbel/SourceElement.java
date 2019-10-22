@@ -130,7 +130,7 @@ public class SourceElement {
 
       // scan for wurblets
       while ((start = text.indexOf("@wurblet", start)) >= 0)  {
-        if (start == 0 || (start > 0 && text.charAt(start-1) != '\\')) {  // if not escaped '\@wurblet'
+        if (start == 0 || text.charAt(start-1) != '\\') {  // if not escaped '\@wurblet'
           // determine comment lead
           String commentLead = null;
           if (type == Type.BLOCK_COMMENT) {
@@ -211,7 +211,7 @@ public class SourceElement {
           hereStart = -1;
         }
 
-        if (start == 0 || (start > 0 && text.charAt(start-1) != '\\')) {
+        if (start == 0 || text.charAt(start-1) != '\\') {
           // get the length of the leadstring (i.e. back to start of current line)
           int leadNdx = start;
           while (leadNdx >= 0) {
@@ -267,13 +267,12 @@ public class SourceElement {
                     // add the here-Document (escapes of wurblet-characters removed)
                     String hereText = body.replace("\\@", "@");
                     if (hereOption == null || !hereOption.equals("--nosource")) {
-                      hereText = new StringBuilder().append(Constants.ORIGIN_INFO_LEAD)
-                                                    .append(doc.getName())
-                                                    .append(":")
-                                                    .append(doc.getLineNumber(begin + hereStart))
-                                                    .append("\n")
-                                                    .append(hereText)
-                                                    .toString();
+                      hereText = Constants.ORIGIN_INFO_LEAD +
+                                 doc.getName() +
+                                 ":" +
+                                 doc.getLineNumber(begin + hereStart) +
+                                 "\n" +
+                                 hereText;
                     }
                     hereDocuments.add(new SourceHereSubElement(this, filename, hereText));
                   }

@@ -367,23 +367,28 @@ public abstract class AbstractWurbiler implements Wurbiler {
                           break;
                         case CMD_IMPORT:
                           // add to imports
-                          cmdOk = handleImport(stok);
+                          handleImport(stok);
+                          cmdOk = true;
                           break;
                         case CMD_INDENT:
                           // set the indent command
-                          cmdOk = handleIndent(stok);
+                          handleIndent(stok);
+                          cmdOk = true;
                           break;
                         case CMD_TO:
                           // switch output stream
-                          cmdOk = handleOutName(stok);
+                          handleOutName(stok);
+                          cmdOk = true;
                           break;
                         case CMD_ARGS:
                           // set the args command
-                          cmdOk = handleArgs(stok);
+                          handleArgs(stok);
+                          cmdOk = true;
                           break;
                         case CMD_PHASE:
                           // set the wurblet's phase
-                          cmdOk = handlePhase(stok);
+                          handlePhase(stok);
+                          cmdOk = true;
                           break;
                         case CMD_COMMENT:
                           // add wurblet comment
@@ -980,9 +985,8 @@ public abstract class AbstractWurbiler implements Wurbiler {
    * Handles the import-command.
    *
    * @param stok the tokenizer pointing to first arg
-   * @return true if ok, false if some error
    */
-  private boolean handleImport(StringTokenizer stok) {
+  private void handleImport(StringTokenizer stok) {
     if (stok.hasMoreTokens()) {
       String token = stok.nextToken();
       imports.add(token);
@@ -990,7 +994,6 @@ public abstract class AbstractWurbiler implements Wurbiler {
         logger.info("{" + CMD_IMPORT + " " + token + "}");
       }
     }
-    return true;
   }
 
 
@@ -998,9 +1001,8 @@ public abstract class AbstractWurbiler implements Wurbiler {
    * Handles the args-command.
    *
    * @param stok the tokenizer pointing to first arg
-   * @return true if ok, false if some error
    */
-  private boolean handleArgs(StringTokenizer stok) {
+  private void handleArgs(StringTokenizer stok) {
     List<String> argList = new ArrayList<>();
     if (stok.hasMoreTokens()) {
       String arg = stok.nextToken();
@@ -1020,7 +1022,6 @@ public abstract class AbstractWurbiler implements Wurbiler {
     else  {
       args = null;
     }
-    return true;
   }
 
 
@@ -1062,9 +1063,8 @@ public abstract class AbstractWurbiler implements Wurbiler {
    * Handles the indent-command.
    *
    * @param stok the tokenizer pointing to first arg
-   * @return true if ok, false if some error
    */
-  private boolean handleIndent(StringTokenizer stok) {
+  private void handleIndent(StringTokenizer stok) {
     if (stok.hasMoreTokens()) {
       String token = stok.nextToken();
       if (token.equals("auto")) {
@@ -1078,7 +1078,6 @@ public abstract class AbstractWurbiler implements Wurbiler {
         logger.info("{" + CMD_INDENT + " " + token + "}");
       }
     }
-    return true;
   }
 
 
@@ -1086,9 +1085,8 @@ public abstract class AbstractWurbiler implements Wurbiler {
    * Handles the phase-command.
    *
    * @param stok the tokenizer pointing to first arg
-   * @return true if ok, false if some error
    */
-  private boolean handlePhase(StringTokenizer stok) {
+  private void handlePhase(StringTokenizer stok) {
     if (stok.hasMoreTokens()) {
       String token = stok.nextToken();
       int ph = Integer.parseInt(token);
@@ -1102,7 +1100,6 @@ public abstract class AbstractWurbiler implements Wurbiler {
         logger.info("{" + CMD_PHASE + " " + token + "}");
       }
     }
-    return true;
   }
 
 
@@ -1110,15 +1107,13 @@ public abstract class AbstractWurbiler implements Wurbiler {
    * Handles the to-command.
    *
    * @param stok the tokenizer pointing to first arg
-   * @return true if ok, false if some error
    */
-  private boolean handleOutName(StringTokenizer stok) {
+  private void handleOutName(StringTokenizer stok) {
     String path = stok.hasMoreTokens() ? stok.nextToken() : null;
     setOutName(path);
     if (verbosity.isDebug()) {
       logger.info("{" + CMD_TO + (path == null ? "" : (" " + path)) + "}");
     }
-    return true;
   }
 
 

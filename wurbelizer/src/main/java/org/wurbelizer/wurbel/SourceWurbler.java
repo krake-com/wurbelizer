@@ -55,19 +55,20 @@ public class SourceWurbler extends AbstractWurbler {
   private static final String PROPERTY_FOLDTYPE  = "foldtype";
 
 
-  private final String filename;                    // the filename to wurbelize
-  private final String[] wurbletPath;               // paths to load wurblets from
-  private final String analyzeDir;                  // directory with extra wurblet information
-  private final Logger logger;                      // the logger
-  private final Verbosity verbosity;                // verbosity
-  private final Set<String> errorsSoFar;            // old error message list
-  private final boolean dryRun;                     // true if dry run (no wurblets, just parsing)
+  private final String filename;                        // the filename to wurbelize
+  private final String[] wurbletPath;                   // paths to load wurblets from
+  private final String analyzeDir;                      // directory with extra wurblet information
+  private final Logger logger;                          // the logger
+  private final Verbosity verbosity;                    // verbosity
+  private final Set<String> errorsSoFar;                // old error message list
+  private final boolean dryRun;                         // true if dry run (no wurblets, just parsing)
+  private final WurbletExecutionFilter wurbletFilter;   // optional wurblet execution filter
 
-  private SourceRegion guardType;                   // the guard type
-  private SourceRegion.FoldType defaultFoldType;    // the default fold type (null if none)
-  private Properties wurbProps;                     // properties from wurb-file
-  private int loopCount;                            // loop counter
-  private SourceType sourceType;                    // type of this source file
+  private SourceRegion guardType;                       // the guard type
+  private SourceRegion.FoldType defaultFoldType;        // the default fold type (null if none)
+  private Properties wurbProps;                         // properties from wurb-file
+  private int loopCount;                                // loop counter
+  private SourceType sourceType;                        // type of this source file
 
 
 
@@ -81,11 +82,12 @@ public class SourceWurbler extends AbstractWurbler {
    * @param verbosity the verbosity
    * @param logger the logger (can also be used by the wurblets)
    * @param errorsSoFar a set of errors logged so far, null if no suppression of repeating errors
+   * @param wurbletFilter optional wurblet execution filter
    * @param dryRun true if don't run any wurblets, just parse the source file
    * @throws WurbelException if loading the wurb-file failed
    */
   public SourceWurbler(String filename, String wurbFilename, String[] wurbletPath, String analyzeDir,
-                       Logger logger, Verbosity verbosity, Set<String> errorsSoFar, boolean dryRun)
+                       Logger logger, Verbosity verbosity, Set<String> errorsSoFar, WurbletExecutionFilter wurbletFilter, boolean dryRun)
          throws WurbelException {
 
     this.filename       = filename;
@@ -94,6 +96,7 @@ public class SourceWurbler extends AbstractWurbler {
     this.logger         = logger;
     this.verbosity      = verbosity == null ? Verbosity.DEFAULT : verbosity;
     this.errorsSoFar    = errorsSoFar;
+    this.wurbletFilter  = wurbletFilter;
     this.dryRun         = dryRun;
 
 
@@ -329,135 +332,138 @@ public class SourceWurbler extends AbstractWurbler {
             for (int wurbletIndex = wurbletList.size() - 1; wurbletIndex >= 0; wurbletIndex--) {
 
               SourceWurbletSubElement wurbletElement = wurbletList.get(wurbletIndex);
+              String currentGuardName = wurbletElement.getName();
 
-              // parse container options (wurbler args)
-              int indent = 0;                                       // extra indentation
-              boolean invoke = true;                                // run the wurblet
-              SourceRegion.FoldType foldType = defaultFoldType;     // the fold type (default none)
+              if (wurbletFilter == null || wurbletFilter.isExecutable(wurbletElement)) {
 
-              // parse wurbler args
-              for (String warg: wurbletElement.getWurblerArgs()) {
-                if (warg.startsWith("indent=")) {
-                  indent = Integer.parseInt(warg.substring(7));
-                }
-                else if (warg.startsWith("test:")) {
-                  invoke = simpleCondition(warg.substring(5));
-                }
-                else if (warg.startsWith("fold=")) {
-                  String val = warg.substring(5).toUpperCase();
-                  if (!val.equals("NONE")) {
-                    foldType = SourceRegion.FoldType.valueOf(val);
+                // parse container options (wurbler args)
+                int indent = 0;                                       // extra indentation
+                boolean invoke = true;                                // run the wurblet
+                SourceRegion.FoldType foldType = defaultFoldType;     // the fold type (default none)
+
+                // parse wurbler args
+                for (String warg : wurbletElement.getWurblerArgs()) {
+                  if (warg.startsWith("indent=")) {
+                    indent = Integer.parseInt(warg.substring(7));
+                  }
+                  else if (warg.startsWith("test:")) {
+                    invoke = simpleCondition(warg.substring(5));
+                  }
+                  else if (warg.startsWith("fold=")) {
+                    String val = warg.substring(5).toUpperCase();
+                    if (!val.equals("NONE")) {
+                      foldType = SourceRegion.FoldType.valueOf(val);
+                    }
+                  }
+                  else if (warg.startsWith("phase=")) {
+                    int wurbletPhase = Integer.parseInt(warg.substring(6));
+                    if (wurbletPhase < 1) {
+                      wurbletPhase = 1;
+                    }
+                    if (wurbletPhase != phase) {
+                      invoke = false;   // skip this wurblet
+                    }
                   }
                 }
-                else if (warg.startsWith("phase=")) {
-                  int wurbletPhase = Integer.parseInt(warg.substring(6));
-                  if (wurbletPhase < 1) {
-                    wurbletPhase = 1;
+
+                ByteArrayOutputStream os = new ByteArrayOutputStream(); // holds the data
+                PrintStream ps = new PrintStream(os);
+
+                try {
+
+                  if (!wurbletElement.isInline() && !guardedNames.add(currentGuardName)) {
+                    throw new WurbelException("guarded name '" + currentGuardName + "' not unique");
                   }
-                  collectedPhases.add(wurbletPhase);   // add phase if not yet done
-                  if (wurbletPhase != phase) {
-                    invoke = false;   // skip this wurblet
+
+                  wurbProps.setProperty(WURBLET_GUARDNAME, currentGuardName);
+                  String wurbletName = wurbletElement.getWurbletName();
+                  wurbProps.setProperty(WURBLET_WURBLETNAME, wurbletName);
+
+                  if (verbosity.isDebug()) {
+                    logger.info("[" + loopCount + "]wurblet: " + currentGuardName + ", " + wurbletName);
                   }
+
+                  // load the wurblet (may throw an Exception, but not a WurbelException)
+                  loadWurblet(wurbletName, wurbletPath, wurbProps);
+
+                  // get arguments if not fixed
+                  if (!isFixedArgs()) {
+                    setArgs(wurbletElement.getWurbletArgs());
+                  }
+                  setPrintStream(ps);
+
+                  // run the wurblet
+                  if (!invoke || !runWurblet(phase, collectedPhases)) {
+                    continue;
+                  }
+                  wurbletCount++;
                 }
-              }
-
-              ByteArrayOutputStream os = new ByteArrayOutputStream(); // holds the data
-              PrintStream ps = new PrintStream(os);
-
-              try {
-
-                String currentGuardName = wurbletElement.getName();
-
-                if (!wurbletElement.isInline() && !guardedNames.add(currentGuardName)) {
-                  throw new WurbelException("guarded name '" + currentGuardName + "' not unique");
-                }
-
-                wurbProps.setProperty(WURBLET_GUARDNAME, currentGuardName);
-                String wurbletName = wurbletElement.getWurbletName();
-                wurbProps.setProperty(WURBLET_WURBLETNAME, wurbletName);
-
-                if (verbosity.isDebug()) {
-                  logger.info("[" + loopCount + "]wurblet: " + currentGuardName + ", " + wurbletName);
-                }
-
-                // load the wurblet (may throw an Exception, but not a WurbelException)
-                loadWurblet(wurbletName, wurbletPath, wurbProps);
-
-                // get arguments if not fixed
-                if (!isFixedArgs()) {
-                  setArgs(wurbletElement.getWurbletArgs());
-                }
-                setPrintStream(ps);
-
-                // run the wurblet
-                if (!invoke || !runWurblet(phase, collectedPhases)) {
+                catch (WurbelDiscardException dx) {
+                  // discard wurblet's output and treat as warning
+                  logger.warning(ExceptionHelper.concatenateMessages(dx));
                   continue;
                 }
-                wurbletCount++;
-              }
-              catch (WurbelDiscardException dx) {
-                // discard wurblet's output and treat as warning
-                logger.warning(ExceptionHelper.concatenateMessages(dx));
-                continue;
-              }
-              catch (WurbelException ex)  {
-                errors++;
-                // log only exceptions that did not already show up (avoids cluttering output)
-                String errMsg = ExceptionHelper.concatenateMessages(ex);
-                if (!ex.isSourceInfoIncluded()) {
-                  errMsg = new StringBuilder().append(new File(filename).getName())
-                                              .append(":[")
-                                              .append(doc.getLineNumber(wurbletElement.getWurbletBegin()))
-                                              .append("] ")
-                                              .append(errMsg)
-                                              .toString();
-                }
-                boolean doLog = true;
-                if (errorsSoFar != null) {
-                  doLog = !errorsSoFar.contains(errMsg);
+                catch (WurbelException ex) {
+                  errors++;
+                  // log only exceptions that did not already show up (avoids cluttering output)
+                  String errMsg = ExceptionHelper.concatenateMessages(ex);
+                  if (!ex.isSourceInfoIncluded()) {
+                    errMsg = new File(filename).getName() +
+                             ":[" +
+                             doc.getLineNumber(wurbletElement.getWurbletBegin()) +
+                             "] " +
+                             errMsg;
+                  }
+                  boolean doLog = true;
+                  if (errorsSoFar != null) {
+                    doLog = !errorsSoFar.contains(errMsg);
+                    if (doLog) {
+                      errorsSoFar.add(errMsg);
+                    }
+                  }
                   if (doLog) {
-                    errorsSoFar.add(errMsg);
+                    logger.error(errMsg);
+                  }
+
+                  if (ex instanceof WurbelTerminationException) {
+                    throw ex;
+                  }
+
+                  // place exceptions in comments in output
+                  if (wurbletElement.isInline()) {
+                    // print only a single line as newlines would break the insertion point
+                    ps.print(" { " + ex.getMessage() + " } ");
+                  }
+                  else {
+                    ps.println("/********");
+                    ex.printStackTrace(ps);
+                    ps.println("********/");
                   }
                 }
-                if (doLog) {
-                  logger.error(errMsg);
-                }
+                // any other exception will abort (NPE, whatever)
 
-                if (ex instanceof WurbelTerminationException) {
-                  throw ex;
-                }
+                // build generated text
+                String srcText = getWurblet().process(os.toString());
 
-                // place exceptions in comments in output
+                // add fixed indent if option set
+                srcText = WurbelHelper.indent(srcText, indent);
+
+                // replace and if no success delete
                 if (wurbletElement.isInline()) {
-                  // print only a single line as newlines would break the insertion point
-                  ps.print(" { " + ex.getMessage() + " } ");
+                  // inline wurblet: replace text between two consecutive /**/
+                  // within the next source element
+                  doc.replaceInline(srcText, elementIndex, wurbletElement);
                 }
-                else  {
-                  ps.println("/********");
-                  ex.printStackTrace(ps);
-                  ps.println("********/");
+                else {
+                  // generate text into guarded section
+                  if (doc.replaceGuarded(guardType, foldType, wurbletElement.getName(), srcText, wurbletElement) == -1) {
+                    // insert the wurblet output
+                    doc.insertGuarded(guardType, foldType, wurbletElement.getName(), srcText, elementIndex + 1, wurbletElement);
+                  }
                 }
               }
-              // any other exception will abort (NPE, whatever)
-
-              // build generated text
-              String srcText = getWurblet().process(os.toString());
-
-              // add fixed indent if option set
-              srcText = WurbelHelper.indent(srcText, indent);
-
-              // replace and if no success delete
-              if (wurbletElement.isInline()) {
-                // inline wurblet: replace text between two consecutive /**/
-                // within the next source element
-                doc.replaceInline(srcText, elementIndex, wurbletElement);
-              }
-              else  {
-                // generate text into guarded section
-                if (doc.replaceGuarded(guardType, foldType, wurbletElement.getName(), srcText, wurbletElement) == -1) {
-                  // insert the wurblet output
-                  doc.insertGuarded(guardType, foldType, wurbletElement.getName(), srcText, elementIndex + 1, wurbletElement);
-                }
+              else if (!wurbletElement.isInline()) {
+                guardedNames.add(currentGuardName);   // don't remove guarded section!
               }
             }
           }
