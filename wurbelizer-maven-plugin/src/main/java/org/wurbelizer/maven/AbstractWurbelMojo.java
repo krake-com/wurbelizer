@@ -42,11 +42,13 @@ import org.wurbelizer.wurbel.WurbelException;
 import org.wurbelizer.wurbel.WurbelHelper;
 import org.wurbelizer.wurbel.WurbelResult;
 import org.wurbelizer.wurbel.Wurbler;
+import org.wurbelizer.wurbel.WurbletExecutionFilter;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -54,6 +56,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Base class for the wurbel mojos.<br>
@@ -113,11 +117,44 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
 
   /**
    * Dry run.<br>
-   * Don't run the wurblets, just parse the files.
+   * Don't run any wurblets, just parse the files.
    */
   @Parameter
   private boolean dryRun;
 
+
+  /**
+   * Optional list of regular expressions describing the wurblet names used in the wurblet anchors.<br>
+   * If given, only those wurblets will be processed.
+   */
+  @Parameter
+  private List<String> includeWurblets;
+
+  /**
+   * Optional list of regular expressions describing the guarded names used in the wurblet anchors.<br>
+   * If given, only those wurblet anchors will be processed.
+   */
+  @Parameter
+  private List<String> includeAnchors;
+
+  /**
+   * Optional list of regular expressions describing the wurblet names used in the wurblet anchors to exclude.<br>
+   * Same as {@link #includeWurblets}, but those wurblets will <em>not</em> be processed.
+   */
+  @Parameter
+  private List<String> excludeWurblets;
+
+  /**
+   * Optional list of regular expressions describing the guarded names used in the wurblet anchors to exclude.<br>
+   * Same as {@link #includeAnchors}, but those wurblet anchors will <em>not</em> be processed.
+   */
+  @Parameter
+  private List<String> excludeAnchors;
+
+  /**
+   * Optional wurblet execution filter.
+   */
+  private WurbelFilter wurbelFilter;
 
   /**
    * The classrealm.
@@ -248,16 +285,22 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
         }
         else {
           // all from source dir with default java-extension
-          if (getSourceDir().isDirectory() && getSourceDir().list() != null && getSourceDir().list().length > 0) {
-            final FileSet fs = new FileSet();
-            fs.setDirectory(getSourceDir().getPath());
-            fs.addInclude("**/*" + Constants.JAVA_SOURCE_EXTENSION);
-            if (wurbelFileSet(fs, phase, collectedPhases)) {
-              hereDocsUpdated = true;
+          if (getSourceDir().isDirectory()) {
+            String[] files = getSourceDir().list();
+            if (files != null && files.length > 0) {
+              final FileSet fs = new FileSet();
+              fs.setDirectory(getSourceDir().getPath());
+              fs.addInclude("**/*" + Constants.JAVA_SOURCE_EXTENSION);
+              if (wurbelFileSet(fs, phase, collectedPhases)) {
+                hereDocsUpdated = true;
+              }
+            }
+            else {
+              getLog().warn("empty wurbel.sourceDir " + getSourceDir().getAbsolutePath());
             }
           }
           else {
-            getLog().warn("no or empty wurbel.sourceDir " + getSourceDir().getAbsolutePath());
+            getLog().warn("missing wurbel.sourceDir " + getSourceDir().getAbsolutePath());
           }
         }
 
@@ -293,13 +336,14 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
    * @param verbosity the verbosity
    * @param logger the logger (can also be used by the wurblets)
    * @param errorsSoFar a set of errors logged so far, null if no suppression of repeating errors
+   * @param wurbletFilter optional wurblet execution filter
    * @param dryRun dry run
    * @return the wurbler
    * @throws WurbelException if loading the wurb-file failed
    */
   public Wurbler createWurbler(String filename, String wurbFilename, String[] wurbletPath, String analyzeDir,
                                Logger logger, Verbosity verbosity, Set<String> errorsSoFar,
-                               boolean dryRun) throws WurbelException {
+                               WurbletExecutionFilter wurbletFilter, boolean dryRun) throws WurbelException {
     return new SourceWurbler(
             filename,
             wurbFilename,
@@ -308,6 +352,7 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
             logger,
             verbosity,
             errorsSoFar,
+            wurbletFilter,
             dryRun);
   }
 
@@ -340,20 +385,18 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
       getLog().info("wurbelizing files in " + dirName);
     }
 
-    int wurbeledFilesCount  = 0;
-    int updatedFilesCount   = 0;
-    int wurbletCount        = 0;
-    int errorFilesCount     = 0;
-    boolean hereDocsUpdated = false;
-
-    String resourceDirName = getResourceDirName(dirName);
-    Set<String> processedFiles = new HashSet<>();
+    int wurbeledFilesCount                = 0;
+    int updatedFilesCount                 = 0;
+    int wurbletCount                      = 0;
+    int errorFilesCount                   = 0;
+    boolean hereDocsUpdated               = false;
+    Set<String> errorsSoFar               = new HashSet<>();
+    String resourceDirName                = getResourceDirName(dirName);
+    Set<String> processedFiles            = new HashSet<>();
 
     String[] names = new FileSetManager(getLog(), verbosityLevel.isDebug()).getIncludedFiles(fileSet);
     // always sort alphabetically to provide a deterministic file order
     Arrays.sort(names);
-
-    Set<String> errorsSoFar = new HashSet<>();
 
     for (String name: names) {
 
@@ -401,6 +444,7 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
                   new MavenLogger(getLog()),
                   verbosityLevel,
                   errorsSoFar,
+                  wurbelFilter,
                   dryRun);
 
           // wurbelize the source file
@@ -531,12 +575,47 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
     if (wurbletPaths.isEmpty()) {
         throw new MojoExecutionException("wurbletPaths is empty");
     }
+
+    try {
+      boolean createFilter = false;
+      List<Pattern> includeAnchorPatterns = new ArrayList<>();
+      if (includeAnchors != null) {
+        for (String anchor : includeAnchors) {
+          includeAnchorPatterns.add(Pattern.compile(anchor));
+          createFilter = true;
+        }
+      }
+      List<Pattern> includeWurbletPatterns = new ArrayList<>();
+      if (includeWurblets != null) {
+        for (String wurblet: includeWurblets) {
+          includeWurbletPatterns.add(Pattern.compile(wurblet));
+          createFilter = true;
+        }
+      }
+      List<Pattern> excludeAnchorPatterns = new ArrayList<>();
+      if (excludeAnchors != null) {
+        for (String anchor : excludeAnchors) {
+          excludeAnchorPatterns.add(Pattern.compile(anchor));
+          createFilter = true;
+        }
+      }
+      List<Pattern> excludeWurbletPatterns = new ArrayList<>();
+      if (excludeWurblets != null) {
+        for (String wurblet: excludeWurblets) {
+          excludeWurbletPatterns.add(Pattern.compile(wurblet));
+          createFilter = true;
+        }
+      }
+      wurbelFilter = createFilter ?
+                     new WurbelFilter(includeWurbletPatterns, includeAnchorPatterns,
+                                      excludeWurbletPatterns, excludeAnchorPatterns) : null;
+    }
+    catch (PatternSyntaxException px) {
+      throw new MojoExecutionException("cannot compile filter pattern  '" + px.getPattern() + "': " + px.getMessage(), px);
+    }
   }
 
 
-
-
-  @SuppressWarnings("unchecked")
   private void updateClassLoader() {
 
     if (wurbletDependencies != null) {

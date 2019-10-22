@@ -112,14 +112,12 @@ public class WurbelHelper {
    * Translates variables using StringBuilder.
    * The translation is recursive, i.e. loops until no more replacements were performed.
    *
-   * @param arg the argument to be translated/parsed
+   * @param buf the argument buffer to be translated/parsed in-place
    * @param getenv true if check environment, false if system property
    * @param lastLoop true if translate \$ to $ finally
    * @param otherProps != null if use these properties too for translation
-   *
-   * @return the parsed argument
    */
-  public static StringBuilder translateVariables(StringBuilder arg, boolean getenv, boolean lastLoop, Properties otherProps) {
+  public static void translateVariables(StringBuilder buf, boolean getenv, boolean lastLoop, Properties otherProps) {
 
     if (getenv && envProperties == null)  {
       envProperties = new Environment();    // initialize first
@@ -128,7 +126,7 @@ public class WurbelHelper {
     boolean replaced;
 
     do  {
-      StringTokenizer stok = new StringTokenizer(arg.toString(), getenv ? " /.,;:()[]=!\t\r\n'\"" : " /,;:()[]=!\t\r\n'\"");
+      StringTokenizer stok = new StringTokenizer(buf.toString(), getenv ? " /.,;:()[]=!\t\r\n'\"" : " /,;:()[]=!\t\r\n'\"");
       replaced = false;
       while (stok.hasMoreTokens())  {
         String token = stok.nextToken();
@@ -158,8 +156,8 @@ public class WurbelHelper {
           }
           if (value != null)  {
             // found a variable
-            int ndx = arg.indexOf(token);
-            arg.replace(ndx, ndx + token.length(), value);
+            int ndx = buf.indexOf(token);
+            buf.replace(ndx, ndx + token.length(), value);
             replaced = true;
             break;
           }
@@ -169,16 +167,14 @@ public class WurbelHelper {
 
     if (lastLoop) {
       // translate \$ to $ (this allows \$ to suppress variable substituion)
-      int len = arg.length() - 1;
+      int len = buf.length() - 1;
       for (int i=0; i < len; i++) {
-        if (arg.charAt(i) == '\\' && arg.charAt(i+1) == '$') {
-          arg.deleteCharAt(i);
+        if (buf.charAt(i) == '\\' && buf.charAt(i+1) == '$') {
+          buf.deleteCharAt(i);
           len--;
         }
       }
     }
-
-    return arg;
   }
 
 
@@ -194,21 +190,22 @@ public class WurbelHelper {
    * @return the parsed argument
    */
   public static String translateVariables(String arg, boolean getenv, boolean lastLoop, Properties otherProps) {
-    return translateVariables(new StringBuilder(arg), getenv, lastLoop, otherProps).toString();
+    StringBuilder buf = new StringBuilder();
+    buf.append(arg);
+    translateVariables(buf, getenv, lastLoop, otherProps);
+    return buf.toString();
   }
 
 
   /**
    * Translates variables in arguments, first properties, second environmen. Using StringBuilder.
    *
-   * @param arg argument to be translated/parsed
+   * @param buf argument buffer to be translated/parsed in place
    * @param otherProps != null if use these properties too for translation
-   *
-   * @return the parsed argument
    */
-  public static StringBuilder translateVariables(StringBuilder arg, Properties otherProps) {
-    arg = translateVariables(arg, false, false, otherProps);
-    return translateVariables(arg, true, true, otherProps);
+  public static void translateVariables(StringBuilder buf, Properties otherProps) {
+    translateVariables(buf, false, false, otherProps);
+    translateVariables(buf, true, true, otherProps);
   }
 
 
@@ -221,7 +218,10 @@ public class WurbelHelper {
    * @return the parsed argument
    */
   public static String translateVariables(String arg, Properties otherProps) {
-    return translateVariables(new StringBuilder(arg), otherProps).toString();
+    StringBuilder buf = new StringBuilder();
+    buf.append(arg);
+    translateVariables(buf, otherProps);
+    return buf.toString();
   }
 
 
@@ -295,19 +295,14 @@ public class WurbelHelper {
    */
   public static String indent(String source, int indent) {
     if (source != null && indent > 0) {
-
-      StringBuilder ibuf = new StringBuilder(indent);
-      for (int i=0; i < indent; i++)  {
-        ibuf.append(' ');
-      }
-
+      String indentStr = " ".repeat(indent);
       StringBuilder buf = new StringBuilder(source.length());
 
       StringTokenizer stok = new StringTokenizer(source, LINE_DELIM, true);
       while (stok.hasMoreTokens())  {
         String line = stok.nextToken();
         if (!line.equals(LINE_DELIM))  {
-          buf.append(ibuf);
+          buf.append(indentStr);
         }
         buf.append(line);
       }

@@ -37,11 +37,8 @@ public class WurbileHelper {
   public static String toCommentBlock(String comment, int indent) {
     StringBuilder buf = new StringBuilder();
     if (comment != null && !comment.isEmpty()) {
-      for (int i=0; i < indent; i++) {
-        buf.append(' ');
-      }
-      String indentStr = buf.toString();
-      buf.append("/**");
+      String indentStr = " ".repeat(Math.max(0, indent));
+      buf.append(indentStr).append("/**");
 
       StringTokenizer stok = new StringTokenizer(comment, "\n\r");
       while (stok.hasMoreTokens()) {

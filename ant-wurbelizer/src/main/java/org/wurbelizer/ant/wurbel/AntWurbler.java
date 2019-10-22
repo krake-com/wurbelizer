@@ -465,7 +465,7 @@ public class AntWurbler extends MatchingTask {
                         AntWurbler.this.log(msg, Project.MSG_INFO);
                       }
                     },
-                    verbosity, errorsSoFar, dryRun) {
+                    verbosity, errorsSoFar, null, dryRun) {
 
                       /**
                        * gets the property value for a given namespace and key.
