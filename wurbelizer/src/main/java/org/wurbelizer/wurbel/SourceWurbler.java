@@ -58,9 +58,11 @@ public class SourceWurbler extends AbstractWurbler {
   private final String filename;                        // the filename to wurbelize
   private final String[] wurbletPath;                   // paths to load wurblets from
   private final String analyzeDir;                      // directory with extra wurblet information
+  private final int phase;                              // wurblet execution phase
   private final Logger logger;                          // the logger
   private final Verbosity verbosity;                    // verbosity
   private final Set<String> errorsSoFar;                // old error message list
+  private final Set<Integer> collectedPhases;           // the phases of all wurblets detected so far
   private final boolean dryRun;                         // true if dry run (no wurblets, just parsing)
   private final WurbletExecutionFilter wurbletFilter;   // optional wurblet execution filter
 
@@ -79,25 +81,30 @@ public class SourceWurbler extends AbstractWurbler {
    * @param wurbFilename optional wurblet properties file, null to check in same dir
    * @param wurbletPath the list of package names to load wurblets from (if wurblet name is not absolute)
    * @param analyzeDir the list of directories wurblets load extra information from (usually from apt-runs)
-   * @param verbosity the verbosity
-   * @param logger the logger (can also be used by the wurblets)
-   * @param errorsSoFar a set of errors logged so far, null if no suppression of repeating errors
+   * @param phase the wurbel phase, 0 for heredocs, wurblets start at 1
    * @param wurbletFilter optional wurblet execution filter
    * @param dryRun true if don't run any wurblets, just parse the source file
+   * @param logger the logger (can also be used by the wurblets)
+   * @param verbosity the verbosity
+   * @param errorsSoFar a set of errors logged so far, null if no suppression of repeating errors
+   * @param collectedPhases the phases of all wurblets detected so far
    * @throws WurbelException if loading the wurb-file failed
    */
-  public SourceWurbler(String filename, String wurbFilename, String[] wurbletPath, String analyzeDir,
-                       Logger logger, Verbosity verbosity, Set<String> errorsSoFar, WurbletExecutionFilter wurbletFilter, boolean dryRun)
+  public SourceWurbler(String filename, String wurbFilename, String[] wurbletPath, String analyzeDir, int phase,
+                       WurbletExecutionFilter wurbletFilter, boolean dryRun,
+                       Logger logger, Verbosity verbosity, Set<String> errorsSoFar, Set<Integer> collectedPhases)
          throws WurbelException {
 
-    this.filename       = filename;
-    this.wurbletPath    = wurbletPath;
-    this.analyzeDir     = analyzeDir;
-    this.logger         = logger;
-    this.verbosity      = verbosity == null ? Verbosity.DEFAULT : verbosity;
-    this.errorsSoFar    = errorsSoFar;
-    this.wurbletFilter  = wurbletFilter;
-    this.dryRun         = dryRun;
+    this.filename         = filename;
+    this.wurbletPath      = wurbletPath;
+    this.analyzeDir       = analyzeDir;
+    this.phase            = phase;
+    this.wurbletFilter    = wurbletFilter;
+    this.dryRun           = dryRun;
+    this.logger           = logger;
+    this.verbosity        = verbosity == null ? Verbosity.DEFAULT : verbosity;
+    this.errorsSoFar      = errorsSoFar;
+    this.collectedPhases  = collectedPhases;
 
 
     File file = new File(filename);
@@ -202,7 +209,7 @@ public class SourceWurbler extends AbstractWurbler {
 
 
   @Override
-  public WurbelResult wurbel(int phase, Set<Integer> collectedPhases) throws WurbelException, SourceException {
+  public WurbelResult wurbel() throws WurbelException, SourceException {
 
     SourceFileFactory.initialize();
 
@@ -338,6 +345,7 @@ public class SourceWurbler extends AbstractWurbler {
 
                 // parse container options (wurbler args)
                 int indent = 0;                                       // extra indentation
+                Integer wurbletPhase = null;                          // explicit wurblet phase argument
                 boolean invoke = true;                                // run the wurblet
                 SourceRegion.FoldType foldType = defaultFoldType;     // the fold type (default none)
 
@@ -356,7 +364,7 @@ public class SourceWurbler extends AbstractWurbler {
                     }
                   }
                   else if (warg.startsWith("phase=")) {
-                    int wurbletPhase = Integer.parseInt(warg.substring(6));
+                    wurbletPhase = Integer.parseInt(warg.substring(6));
                     if (wurbletPhase < 1) {
                       wurbletPhase = 1;
                     }
@@ -385,6 +393,10 @@ public class SourceWurbler extends AbstractWurbler {
 
                   // load the wurblet (may throw an Exception, but not a WurbelException)
                   loadWurblet(wurbletName, wurbletPath, wurbProps);
+
+                  if (wurbletPhase != null) {
+                    getWurblet().setPhase(wurbletPhase);
+                  }
 
                   // get arguments if not fixed
                   if (!isFixedArgs()) {

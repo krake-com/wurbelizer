@@ -32,6 +32,7 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
@@ -54,22 +55,26 @@ import java.util.regex.Pattern;
  */
 public class ConsoleWurbler extends AbstractWurbler {
 
-
-  private String analyzeDir;      // wurblet extra analyze dir
-  private final Logger logger;    // the default logger
-  private Verbosity verbosity;    // tell what's going on
+  private final int phase;                      // wurblet execution phase
+  private final Set<Integer> collectedPhases;   // the phases of all wurblets detected so far
+  private String analyzeDir;                    // wurblet extra analyze dir
+  private final Logger logger;                  // the default logger
+  private Verbosity verbosity;                  // tell what's going on
 
 
   /**
    * Creates an instance of a command line wurbler.
    *
    * @param args the command line arguments
+   * @param phase the wurbel phase, 0 for heredocs, wurblets start at 1
+   * @param collectedPhases the phases of all wurblets detected so far
    *
    * @throws WurbelException if creating the wurbler failed
    */
-  public ConsoleWurbler(String[] args) throws WurbelException {
+  public ConsoleWurbler(String[] args, int phase, Set<Integer> collectedPhases) throws WurbelException {
 
-    super();
+    this.phase = phase;
+    this.collectedPhases = Objects.requireNonNull(collectedPhases);
 
     logger = new DefaultLogger();
     verbosity = Verbosity.DEFAULT;
@@ -125,7 +130,7 @@ public class ConsoleWurbler extends AbstractWurbler {
   }
 
   @Override
-  public WurbelResult wurbel(int phase, Set<Integer> collectedPhases) throws WurbelException, SourceException {
+  public WurbelResult wurbel() throws WurbelException, SourceException {
     boolean executed = runWurblet(phase, collectedPhases);
     return new WurbelResult(executed ? 1 : 0,
                             0,
@@ -188,7 +193,7 @@ public class ConsoleWurbler extends AbstractWurbler {
     try {
       int phase = 1;
       for (;;) {
-        new ConsoleWurbler(args).wurbel(phase, collectedPhases);
+        new ConsoleWurbler(args, phase, collectedPhases).wurbel();
         Integer nextPhase = collectedPhases.higher(phase);
         if (nextPhase == null) {
           break;

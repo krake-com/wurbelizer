@@ -333,27 +333,31 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
    * @param wurbFilename optional wurblet properties file, null to check in same dir
    * @param wurbletPath the list of package names to load wurblets from (if wurblet name is not absolute)
    * @param analyzeDir the list of directories wurblets load extra information from (usually from apt-runs)
-   * @param verbosity the verbosity
-   * @param logger the logger (can also be used by the wurblets)
-   * @param errorsSoFar a set of errors logged so far, null if no suppression of repeating errors
+   * @param phase the wurbel phase, 0 for heredocs, wurblets start at 1
    * @param wurbletFilter optional wurblet execution filter
-   * @param dryRun dry run
+   * @param dryRun true if don't run any wurblets, just parse the source file
+   * @param logger the logger (can also be used by the wurblets)
+   * @param verbosity the verbosity
+   * @param errorsSoFar a set of errors logged so far, null if no suppression of repeating errors
+   * @param collectedPhases the phases of all wurblets detected so far
    * @return the wurbler
    * @throws WurbelException if loading the wurb-file failed
    */
-  public Wurbler createWurbler(String filename, String wurbFilename, String[] wurbletPath, String analyzeDir,
-                               Logger logger, Verbosity verbosity, Set<String> errorsSoFar,
-                               WurbletExecutionFilter wurbletFilter, boolean dryRun) throws WurbelException {
+  public Wurbler createWurbler(String filename, String wurbFilename, String[] wurbletPath, String analyzeDir, int phase,
+                               WurbletExecutionFilter wurbletFilter, boolean dryRun,
+                               Logger logger, Verbosity verbosity, Set<String> errorsSoFar, Set<Integer> collectedPhases) throws WurbelException {
     return new SourceWurbler(
             filename,
             wurbFilename,
             wurbletPath,
             analyzeDir,
+            phase,
+            wurbletFilter,
+            dryRun,
             logger,
             verbosity,
             errorsSoFar,
-            wurbletFilter,
-            dryRun);
+            collectedPhases);
   }
 
 
@@ -441,14 +445,16 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
                   wurbPath,
                   wurbletPathsAsArray(),
                   getAnalyzeDir().getAbsolutePath(),
+                  phase,
+                  wurbelFilter,
+                  dryRun,
                   new MavenLogger(getLog()),
                   verbosityLevel,
                   errorsSoFar,
-                  wurbelFilter,
-                  dryRun);
+                  collectedPhases);
 
           // wurbelize the source file
-          WurbelResult result = sourceWurbler.wurbel(phase, collectedPhases);
+          WurbelResult result = sourceWurbler.wurbel();
 
           wurbletCount += result.getWurbletCount();
 
