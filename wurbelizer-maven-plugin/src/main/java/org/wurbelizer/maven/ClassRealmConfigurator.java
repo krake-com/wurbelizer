@@ -54,8 +54,8 @@ public class ClassRealmConfigurator extends AbstractComponentConfigurator {
                                  ConfigurationListener listener)
          throws ComponentConfigurationException {
 
-    if (component instanceof WurbelMojo) {
-      ((WurbelMojo) component).setClassRealm(containerRealm);
+    if (component instanceof AbstractWurbelMojo) {
+      ((AbstractWurbelMojo) component).setClassRealm(containerRealm);
     }
     else  {
       throw new ComponentConfigurationException("configurator can only be applied to an AbstractWurbelizerMojo");
