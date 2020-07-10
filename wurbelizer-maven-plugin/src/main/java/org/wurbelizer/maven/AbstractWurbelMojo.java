@@ -19,17 +19,6 @@
 
 package org.wurbelizer.maven;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeSet;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
@@ -54,6 +43,18 @@ import org.wurbelizer.wurbel.WurbelException;
 import org.wurbelizer.wurbel.WurbelHelper;
 import org.wurbelizer.wurbel.WurbelResult;
 import org.wurbelizer.wurbel.Wurbler;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Base class for the wurbel mojos.<br>
@@ -549,8 +550,7 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
 
 
 
-  @SuppressWarnings("unchecked")
-  private void updateClassLoader() {
+  private void updateClassLoader() throws MojoExecutionException {
 
     if (wurbletDependencies != null) {
       Set<Artifact> wurbletArtifacts = new HashSet<>();
@@ -565,14 +565,13 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
                 .setResolveTransitively(true)
                 .setLocalRepository(localRepository)
                 .setRemoteRepositories(project.getRemoteArtifactRepositories())
-                .setOffline(true)
                 .setForceUpdate(false)
                 .setManagedVersionMap(project.getManagedVersionMap());
 
         Set<Artifact> resolvedArtifacts = artifactResolver.resolve(artifactRequest).getArtifacts();
 
         if (resolvedArtifacts.isEmpty()) {
-          getLog().error("cannot resolve artifact " + artifact);
+          throw new MojoExecutionException("cannot resolve wurblet artifact " + artifact);
         }
         else {
           wurbletArtifacts.addAll(resolvedArtifacts);
@@ -585,17 +584,36 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
       }
 
       // add all the jars we just downloaded to the new child realm
+      StringBuilder missingDeps = null;
+
       for (Artifact artifact : wurbletArtifacts) {
         try {
-          URL url = artifact.getFile().toURI().toURL();
-          classRealm.addURL(url);
-          if (verbosityLevel.isDebug()) {
-            getLog().info("added to classpath: " + url);
+          File file = artifact.getFile();
+          if (file != null) {
+            URL url = file.toURI().toURL();
+            classRealm.addURL(url);
+            if (verbosityLevel.isDebug()) {
+              getLog().info("added to classpath: " + url);
+            }
+          }
+          else {
+            // artifact not resolved
+            if (missingDeps == null) {
+              missingDeps = new StringBuilder();
+            }
+            else {
+              missingDeps.append(", ");
+            }
+            missingDeps.append(artifact);
           }
         }
         catch (MalformedURLException ex) {
-          getLog().error("cannot determine URL for " + artifact.getFile(), ex);
+          throw new MojoExecutionException("cannot determine URL for " + artifact.getFile(), ex);
         }
+      }
+
+      if (missingDeps != null) {
+        throw new MojoExecutionException("some wurblet dependencies could not be resolved: " + missingDeps);
       }
 
       // make the child realm the ContextClassLoader
