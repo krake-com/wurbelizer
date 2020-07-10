@@ -437,7 +437,7 @@ public class SourceWurbler extends AbstractWurbler {
                     logger.error(errMsg);
                   }
 
-                  if (ex instanceof WurbelTerminationException) {
+                  if (ex instanceof WurbelTerminationException || getWurblet() == null) {
                     throw ex;
                   }
 
