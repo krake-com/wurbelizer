@@ -622,7 +622,7 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
   }
 
 
-  private void updateClassLoader() {
+  private void updateClassLoader() throws MojoExecutionException {
 
     if (wurbletDependencies != null) {
       Set<Artifact> wurbletArtifacts = new HashSet<>();
@@ -637,14 +637,13 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
                 .setResolveTransitively(true)
                 .setLocalRepository(localRepository)
                 .setRemoteRepositories(project.getRemoteArtifactRepositories())
-                .setOffline(true)
                 .setForceUpdate(false)
                 .setManagedVersionMap(project.getManagedVersionMap());
 
         Set<Artifact> resolvedArtifacts = artifactResolver.resolve(artifactRequest).getArtifacts();
 
         if (resolvedArtifacts.isEmpty()) {
-          getLog().error("cannot resolve artifact " + artifact);
+          throw new MojoExecutionException("cannot resolve artifact " + artifact);
         }
         else {
           wurbletArtifacts.addAll(resolvedArtifacts);
@@ -666,7 +665,7 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
           }
         }
         catch (MalformedURLException ex) {
-          getLog().error("cannot determine URL for " + artifact.getFile(), ex);
+          throw new MojoExecutionException("cannot determine URL for " + artifact.getFile(), ex);
         }
       }
 
