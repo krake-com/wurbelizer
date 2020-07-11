@@ -643,7 +643,7 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
         Set<Artifact> resolvedArtifacts = artifactResolver.resolve(artifactRequest).getArtifacts();
 
         if (resolvedArtifacts.isEmpty()) {
-          throw new MojoExecutionException("cannot resolve artifact " + artifact);
+          throw new MojoExecutionException("cannot resolve wurblet artifact " + artifact);
         }
         else {
           wurbletArtifacts.addAll(resolvedArtifacts);
@@ -656,17 +656,36 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
       }
 
       // add all the jars we just downloaded to the new child realm
+      StringBuilder missingDeps = null;
+
       for (Artifact artifact : wurbletArtifacts) {
         try {
-          URL url = artifact.getFile().toURI().toURL();
-          classRealm.addURL(url);
-          if (verbosityLevel.isDebug()) {
-            getLog().info("added to classpath: " + url);
+          File file = artifact.getFile();
+          if (file != null) {
+            URL url = file.toURI().toURL();
+            classRealm.addURL(url);
+            if (verbosityLevel.isDebug()) {
+              getLog().info("added to classpath: " + url);
+            }
+          }
+          else {
+            // artifact not resolved
+            if (missingDeps == null) {
+              missingDeps = new StringBuilder();
+            }
+            else {
+              missingDeps.append(", ");
+            }
+            missingDeps.append(artifact);
           }
         }
         catch (MalformedURLException ex) {
           throw new MojoExecutionException("cannot determine URL for " + artifact.getFile(), ex);
         }
+      }
+
+      if (missingDeps != null) {
+        throw new MojoExecutionException("some wurblet dependencies could not be resolved: " + missingDeps);
       }
 
       // make the child realm the ContextClassLoader
