@@ -52,7 +52,7 @@
     <javac.version.src>14</javac.version.src>
     <javac.version.target>14</javac.version.target>
     <java.version>14</java.version>
-    <ow2.asm.version>8.0</ow2.asm.version>
+    <ow2.asm.version>8.0.1</ow2.asm.version>
     <maven.version>3.6.3</maven.version>
     <netbeans.hint.license>wurbelizer</netbeans.hint.license>
   </properties>
@@ -103,7 +103,7 @@
       <dependency>
         <groupId>org.apache.ant</groupId>
         <artifactId>ant</artifactId>
-        <version>1.10.7</version>
+        <version>1.10.8</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
@@ -306,7 +306,7 @@
         <plugin>
           <groupId>org.owasp</groupId>
           <artifactId>dependency-check-maven</artifactId>
-          <version>5.3.1</version>
+          <version>5.3.2</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
