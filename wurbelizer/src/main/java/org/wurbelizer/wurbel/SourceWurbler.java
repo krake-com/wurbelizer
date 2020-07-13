@@ -344,7 +344,7 @@ public class SourceWurbler extends AbstractWurbler {
               if (wurbletFilter == null || wurbletFilter.isExecutable(wurbletElement)) {
 
                 // parse container options (wurbler args)
-                int indent = 0;                                       // extra indentation
+                int indent = -1;                                      // extra indentation, 0 if none, -1 if smart (default)
                 Integer wurbletPhase = null;                          // explicit wurblet phase argument
                 boolean invoke = true;                                // run the wurblet
                 SourceRegion.FoldType foldType = defaultFoldType;     // the fold type (default none)
@@ -457,8 +457,26 @@ public class SourceWurbler extends AbstractWurbler {
                 // build generated text
                 String srcText = getWurblet().process(os.toString());
 
-                // add fixed indent if option set
-                srcText = WurbelHelper.indent(srcText, indent);
+                int srcIndent = 0;
+                if (indent >= 0) {
+                  // add fixed indent if option set
+                  srcIndent = indent;
+                }
+                else if (sourceType.isSmartIndent() && !wurbletElement.isInline()) {
+                  // smart indent: add extra spaces up to the start of the wurblet anchor's comment block
+                  SourceElement commentElement  = wurbletElement.getElement();
+                  if (commentElement.isComment()) {
+                    String lead = commentElement.getFirstLineLead();
+                    int leadLen = WurbelHelper.determineIndent(lead);
+                    if (leadLen == lead.length()) {   // if lead contains only spaces
+                      srcIndent = leadLen - WurbelHelper.determineIndent(srcText);
+                    }
+                  }
+                }
+
+                if (srcIndent > 0) {
+                  srcText = WurbelHelper.indent(srcText, srcIndent);
+                }
 
                 // replace and if no success delete
                 if (wurbletElement.isInline()) {

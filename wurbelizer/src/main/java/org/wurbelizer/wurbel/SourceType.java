@@ -53,6 +53,16 @@ public interface SourceType {
     return false;
   }
 
+  /**
+   * Returns whether generated code should be generated with smart indent.<br>
+   * With smart indent, the generated code will be aligned with the comment block
+   * containing the wurblet anchor.
+   *
+   * @return true if smart indent
+   */
+  default boolean isSmartIndent() {
+    return false;
+  }
 
   /**
    * Gets all registered source types.

@@ -479,6 +479,32 @@ public class WurbelHelper {
     return str;
   }
 
+  /**
+   * Determines the indent of a text block.<br>
+   * Counts the number of spaces up to the first non-space character,
+   * ignoring leading empty lines.
+   *
+   * @param str the string
+   * @return the number of spaces
+   */
+  public static int determineIndent(String str) {
+    int count = 0;
+    if (str != null) {
+      for (int i=0; i < str.length(); i++) {
+        char c = str.charAt(i);
+        if (c == '\n' || c == '\r') {
+          count = 0;
+        }
+        else if (c != ' ') {
+          break;
+        }
+        else {
+          count++;
+        }
+      }
+    }
+    return count;
+  }
 
   private WurbelHelper() {
   }
