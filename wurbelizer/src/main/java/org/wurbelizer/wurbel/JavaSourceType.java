@@ -107,6 +107,11 @@ public class JavaSourceType implements SourceType {
   }
 
   @Override
+  public boolean isSmartIndent() {
+    return true;
+  }
+
+  @Override
   public Properties extractProperties(SourceDocument document) {
     Properties props = new Properties();
     boolean packageFound = false;
