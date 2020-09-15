@@ -32,7 +32,11 @@ package org.wurbelizer.wurbel;
 @SuppressWarnings("serial")
 public class WurbelException extends Exception {
 
+  /**
+   * true if message contains a hint to the source of the error, false if default to file.
+   */
   private final boolean sourceInfoIncluded;
+
 
   /**
    * Creates a wurbel exception.

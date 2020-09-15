@@ -30,9 +30,17 @@ import java.io.Serializable;
 public class WurbletData implements Serializable {
 
   private static final long serialVersionUID = 2L;
-  
-  private String[] source;      // the source-strings
-  private String[] args;        // the wurblet-args (null = get default from container)
+
+  /**
+   * The source strings.
+   */
+  private String[] source;
+
+  /**
+   * The wurblet-args.<br>
+   * null = get default from container.
+   */
+  private String[] args;
   
   
   /**

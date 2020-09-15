@@ -56,16 +56,23 @@ public class AntWurbiler extends MatchingTask {
 
   private static final String FAIL_MSG = "wurbilation failed";
 
-  private           Path src;       // source path (for wrbl-files)
-  private           File destDir;   // destination directory
-  protected boolean failOnError;    // fail on wurblet error (default)
-  private Verbosity verbosity;      // tell what's going on
-  protected File[]  wurbleList;     // list of all wrbl-files that need to be wurbiled
+  /**
+   * True if fail on wurblet error.
+   */
+  protected boolean failOnError;
 
-  // options
-  private int     indent;           // source indent, -1 = default = 4
-  private String  parentClass;      // implementing parent class (default = AbstractWurblet)
-  private String  packageName;      // package name, null = none
+  /**
+   * List of all wrbl-files that need to be wurbiled.
+   */
+  protected File[] wurbleList;
+
+
+  private Path src;                 // source path (for wrbl-files)
+  private File destDir;             // destination directory
+  private Verbosity verbosity;      // tell what's going on
+  private int indent;               // source indent, -1 = default = 4
+  private String parentClass;       // implementing parent class (default = AbstractWurblet)
+  private String packageName;       // package name, null = none
 
 
 

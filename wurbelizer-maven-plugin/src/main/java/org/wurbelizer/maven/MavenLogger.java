@@ -23,14 +23,22 @@ import org.apache.maven.plugin.logging.Log;
 import org.wurbelizer.misc.Logger;
 
 /**
- * The maven logger.
+ * The maven logger wrapper.
  *
  * @author harald
  */
 public class MavenLogger implements Logger {
 
-  private final Log log;    // the maven logger
+  /**
+   * The maven logger.
+   */
+  private final Log log;
 
+  /**
+   * Creates a maven logger wrapper.
+   *
+   * @param log the maven logger
+   */
   public MavenLogger(Log log) {
     this.log = log;
   }

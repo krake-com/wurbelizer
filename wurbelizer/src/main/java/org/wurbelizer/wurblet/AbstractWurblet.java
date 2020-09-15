@@ -51,11 +51,31 @@ import java.io.PrintStream;
  */
 public abstract class AbstractWurblet implements Wurblet {
 
-  protected Wurbler container;      // the container
-  protected int phase = 1;          // the execution phase (default is 1)
-  protected String configuration;   // the generic wurblet configuration
-  protected PrintStream out;        // the default output stream
-  protected String[] source;        // the fixed source
+  /**
+   * The wurbler container.
+   */
+  protected Wurbler container;
+
+  /**
+   * The execution phase.<br>
+   * Default is 1.
+   */
+  protected int phase = 1;
+
+  /**
+   * The wurblet configuration.
+   */
+  protected String configuration;
+
+  /**
+   * The default output stream.
+   */
+  protected PrintStream out;
+
+  /**
+   * The fixed source text.
+   */
+  protected String[] source;
 
 
   @Override
