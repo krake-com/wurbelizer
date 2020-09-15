@@ -27,18 +27,37 @@ package org.wurbelizer.wurbile;
 @SuppressWarnings("serial")
 public class WurbileException extends Exception {
 
+  /**
+   * Creates a wurbile exception.
+   *
+   * @param cause the cause
+   */
   public WurbileException(Throwable cause) {
     super(cause);
   }
 
+  /**
+   * Creates a wurbile exception.
+   *
+   * @param message the message
+   * @param cause the cause
+   */
   public WurbileException(String message, Throwable cause) {
     super(message, cause);
   }
 
+  /**
+   * Creates a wurbile exception.
+   *
+   * @param message the message
+   */
   public WurbileException(String message) {
     super(message);
   }
 
+  /**
+   * Creates a wurbile exception.
+   */
   public WurbileException() {
   }
 
