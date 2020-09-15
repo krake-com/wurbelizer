@@ -7,7 +7,7 @@
 
   <groupId>org.wurbelizer</groupId>
   <artifactId>wurbelizer-parent</artifactId>
-  <version>14.0-SNAPSHOT</version>
+  <version>15.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Wurbelizer Parent</name>
@@ -49,9 +49,8 @@
     <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <dependency.locations.enabled>false</dependency.locations.enabled>
-    <javac.version.src>14</javac.version.src>
-    <javac.version.target>14</javac.version.target>
-    <java.version>14</java.version>
+    <javac.version.src>15</javac.version.src>
+    <javac.version.target>${javac.version.src}</javac.version.target>
     <ow2.asm.version>8.0.1</ow2.asm.version>
     <maven.version>3.6.3</maven.version>
     <netbeans.hint.license>wurbelizer</netbeans.hint.license>
@@ -329,8 +328,8 @@
             <configuration>
               <rules>
                 <requireJavaVersion>
-                  <version>[${java.version},)</version>
-                  <message>[ERROR] The currently supported version of Java is ${java.version} or higher</message>
+                  <version>[${javac.version.src},)</version>
+                  <message>[ERROR] The currently supported version of Java is ${javac.version.src} or higher</message>
                 </requireJavaVersion>
                 <requireMavenVersion>
                   <version>[${maven.version},)</version>
