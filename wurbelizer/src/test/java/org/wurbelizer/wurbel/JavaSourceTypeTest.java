@@ -16,14 +16,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package org.wurbelizer;
+package org.wurbelizer.wurbel;
 
 import org.testng.annotations.Test;
 import org.wurbelizer.misc.DefaultLogger;
 import org.wurbelizer.misc.Verbosity;
-import org.wurbelizer.wurbel.JavaSourceType;
-import org.wurbelizer.wurbel.SourceDocument;
-import org.wurbelizer.wurbel.SourceException;
 
 import java.util.Properties;
 
