@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 package org.wurbelizer.wurbel;
 
 import org.wurbelizer.misc.Constants;
@@ -33,37 +32,34 @@ import java.util.regex.Pattern;
 public class JavaSourceType implements SourceType {
 
   /**
-   * property holding the java class-name of the source file (without package).<br>
-   * The classname is set for both classes and interfaces.
+   * Property holding the java class name of the source file (without package).<br>
+   * Valid for all kinds of Java classes, i.e. applies for records and interfaces as well.
    */
   public static final String CLASS_NAME = "classname";
 
   /**
-   * property holding the modifiers.<br>
-   * The first starts with 0, i.e. the application
-   * has to loop on {@code getProperty(MODIFIERS + ndx)}.
+   * Property holding the java record name of the source file, if it is a record (without package).
    */
-  public static final String MODIFIERS = "modifiers_";
+  public static final String RECORD_NAME = "recordname";
 
   /**
-   * property holding the java interface-name of the source file, if it is an interface (without package).<br>
-   * For classes this property remains unset.
+   * Property holding the java interface name of the source file, if it is an interface (without package).
    */
   public static final String INTERFACE_NAME = "interfacename";
 
   /**
-   * property holding the package name of the class
+   * Property holding the package name of the class, record or interface.
    */
   public static final String PACKAGE_NAME = "packagename";
 
   /**
-   * property holding the java definition of the class or interface.<br>
-   * This is the rest of the definition without the class or interface name.
+   * Property holding the java definition of the class, record or interface.<br>
+   * This is the rest of the definition without the class, record or interface name.
    */
   public static final String DEFINITION = "definition";
 
   /**
-   * property holding the extended class (or interfaces if this is an interface).<br>
+   * Property holding the extended classes (or interfaces if this is an interface).<br>
    * The first class starts with 0, i.e. the application
    * has to loop on {@code getProperty(EXTENDS + ndx)}.
    * If it is a class {@code getProperty(EXTENDS)} is sufficient.
@@ -71,20 +67,25 @@ public class JavaSourceType implements SourceType {
   public static final String EXTENDS = "extends_";
 
   /**
-   * property holding for the implementes interfaces.<br>
+   * Property holding for the implemented interfaces.<br>
    * The first interface starts with 0, i.e. the application
    * has to loop on {@code getProperty(IMPLEMENTS + ndx)}.
    */
   public static final String IMPLEMENTS = "implements_";
 
   /**
-   * property holding for the annotations for this class.
+   * Property holding the annotations for this class.
    * The first annotation starts with 0, i.e. the application
    * has to loop on {@code getProperty(ANNOTATION + ndx)}.
    */
   public static final String ANNOTATION = "annotation_";
 
-
+  /**
+   * Property holding the modifiers.<br>
+   * The first starts with 0, i.e. the application
+   * has to loop on {@code getProperty(MODIFIERS + ndx)}.
+   */
+  public static final String MODIFIERS = "modifiers_";
 
 
   // some regexes
@@ -92,6 +93,7 @@ public class JavaSourceType implements SourceType {
   private static final Pattern ANNOTATION_PATTERN = Pattern.compile("(@\\w+[^\\n\\r]*)");  // only 1-line annos for now
   // the following row patterns work because they are applied only on the first matching code block
   private static final Pattern CLASS_PATTERN = Pattern.compile("(^|\\s)class\\s+(\\w+)");
+  private static final Pattern RECORD_PATTERN = Pattern.compile("(^|\\s)record\\s+(\\w+)");
   private static final Pattern INTERFACE_PATTERN = Pattern.compile("(^|\\s)interface\\s+(\\w+)");
   // the following patterns work because they are applied to the block containing the CLASS or INTERFACE pattern
   private static final Pattern EXTENDS_PATTERN = Pattern.compile("\\s*(<.*>)*\\s*extends\\s+(\\w+((<.*>)*))");
@@ -160,6 +162,24 @@ public class JavaSourceType implements SourceType {
           code = code.trim();
           props.setProperty(DEFINITION, code);
           extractExtends(props, code, true);
+          break;
+        }
+
+        matcher = RECORD_PATTERN.matcher(code);
+        if (matcher.find()) {
+          String recordName = matcher.group(2);
+          props.setProperty(RECORD_NAME, recordName);
+          props.setProperty(CLASS_NAME, recordName);
+          extractModifiers(props, code);
+          extractAnnotations(props, code.substring(0, matcher.end()));
+          code = code.substring(matcher.end());
+          int ndx = code.lastIndexOf('{');
+          if (ndx > 0) {
+            code = code.substring(0, ndx);    // cut everything after the '{'
+          }
+          code = code.trim();
+          props.setProperty(DEFINITION, code);
+          extractImplements(props, code);   // records are final, but can implement interfaces
           break;
         }
 
