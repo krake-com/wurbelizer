@@ -375,7 +375,6 @@
             <additionalOption>-html5</additionalOption>
             <additionalOption>-Xdoclint:none</additionalOption>
           </additionalOptions>
-          <stylesheetfile>${rootBasedir}/src/site/resources/css/apidocs.css</stylesheetfile>
           <bottom><![CDATA[<a href="${project.url}">Wurbelizer</a> - Agility in Code Generation]]></bottom>
         </configuration>
       </plugin>
@@ -450,7 +449,6 @@
                   <additionalOptions>
                     <additionalOption>-html5</additionalOption>
                   </additionalOptions>
-                  <stylesheetfile>${rootBasedir}/src/site/resources/css/apidocs.css</stylesheetfile>
                   <bottom><![CDATA[<a href="${project.url}">Wurbelizer</a> - Agility in Code Generation]]></bottom>
                   <quiet>true</quiet>
                   <archive>
