@@ -447,8 +447,15 @@ public class SourceWurbler extends AbstractWurbler {
                     ps.print(" { " + ex.getMessage() + " } ");
                   }
                   else {
+                    // stacktraces may contain file path names, which on windows contain backslashes.
+                    // Those backslashes can be harmful in many ways, for example, if a
+                    // backslash is followed by the lower-case letter 'u', the compiler will treat this as
+                    // a unicode character and compilation could fail due to an illegal unicode sequence.
+                    // -> simply replace all backslashes with forward slashes!
+                    HeapFile stackTrace = new HeapFile("",null);
+                    ex.printStackTrace(stackTrace.getPrintStream());
                     ps.println("/********");
-                    ex.printStackTrace(ps);
+                    ps.println(stackTrace.getText().replace('\\', '/'));
                     ps.println("********/");
                   }
                 }
