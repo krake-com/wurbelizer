@@ -445,18 +445,25 @@ public class SourceWurbler extends AbstractWurbler {
                     throw ex;
                   }
 
-                // place exceptions in comments in output
-                if (wurblet.isInline()) {
-                  // print only a single line as newlines would break the insertion point
-                  ps.print(" { " + ex.getMessage() + " } ");
+                  // place exceptions in comments in output
+                  if (wurblet.isInline()) {
+                    // print only a single line as newlines would break the insertion point
+                    ps.print(" { " + ex.getMessage() + " } ");
+                  }
+                  else {
+                    // stacktraces may contain file path names, which on windows contain backslashes.
+                    // Those backslashes can be harmful in many ways, for example, if a
+                    // backslash is followed by the lower-case letter 'u', the compiler will treat this as
+                    // a unicode character and compilation could fail due to an illegal unicode sequence.
+                    // -> simply replace all backslashes with forward slashes!
+                    HeapFile stackTrace = new HeapFile("",null);
+                    ex.printStackTrace(stackTrace.getPrintStream());
+                    ps.println("/********");
+                    ps.println(stackTrace.getText().replace('\\', '/'));
+                    ps.println("********/");
+                  }
                 }
-                else  {
-                  ps.println("/********");
-                  ex.printStackTrace(ps);
-                  ps.println("********/");
-                }
-              }
-              // any other exception will abort (NPE, whatever)
+                // any other exception will abort (NPE, whatever)
 
               // build generated text
               String srcText = os.toString();
