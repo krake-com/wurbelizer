@@ -29,18 +29,17 @@ import java.io.StringReader;
 /**
  * Utility class implementing in-memory files.<br>
  * Nice for here-documents that don't need to be stored on disk.
- * Important: heapfiles are valid among all wurblets <strong>and</strong> sourcefiles
- * within a single ant run.
  *
+ * @see HeapFileFactory
  * @author harald
  */
 public class HeapFile {
 
-  private final String heapName;            // unique heapName of the heapfile
+  private final String name;                // name of the heapfile
   private final ByteArrayOutputStream data; // data for output stream
   private final PrintStream out;            // in memory output stream
   private int invocationCount;              // the last invocationCounter from wurbler-container (for optional use in wurblets)
-  private String sourceName;                // the last heapName of the wurbeled sourcefile
+  private String sourceName;                // the last name of the wurbeled sourcefile
   private byte[] savePoint;                 // last savepoint, null if none
   private boolean discarded;                // true if wurblets reading this heapfile should throw a WurbelDiscardException
 
@@ -48,12 +47,12 @@ public class HeapFile {
   /**
    * Creates a heapfile.
    *
-   * @param heapName the unique heapName of the heapfile
+   * @param name the name of the heapfile
    * @param text the initial contents, null = empty.
    */
-  public HeapFile(String heapName, String text) {
+  public HeapFile(String name, String text) {
 
-    this.heapName = heapName;
+    this.name = name;
 
     data = new ByteArrayOutputStream();
     out = new PrintStream(data);
@@ -102,12 +101,12 @@ public class HeapFile {
 
 
   /**
-   * Gets the heapName of the heapfile.
+   * Gets the name of the heapfile.
    *
-   * @return the heapName
+   * @return the name
    */
   public String getName() {
-    return heapName;
+    return name;
   }
 
   /**
@@ -139,7 +138,7 @@ public class HeapFile {
 
   @Override
   public String toString() {
-    return heapName;
+    return name;
   }
 
 
