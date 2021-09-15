@@ -97,7 +97,7 @@ import java.util.TreeSet;
  * {@code @{comment ..... }@}: adds the text to the wurblet comment<p>
  *
  * {@code @{code ...}@}: adds the code to the class level code. This code is appended to the
- * end of the wurblet's java code and can be used to override or implement wurblet methods.<p>
+ * end of the wurblet's java code and can be used to override or implement wurblet methods.
  *
  * @author harald
  */
