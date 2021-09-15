@@ -65,7 +65,6 @@ public abstract class AbstractJavaWurblet extends AbstractWurblet {
     return superClassName;
   }
 
-
   /**
    * Gets the packagename (from container).
    * @return the package name
@@ -79,6 +78,33 @@ public abstract class AbstractJavaWurblet extends AbstractWurblet {
     return packageName;
   }
 
+  /**
+   * Returns whether the java file is an interface.
+   *
+   * @return true if interface
+   */
+  public boolean isInterface() {
+    return getContainer().getProperty(Wurbler.PROPSPACE_WURBLET, JavaSourceType.INTERFACE_NAME) != null;
+  }
+
+  /**
+   * Returns whether the java file is a record.
+   *
+   * @return true if record
+   */
+  public boolean isRecord() {
+    return getContainer().getProperty(Wurbler.PROPSPACE_WURBLET, JavaSourceType.RECORD_NAME) != null;
+  }
+
+  /**
+   * Returns whether the java file is a real class and not an interface or a record.
+   *
+   * @return true if real class
+   */
+  public boolean isClass() {
+    return getContainer().getProperty(Wurbler.PROPSPACE_WURBLET, JavaSourceType.CLASS_NAME) != null &&
+           !isRecord() && !isInterface();
+  }
 
   /**
    * Returns whether the abstract modifier is set.
