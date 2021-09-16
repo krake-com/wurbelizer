@@ -19,6 +19,10 @@
 
 package org.wurbelizer.wurbile;
 
+import org.wurbelizer.misc.Logger;
+import org.wurbelizer.misc.Verbosity;
+import org.wurbelizer.wurbel.WurbelHelper;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -32,9 +36,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
-import org.wurbelizer.misc.Logger;
-import org.wurbelizer.misc.Verbosity;
-import org.wurbelizer.wurbel.WurbelHelper;
 
 
 /**
@@ -1019,7 +1020,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
   /**
    * Handles the comment command.
    *
-   * @param stok
+   * @param buf the comment
    * @return true if ok, false if some error
    */
   private boolean handleComment(String buf) {
@@ -1031,7 +1032,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
   /**
    * Handles the config command.
    *
-   * @param stok
+   * @param buf the config
    * @return true if ok, false if some error
    */
   private boolean handleConfig(String buf) {

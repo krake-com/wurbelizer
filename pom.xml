@@ -7,7 +7,7 @@
 
   <groupId>org.wurbelizer</groupId>
   <artifactId>wurbelizer-parent</artifactId>
-  <version>8.2.2.4-SNAPSHOT</version>
+  <version>8.2.2.4</version>
   <packaging>pom</packaging>
 
   <name>Wurbelizer Parent</name>
@@ -318,6 +318,20 @@
           <stylesheetfile>${rootBasedir}/src/site/resources/css/apidocs.css</stylesheetfile>
           <bottom><![CDATA[<a href="${project.url}">Wurbelizer</a> - a lightweight code generator]]></bottom>
         </configuration>
+        <reportSets>
+          <reportSet>
+            <id>default</id>
+            <reports>
+              <report>javadoc</report>
+            </reports>
+          </reportSet>
+          <reportSet>
+            <id>aggregate</id>
+            <reports>
+              <report>aggregate</report>
+            </reports>
+          </reportSet>
+        </reportSets>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

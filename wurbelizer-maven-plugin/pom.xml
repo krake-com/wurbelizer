@@ -5,10 +5,9 @@
   <parent>
     <groupId>org.wurbelizer</groupId>
     <artifactId>wurbelizer-parent</artifactId>
-    <version>8.2.2.4-SNAPSHOT</version>
+    <version>8.2.2.4</version>
   </parent>
 
-  <groupId>org.wurbelizer</groupId>
   <artifactId>wurbelizer-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Wurbelizer Maven Plugin</name>
