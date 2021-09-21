@@ -7,7 +7,7 @@
 
   <groupId>org.wurbelizer</groupId>
   <artifactId>wurbelizer-parent</artifactId>
-  <version>11.3.1.1-SNAPSHOT</version>
+  <version>11.3.1.1</version>
   <packaging>pom</packaging>
 
   <name>Wurbelizer Parent</name>
@@ -50,9 +50,8 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <dependency.locations.enabled>false</dependency.locations.enabled>
     <javac.version.src>11</javac.version.src>
-    <javac.version.target>${javac.version.src}</javac.version.target>
     <javac.lint>unchecked,deprecation,removal,requires-transitive-automatic,requires-automatic</javac.lint>
-    <ow2.asm.version>9.1</ow2.asm.version>
+    <ow2.asm.version>9.2</ow2.asm.version>
     <maven.version>3.6.3</maven.version>
     <netbeans.hint.license>wurbelizer</netbeans.hint.license>
   </properties>
@@ -103,12 +102,12 @@
       <dependency>
         <groupId>org.apache.ant</groupId>
         <artifactId>ant</artifactId>
-        <version>1.10.10</version>
+        <version>1.10.11</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-plugin-api</artifactId>
-        <version>3.8.1</version>
+        <version>3.8.2</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.plugin-tools</groupId>
@@ -143,7 +142,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-plugin-plugin</artifactId>
-          <version>3.6.0</version>
+          <version>3.6.1</version>
           <dependencies>
             <dependency>
               <groupId>org.ow2.asm</groupId>
@@ -155,7 +154,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>3.3.0</version>
+          <version>3.3.1</version>
           <dependencies>
             <dependency>
               <groupId>org.ow2.asm</groupId>
@@ -190,8 +189,7 @@
           <version>3.8.1</version>
           <configuration>
             <encoding>${project.build.sourceEncoding}</encoding>
-            <source>${javac.version.src}</source>
-            <target>${javac.version.target}</target>
+            <release>${javac.version.src}</release>
             <showWarnings>true</showWarnings>
             <showDeprecation>true</showDeprecation>
             <compilerArgument>-Xlint:unchecked</compilerArgument>
@@ -284,7 +282,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>3.1.2</version>
+          <version>3.2.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -294,7 +292,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-project-info-reports-plugin</artifactId>
-          <version>3.1.1</version>
+          <version>3.1.2</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -309,12 +307,12 @@
         <plugin>
           <groupId>org.owasp</groupId>
           <artifactId>dependency-check-maven</artifactId>
-          <version>6.2.0</version>
+          <version>6.3.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-enforcer-plugin</artifactId>
-          <version>3.0.0-M3</version>
+          <version>3.0.0</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -371,12 +369,27 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
+          <failOnError>false</failOnError>
           <additionalOptions>
             <additionalOption>-html5</additionalOption>
             <additionalOption>-Xdoclint:none</additionalOption>
           </additionalOptions>
           <bottom><![CDATA[<a href="${project.url}">Wurbelizer</a> - Agility in Code Generation]]></bottom>
         </configuration>
+        <reportSets>
+          <reportSet>
+            <id>default</id>
+            <reports>
+              <report>javadoc</report>
+            </reports>
+          </reportSet>
+          <reportSet>
+            <id>aggregate</id>
+            <reports>
+              <report>aggregate</report>
+            </reports>
+          </reportSet>
+        </reportSets>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
