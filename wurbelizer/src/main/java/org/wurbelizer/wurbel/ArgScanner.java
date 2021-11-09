@@ -24,7 +24,7 @@ import java.util.Properties;
 /**
  * Utility class to scan for arguments and to do variable translation.<p>
  *
- * Arguments usually are separated by whitespaces.
+ * Arguments are usually separated by whitespaces.
  * However, sometimes arguments must include whitespaces, i.e.
  * must be quoted. There are two kinds quotes:<p>
  *

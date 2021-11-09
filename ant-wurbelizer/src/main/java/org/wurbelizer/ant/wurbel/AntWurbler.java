@@ -123,7 +123,7 @@ public class AntWurbler extends MatchingTask {
 
   /**
    * Sets whether files should be wurbelized more than once within a single ant-run.
-   * Enabling this feature allow specifying source files with wildcards in more than
+   * Enabling this feature allows specifying source files with wildcards in more than
    * one ant target without the need to provide an extra exclude-clause.
    *
    * @param runOnce true if run once (default), false to run even more than once.
@@ -370,7 +370,6 @@ public class AntWurbler extends MatchingTask {
 
   /**
    * Scans the directory looking for source files to be wurbelized.
-   * The results are returned in the class variable wurbleList.
    *
    * @param srcDir the source directory
    * @param files the array of filenames
@@ -487,14 +486,14 @@ public class AntWurbler extends MatchingTask {
 
             }.wurbel();
 
-            wurbletCount += result.getWurbletCount();
+            wurbletCount += result.wurbletCount();
 
-            if (result.getErrors() > 0) {
+            if (result.errors() > 0) {
               errorFilesCount++;
-              log(file.getName() + " generated with wurblet errors (" + result.getErrors() + ")", Project.MSG_WARN);
+              log(file.getName() + " generated with wurblet errors (" + result.errors() + ")", Project.MSG_WARN);
             }
             else {
-              if (result.getUpdateType() == WurbelResult.UpdateType.UPDATED) {
+              if (result.updateType() == WurbelResult.UpdateType.UPDATED) {
                 updatedFilesCount++;
                 // file has been modified without errors
                 if (verbosity.isDebug()) {
@@ -504,7 +503,7 @@ public class AntWurbler extends MatchingTask {
                   log(file.getName());
                 }
               }
-              else if (result.getUpdateType() == WurbelResult.UpdateType.HEREDOCS) {
+              else if (result.updateType() == WurbelResult.UpdateType.HEREDOCS) {
                 hereDocsUpdated = true;
               }
             }

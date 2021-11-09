@@ -85,7 +85,7 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
 
 
   /**
-   * Determines the charset charset.
+   * Determines the charset.
    */
   protected void determineEncoding() {
     if (charset != null) {

@@ -396,7 +396,7 @@ public class WurbelHelper {
    * Gets the reader for a given filename.<br>
    * By convention, if the name starts with a dot, it is expected
    * to be a HeapFile in memory.
-   * Otherwise it's a real file.
+   * Otherwise, it's a real file.
    *
    * @param fileName the name of the file
    * @return the reader

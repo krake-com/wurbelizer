@@ -199,7 +199,7 @@ public class SourceDocument {
         /*
          * Because the guarded blocks begin with a single line comment which is
          * indendet by a newline + <spaces> the code-block before must be made
-         * smaller to cut off this garbage. Otherwise the generated sources
+         * smaller to cut off this garbage. Otherwise, the generated sources
          * would get longer and longer... ;-)
          */
         if (i > 0) {
@@ -421,7 +421,7 @@ public class SourceDocument {
   /**
    * Gets the contents of the whole document.
    *
-   * @return the documents contents.
+   * @return the document's content
    */
   public StringBuilder getText() {
     return text;

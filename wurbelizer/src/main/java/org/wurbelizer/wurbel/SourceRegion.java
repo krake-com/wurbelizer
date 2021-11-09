@@ -58,7 +58,7 @@ public interface SourceRegion {
   }
 
   /**
-   * Creates the begin comment.
+   * Creates the start comment.
    *
    * @param foldType the fold type, null if none
    * @param guardName the name of the guarded section
@@ -78,7 +78,7 @@ public interface SourceRegion {
   String createEnd(FoldType foldType, String guardName, SourceWurbletSubElement wurbletElement);
 
   /**
-   * Gets the region's name (wurblet tag) if this is the begin comment is of this region type.
+   * Gets the region's name (wurblet tag) if this is the start comment is of this region type.
    *
    * @param comment the comment string
    * @return the region's name if is of this type

@@ -208,7 +208,7 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
     // validate configuration
     validate();
 
-    // setup the file charset
+    // set up the file charset
     determineEncoding();
 
     // get the verbosity
@@ -456,14 +456,14 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
           // wurbelize the source file
           WurbelResult result = sourceWurbler.wurbel();
 
-          wurbletCount += result.getWurbletCount();
+          wurbletCount += result.wurbletCount();
 
-          if (result.getErrors() > 0) {
+          if (result.errors() > 0) {
             errorFilesCount++;
-            getLog().warn(fileName + " generated with wurblet errors (" + result.getErrors() + ")");
+            getLog().warn(fileName + " generated with wurblet errors (" + result.errors() + ")");
           }
           else {
-            if (result.getUpdateType() == WurbelResult.UpdateType.UPDATED) {
+            if (result.updateType() == WurbelResult.UpdateType.UPDATED) {
               updatedFilesCount++;
               // file has been modified without errors
               String msg = fileName + (wurbPath == null ? "" : (" (" + wurbPath + ")"));
@@ -474,7 +474,7 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
                 getLog().info(msg);
               }
             }
-            else if (result.getUpdateType() == WurbelResult.UpdateType.HEREDOCS) {
+            else if (result.updateType() == WurbelResult.UpdateType.HEREDOCS) {
               hereDocsUpdated = true;
             }
           }

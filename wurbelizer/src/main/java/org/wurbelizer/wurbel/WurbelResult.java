@@ -22,9 +22,11 @@ package org.wurbelizer.wurbel;
  * Result from wurbler.<br>
  * For a single file.
  *
- * @author harald
+ * @param wurbletCount the number of executed wurbletCount
+ * @param errors       the number of errors
+ * @param updateType   the kind of update of the source file
  */
-public class WurbelResult {
+public record WurbelResult(int wurbletCount, int errors, UpdateType updateType) {
 
   /**
    * tells if and why file is updated.
@@ -42,50 +44,6 @@ public class WurbelResult {
      * heredocs in file found and written to disk, file is not updated.
      */
     HEREDOCS
-  }
-
-  private final int wurbletCount;
-  private final int errors;
-  private final UpdateType updateType;
-
-  /**
-   * Creates a wurbel result.
-   *
-   * @param wurbletCount the number of executed wurbletCount
-   * @param errors the number of errors
-   * @param updateType the kind of update of the source file
-   */
-  public WurbelResult(int wurbletCount, int errors, UpdateType updateType) {
-    this.wurbletCount = wurbletCount;
-    this.errors = errors;
-    this.updateType = updateType;
-  }
-
-  /**
-   * Gets the number of executed wurbletCount.
-   *
-   * @return the wurblet count
-   */
-  public int getWurbletCount() {
-    return wurbletCount;
-  }
-
-  /**
-   * Gets the number of errors.
-   *
-   * @return the error count
-   */
-  public int getErrors() {
-    return errors;
-  }
-
-  /**
-   * Gets the kind of update to the source file.
-   *
-   * @return the update type
-   */
-  public UpdateType getUpdateType() {
-    return updateType;
   }
 
 }

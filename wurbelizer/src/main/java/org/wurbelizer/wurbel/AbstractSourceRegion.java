@@ -23,7 +23,7 @@ package org.wurbelizer.wurbel;
  */
 public abstract class AbstractSourceRegion implements SourceRegion {
 
-  // netbeans token (splitted cause netbeans cuts off when reading this source :-))
+  // netbeans token (split cause netbeans cuts off when reading this source :-))
   private static final String GUARD_LEAD = "//GEN-";
   /**
    * Tag to start a named region.<br>
@@ -67,7 +67,7 @@ public abstract class AbstractSourceRegion implements SourceRegion {
    * Checks for the token and assert it's not a region name.
    *
    * @param comment the comment string to check
-   * @param token the begin or end token
+   * @param token the begin- or end-token
    * @return true if token found
    */
   protected boolean matches(String comment, String token) {

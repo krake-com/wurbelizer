@@ -49,7 +49,7 @@
     <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <dependency.locations.enabled>false</dependency.locations.enabled>
-    <javac.version.src>17</javac.version.src>
+    <javac.version>17</javac.version>
     <javac.lint>unchecked,deprecation,removal,requires-transitive-automatic,requires-automatic</javac.lint>
     <ow2.asm.version>9.2</ow2.asm.version>
     <maven.version>3.6.3</maven.version>
@@ -189,7 +189,7 @@
           <version>3.8.1</version>
           <configuration>
             <encoding>${project.build.sourceEncoding}</encoding>
-            <release>${javac.version.src}</release>
+            <release>${javac.version}</release>
             <showWarnings>true</showWarnings>
             <showDeprecation>true</showDeprecation>
             <compilerArgument>-Xlint:unchecked</compilerArgument>
@@ -330,8 +330,8 @@
             <configuration>
               <rules>
                 <requireJavaVersion>
-                  <version>[${javac.version.src},)</version>
-                  <message>[ERROR] The currently supported version of Java is ${javac.version.src} or higher</message>
+                  <version>[${javac.version},)</version>
+                  <message>[ERROR] The currently supported version of Java is ${javac.version} or higher</message>
                 </requireJavaVersion>
                 <requireMavenVersion>
                   <version>[${maven.version},)</version>
