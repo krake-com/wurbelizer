@@ -102,12 +102,12 @@
       <dependency>
         <groupId>org.apache.ant</groupId>
         <artifactId>ant</artifactId>
-        <version>1.10.11</version>
+        <version>1.10.12</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-plugin-api</artifactId>
-        <version>3.8.2</version>
+        <version>3.8.3</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.plugin-tools</groupId>
