@@ -42,13 +42,13 @@ import java.util.TreeSet;
  * Provides basic functionality of a wurblet compiler.<br>
  *
  * Translates an input stream (usually a file with extension *.wrbl)
- * into a an output stream and a fixed source list.
+ * into an output stream and a fixed source list.
  * The generated java-output implements the interface {@code Wurblet}.
  * The fixed source part of the wurblet is stored in a {@code List} of Strings which usually is
  * stored in serialized form in a separate file and will be deserialized by the wurbler
  * when running the wurblet.<p>
  *
- * By default the input stream starts at the source-level.
+ * By default, the input stream starts at the source-level.
  * The backslash is recognized as wurblet-level is entered via {@code '@['} and left via {@code ']@'}.
  * Wurblet-levels again may contain other wurblet-levels, i.e. they may be nested
  * resulting in a wurblet generating a wurblet which in turn generates java source
@@ -67,8 +67,7 @@ import java.util.TreeSet;
  *
  * {@code @{include <pathname>}@}: includes a file in the current input stream.
  * Includes may be nested to any depth. Loops are detected.
- * the include pathname allows $-variables that will be replaced
- * at compile time.<p>
+ * The include-pathname allows $-variables that will be replaced at compile time.<p>
  *
  * {@code @{package <packagename>}@}: sets the package-name for the generated class.<p>
  *
@@ -341,7 +340,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
                     if (isAutoIndent()) {
                       setIndent(autoIndent + (lastWasOpenBlock ? 2 : 0));
                     }
-                    out.write(indentStr + outName + ".print(" + wurbletBuf.toString() + ");\n");
+                    out.write(indentStr + outName + ".print(" + wurbletBuf + ");\n");
                   }
                   else if (wurbletMode == WURBLET_COMMAND) {
                     StringTokenizer stok = new StringTokenizer(wurbletBuf.toString(), " \t\n\r");

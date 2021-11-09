@@ -21,7 +21,7 @@ package org.wurbelizer.maven;
 import org.apache.maven.model.Dependency;
 
 /**
- * Resource wurblets are depending on.
+ * Resource the wurblets depend on.
  *
  * @author harald
  */

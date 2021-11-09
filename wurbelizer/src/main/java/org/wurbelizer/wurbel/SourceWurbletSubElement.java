@@ -140,9 +140,9 @@ public class SourceWurbletSubElement extends SourceSubElement {
 
 
   /**
-   * Gets the text offset for begin of wurblet within whole document.
+   * Gets the text offset for the start of the wurblet within whole document.
    *
-   * @return the begin
+   * @return the start
    */
   public int getWurbletBegin() {
     return wurbletBegin;

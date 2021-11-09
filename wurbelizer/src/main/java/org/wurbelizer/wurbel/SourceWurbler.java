@@ -65,12 +65,12 @@ public class SourceWurbler extends AbstractWurbler {
   private final Set<Integer> collectedPhases;           // the phases of all wurblets detected so far
   private final boolean dryRun;                         // true if dry run (no wurblets, just parsing)
   private final WurbletExecutionFilter wurbletFilter;   // optional wurblet execution filter
+  private final Properties wurbProps;                   // properties from wurb-file
+  private final SourceType sourceType;                  // type of this source file
 
   private SourceRegion guardType;                       // the guard type
   private SourceRegion.FoldType defaultFoldType;        // the default fold type (null if none)
-  private Properties wurbProps;                         // properties from wurb-file
   private int loopCount;                                // loop counter
-  private SourceType sourceType;                        // type of this source file
 
 
 
@@ -262,7 +262,7 @@ public class SourceWurbler extends AbstractWurbler {
 
       String orgText = doc.getText().toString();    // save original text
 
-      // go through all sections and apply wurblets (we cant use iterator)
+      // go through all sections and apply wurblets (we can't use iterator)
       for (int elementIndex=0; elementIndex < doc.getElements().size(); elementIndex++)  {
 
         SourceElement element = doc.getElements().get(elementIndex);
@@ -447,7 +447,7 @@ public class SourceWurbler extends AbstractWurbler {
                     ps.print(" { " + ex.getMessage() + " } ");
                   }
                   else {
-                    // stacktraces may contain file path names, which on windows contain backslashes.
+                    // stacktraces may contain file path names, which on Windows contain backslashes.
                     // Those backslashes can be harmful in many ways, for example, if a
                     // backslash is followed by the lower-case letter 'u', the compiler will treat this as
                     // a unicode character and compilation could fail due to an illegal unicode sequence.
@@ -604,7 +604,7 @@ public class SourceWurbler extends AbstractWurbler {
 
 
   /**
-   * Set guardtype from string
+   * Sets the guardtype from a string.
    *
    * @throws WurbelException if no matching guard type
    */
@@ -615,12 +615,12 @@ public class SourceWurbler extends AbstractWurbler {
 
 
   /**
-   * Set foldtype from string
+   * Sets the foldtype from a string.
    */
   private void setDefaultFoldType(String value)  {
     if (value != null) {
       value = value.toUpperCase();
-      if (!value.equals("none")) {
+      if (!"NONE".equals(value)) {
         defaultFoldType = SourceRegion.FoldType.valueOf(value);
       }
     }
@@ -628,13 +628,13 @@ public class SourceWurbler extends AbstractWurbler {
 
 
   /**
-   * process property line
+   * Processes a property line.
    *
    * @throws WurbelException if no matching guard type
    */
   private void processPropertyLine(String line) throws WurbelException {
     String key = WurbelHelper.scanPropertyLine(line, wurbProps);
-    if (key != null && key.equals(PROPERTY_GUARDTYPE)) {
+    if (key != null && key.equalsIgnoreCase(PROPERTY_GUARDTYPE)) {
       // overwrite guardtype from wurbfile
       setGuardType(wurbProps.getProperty(PROPERTY_GUARDTYPE));
     }

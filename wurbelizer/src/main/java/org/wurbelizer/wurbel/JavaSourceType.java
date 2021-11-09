@@ -183,7 +183,7 @@ public class JavaSourceType implements SourceType {
           break;
         }
 
-        // try annotations as long as we didn't caught the class or interface declaration
+        // try annotations as long as we didn't catch the class or interface declaration
         extractAnnotations(props, code);
       }
     }

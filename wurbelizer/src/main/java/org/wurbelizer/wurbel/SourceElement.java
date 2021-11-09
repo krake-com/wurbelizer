@@ -74,7 +74,7 @@ public class SourceElement {
   private int end;                                              // end of the element
   private String guardedName;                                   // the guarded name if this is a guarded section
                                                                 // or comment with wurblet directive
-  private String firstLineLead;                                 // the string from start of line up to the begin of element (lazy)
+  private String firstLineLead;                                 // the string from start of line up to the start of element (lazy)
 
   private List<SourceWurbletSubElement>  wurblets;              // List of wurblets
   private List<SourceHereSubElement>     hereDocuments;         // List of here-documents
@@ -86,7 +86,7 @@ public class SourceElement {
    * Creates a source element.
    *
    * @param doc the source document the element belongs to
-   * @param type the element's type, one one TYPE_....
+   * @param type the element's type
    * @param begin the start of the element within the document
    * @param end the end of the element
    * @param parentWurbletElement the wurblet element that generated this element, null if not generated
@@ -465,9 +465,9 @@ public class SourceElement {
 
 
   /**
-   * Gets the start/begin offset of this element within its document.
+   * Gets the start offset of this element within its document.
    *
-   * @return the begin offset
+   * @return the start offset
    */
   public int getBegin() {
     return begin;
@@ -475,7 +475,8 @@ public class SourceElement {
 
 
   /**
-   * Sets the start/begin offset of this element within its document.
+   * Sets the start offset of this element within its document.
+   *
    * @param begin the start of this element
    */
   public void setBegin(int begin) {

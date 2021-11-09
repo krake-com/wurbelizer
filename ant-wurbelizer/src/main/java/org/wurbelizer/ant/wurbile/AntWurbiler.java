@@ -314,7 +314,6 @@ public class AntWurbiler extends MatchingTask {
 
   /**
    * Scans the directory looking for source files to be wurbelized.
-   * The results are returned in the class variable wurbleList.
    *
    * @param srcDir the source directory
    * @param files the array of filenames

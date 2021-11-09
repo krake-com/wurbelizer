@@ -74,7 +74,7 @@ public class SourceFile {
       }
       orgText = orgBuf.toString();
       /*
-       * We cannot just check whether we are on windows or not because VCS like git or subversion
+       * We cannot just check whether we are on Windows or not because VCS like git or subversion
        * can be configured how to treat line endings. We must determine that from the file contents!
        */
       usingCRLF = orgText.contains("\r\n");
