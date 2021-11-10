@@ -603,7 +603,7 @@ public class SourceWurbler extends AbstractWurbler {
   private void setDefaultFoldType(String value)  {
     if (value != null) {
       value = value.toUpperCase();
-      if (!value.equals("none")) {
+      if (!"NONE".equals(value)) {
         defaultFoldType = SourceDocument.FoldType.valueOf(value);
       }
     }
