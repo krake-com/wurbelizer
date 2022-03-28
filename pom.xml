@@ -49,8 +49,8 @@
     <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <dependency.locations.enabled>false</dependency.locations.enabled>
-    <javac.version>17</javac.version>
-    <javac.lint>unchecked,deprecation,removal,requires-transitive-automatic,requires-automatic</javac.lint>
+    <javac.version>18</javac.version>
+    <javac.lint>all,-processing</javac.lint>
     <ow2.asm.version>9.2</ow2.asm.version>
     <maven.version>3.6.3</maven.version>
     <netbeans.hint.license>wurbelizer</netbeans.hint.license>
@@ -155,6 +155,9 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>3.3.1</version>
+          <configuration>
+            <doclint>all,-missing</doclint>
+          </configuration>
           <dependencies>
             <dependency>
               <groupId>org.ow2.asm</groupId>
