@@ -145,6 +145,9 @@
           <artifactId>maven-plugin-plugin</artifactId>
           <version>3.6.4</version>
           <configuration>
+            <requirements>
+              <maven>${maven.version}</maven>
+            </requirements>
             <expectedProvidedScopeExclusions>
               <!-- out of our scope -->
               <expectedProvidedScopeExclusion>org.apache.maven:maven-model</expectedProvidedScopeExclusion>
