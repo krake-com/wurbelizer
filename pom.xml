@@ -378,6 +378,11 @@
   <reporting>
     <plugins>
       <plugin>
+        <!-- generate plugin docs as well -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
