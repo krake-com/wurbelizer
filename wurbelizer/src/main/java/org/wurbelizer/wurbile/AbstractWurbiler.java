@@ -217,7 +217,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
       int           subWurblets = 0;                    // number of sub-wurblet levels (nested wurblet)
       StringBuilder wurbletBuf  = new StringBuilder();  // if WURBLET_OBJECT or WURBLET_COMMAND:
                                                         // buffer for text in between @-clause
-      boolean       dontRead    = false;                // true if don't read from input stream (once)
+      boolean       dontRead    = false;                // true = don't read from input stream (once)
       boolean       blockStart  = false;                // true = next char is first in wurblet-block
 
       errors      = 0;

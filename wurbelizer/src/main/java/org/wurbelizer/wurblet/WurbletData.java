@@ -16,19 +16,18 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 package org.wurbelizer.wurblet;
 
+import java.io.Serial;
 import java.io.Serializable;
 
-
 /**
- * Class holding the  wurblet data.
+ * Class holding the  wurblet data.<br>
  * An instance of this class is serialized per wurblet.
  */
-
 public class WurbletData implements Serializable {
 
+  @Serial
   private static final long serialVersionUID = 2L;
 
   /**

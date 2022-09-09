@@ -306,7 +306,7 @@ public class SourceElement {
 
 
   /**
-   * Gets the string from the beginning of the line up to this element.
+   * Gets the string from the beginning of the line, up to this element.
    *
    * @return the lead string, empty if none (never null)
    */
