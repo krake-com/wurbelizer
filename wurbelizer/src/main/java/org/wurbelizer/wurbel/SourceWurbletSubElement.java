@@ -124,7 +124,7 @@ public class SourceWurbletSubElement extends SourceSubElement {
     }
     setWurbletName(currentWurbletName);
 
-    // set the wurblet argument list (may be empty)
+    // set the wurblet argument list (could be empty)
     setWurbletArgs(argList.toArray(new String[0]));
   }
 

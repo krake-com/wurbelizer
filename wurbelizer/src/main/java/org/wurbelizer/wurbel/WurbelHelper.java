@@ -115,7 +115,7 @@ public class WurbelHelper {
    * @param buf the argument buffer to be translated/parsed in-place
    * @param getenv true if check environment, false if system property
    * @param lastLoop true if translate \$ to $ finally
-   * @param otherProps != null if use these properties too for translation
+   * @param otherProps != null to use given properties for translation as well
    */
   public static void translateVariables(StringBuilder buf, boolean getenv, boolean lastLoop, Properties otherProps) {
 
@@ -185,7 +185,7 @@ public class WurbelHelper {
    * @param arg the argument to be translated/parsed
    * @param getenv true if check environment, false if system property
    * @param lastLoop true if translate \$ to $ finally
-   * @param otherProps != null if use these properties too for translation
+   * @param otherProps != null to use given properties for translation as well
    *
    * @return the parsed argument
    */
@@ -201,7 +201,7 @@ public class WurbelHelper {
    * Translates variables in arguments, first properties, second environmen. Using StringBuilder.
    *
    * @param buf argument buffer to be translated/parsed in place
-   * @param otherProps != null if use these properties too for translation
+   * @param otherProps != null to use given properties for translation as well
    */
   public static void translateVariables(StringBuilder buf, Properties otherProps) {
     translateVariables(buf, false, false, otherProps);
@@ -213,7 +213,7 @@ public class WurbelHelper {
    * Translates variables in arguments, first properties, second environment
    *
    * @param arg argument to be translated/parsed
-   * @param otherProps != null if use these properties too for translation
+   * @param otherProps != null to use given properties for translation as well
    *
    * @return the parsed argument
    */

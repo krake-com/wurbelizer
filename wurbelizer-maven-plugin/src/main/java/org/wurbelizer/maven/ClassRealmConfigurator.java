@@ -36,7 +36,7 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
  * A custom configurator for the {@link WurbelMojo}.
  * <p>
  * Extracts the classrealm and make it available to mojos.
- * This is necessary in multi-module maven projects, if wurblets are compiled
+ * This is necessary in multimodule maven projects, if wurblets are compiled
  * in one module and used in other modules of the project. Otherwise,
  * the first build of the super-pom will fail.
  *

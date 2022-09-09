@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 package org.wurbelizer.wurbel;
 
 import org.wurbelizer.misc.Logger;
@@ -25,7 +24,6 @@ import org.wurbelizer.misc.Verbosity;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.Properties;
-
 
 /**
  * The wurblet container.
@@ -132,7 +130,7 @@ public interface Wurbler {
   /**
    * Gets the property value for a given namespace and key.
    *
-   * @param nameSpace the namespace, null for the default java runtime properties.
+   * @param nameSpace the namespace, null for the default java runtime properties
    * @param key the property's key
    *
    * @return the property's value, null if no such property
@@ -143,7 +141,7 @@ public interface Wurbler {
   /**
    * Gets all Properties within a namespace.
    *
-   * @param nameSpace the namespace, null for the default java runtime properties.
+   * @param nameSpace the namespace, null for the default java runtime properties
    *
    * @return the properties, null if no such namespace
    */
@@ -151,11 +149,11 @@ public interface Wurbler {
 
 
   /**
-   * Gets an analyze information file.<br>
+   * Gets an analyze-information file.<br>
    * Some wurblets need extra information which is provided in files
    * in the so-called analyzedir (example in ant: analyzedir=${apt})
    *
-   * @param name the filename relative to the analyzedir.
+   * @param name the filename relative to the analyze-directory
    *
    * @return the file
    */

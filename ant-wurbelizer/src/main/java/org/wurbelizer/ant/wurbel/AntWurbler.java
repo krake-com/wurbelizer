@@ -155,7 +155,7 @@ public class AntWurbler extends MatchingTask {
   /**
    * Sets the dry run property.
    *
-   * @param dryRun true if don't run any wurblets, just parse
+   * @param dryRun true to just parse the source file, don't run any wurblets
    */
   public void setDryRun(boolean dryRun) {
     this.dryRun = dryRun;

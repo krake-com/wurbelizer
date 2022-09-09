@@ -20,6 +20,8 @@ package org.wurbelizer.maven;
 
 import org.apache.maven.shared.model.fileset.FileSet;
 
+import java.io.Serial;
+
 /**
  * Simple FileSet wrapper to make fileset configuration available without
  * camel-case fiddling.
@@ -28,8 +30,6 @@ import org.apache.maven.shared.model.fileset.FileSet;
  */
 public class Fileset extends FileSet {
 
-    /**
-     * Generated serial version id.
-     */
+    @Serial
     private static final long serialVersionUID = 4061903418270599092L;
 }

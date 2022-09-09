@@ -83,7 +83,7 @@ public class SourceWurbler extends AbstractWurbler {
    * @param analyzeDir the list of directories wurblets load extra information from (usually from apt-runs)
    * @param phase the wurbel phase, 0 for heredocs, wurblets start at 1
    * @param wurbletFilter optional wurblet execution filter
-   * @param dryRun true if don't run any wurblets, just parse the source file
+   * @param dryRun true to just parse the source file, don't run any wurblets
    * @param logger the logger (can also be used by the wurblets)
    * @param verbosity the verbosity
    * @param errorsSoFar a set of errors logged so far, null if no suppression of repeating errors
@@ -540,12 +540,12 @@ public class SourceWurbler extends AbstractWurbler {
         text = newText;  // one more pass to check for more changes
       }
 
-      // rewind all other created sources for next loop
+      // rewind the other created sources for next loop
       SourceFileFactory.resetAll();
     }
 
     if (!dryRun) {
-      // write back all other created sources if they differ from original text
+      // write back the other created sources if they differ from original text
       SourceFileFactory.flushAll();
     }
 

@@ -16,13 +16,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 package org.wurbelizer.misc;
 
 /**
  * An implementation independent logger.<br>
- * The wurbelizer always uses the logger of the container,
- * for example Ant or Maven.
+ * The wurbelizer always uses the container's logger (from Ant, Maven, etc...).
  *
  * @author harald
  */

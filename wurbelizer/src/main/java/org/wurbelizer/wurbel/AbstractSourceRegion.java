@@ -67,7 +67,7 @@ public abstract class AbstractSourceRegion implements SourceRegion {
    * Checks for the token and assert it's not a region name.
    *
    * @param comment the comment string to check
-   * @param token the begin- or end-token
+   * @param token the start- or end-token
    * @return true if token found
    */
   protected boolean matches(String comment, String token) {
