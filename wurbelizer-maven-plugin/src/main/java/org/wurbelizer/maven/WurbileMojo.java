@@ -26,6 +26,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
+import org.slf4j.LoggerFactory;
 import org.wurbelizer.misc.Constants;
 import org.wurbelizer.misc.Logger;
 import org.wurbelizer.misc.Verbosity;
@@ -184,8 +185,7 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
       getLog().info("wurbiling files in " + dirName);
     }
 
-    for (String fileName:
-         new FileSetManager(getLog(), verbosityLevel.isDebug()).getIncludedFiles(fileSet)) {
+    for (String fileName: new FileSetManager(LoggerFactory.getLogger(FileSetManager.class), verbosityLevel.isDebug()).getIncludedFiles(fileSet)) {
 
       try {
 

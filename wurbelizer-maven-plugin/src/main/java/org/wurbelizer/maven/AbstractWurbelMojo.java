@@ -22,7 +22,6 @@ package org.wurbelizer.maven;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -32,6 +31,7 @@ import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.slf4j.LoggerFactory;
 import org.wurbelizer.misc.Constants;
 import org.wurbelizer.misc.Logger;
 import org.wurbelizer.misc.Verbosity;
@@ -180,12 +180,6 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
    */
   @Component
   private RepositorySystem repositorySystem;
-
-  /**
-   * To resolve the wurblet artifacts.
-   */
-  @Component
-  private ArtifactResolver artifactResolver;
 
   /**
    * The local repository to resolve the artifacts.
@@ -398,7 +392,7 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
     String resourceDirName                = getResourceDirName(dirName);
     Set<String> processedFiles            = new HashSet<>();
 
-    String[] names = new FileSetManager(getLog(), verbosityLevel.isDebug()).getIncludedFiles(fileSet);
+    String[] names = new FileSetManager(LoggerFactory.getLogger(FileSetManager.class), verbosityLevel.isDebug()).getIncludedFiles(fileSet);
     // always sort alphabetically to provide a deterministic file order
     Arrays.sort(names);
 
@@ -640,7 +634,7 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
                 .setForceUpdate(false)
                 .setManagedVersionMap(project.getManagedVersionMap());
 
-        Set<Artifact> resolvedArtifacts = artifactResolver.resolve(artifactRequest).getArtifacts();
+        Set<Artifact> resolvedArtifacts = repositorySystem.resolve(artifactRequest).getArtifacts();
 
         if (resolvedArtifacts.isEmpty()) {
           throw new MojoExecutionException("cannot resolve wurblet artifact " + artifact);
