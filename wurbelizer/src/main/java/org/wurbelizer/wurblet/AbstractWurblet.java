@@ -16,14 +16,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 package org.wurbelizer.wurblet;
 
 import org.wurbelizer.wurbel.WurbelException;
 import org.wurbelizer.wurbel.Wurbler;
 
 import java.io.PrintStream;
-
 
 /**
  * Provides basic functionality of a wurblet.

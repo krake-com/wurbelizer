@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 package org.wurbelizer.wurbel;
 
 import org.wurbelizer.misc.Constants;
@@ -33,9 +32,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-
-
-
 
 /**
  * Provides basic functionality of a wurblet container.<br>

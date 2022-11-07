@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 package org.wurbelizer.wurbel;
+
+import java.io.Serial;
 
 /**
  * Same as {@link WurbelException} but terminates the build process immediately.<br>
@@ -28,8 +29,10 @@ package org.wurbelizer.wurbel;
  * @see WurbelException
  * @see WurbelDiscardException
  */
-@SuppressWarnings("serial")
 public class WurbelTerminationException extends WurbelException {
+
+  @Serial
+  static final long serialVersionUID = 1L;
 
   /**
    * Creates a wurbel exception.

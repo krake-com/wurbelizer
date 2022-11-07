@@ -25,7 +25,7 @@ import java.util.StringTokenizer;
  *
  * @author harald
  */
-public class WurbileHelper {
+public final class WurbileHelper {
 
   /**
    * Converts a string to a comment block.
@@ -50,7 +50,6 @@ public class WurbileHelper {
     return buf.toString();
   }
 
-  private WurbileHelper() {
-  }
+  private WurbileHelper() {}
 
 }

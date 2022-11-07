@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 package org.wurbelizer.wurbel;
+
+import java.io.Serial;
 
 /**
  * An exception thrown while executing a {@link org.wurbelizer.wurblet.Wurblet}.<br>
@@ -29,8 +30,10 @@ package org.wurbelizer.wurbel;
  * @see WurbelTerminationException
  * @see WurbelDiscardException
  */
-@SuppressWarnings("serial")
 public class WurbelException extends Exception {
+
+  @Serial
+  static final long serialVersionUID = 1L;
 
   /**
    * true if message contains a hint to the source of the error, false if default to file.

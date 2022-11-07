@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 package org.wurbelizer.wurbel;
 
 import java.util.Properties;
@@ -43,7 +42,6 @@ import java.util.Properties;
  *
  * @author harald
  */
-
 public class ArgScanner {
 
   private final String str;               // the source string

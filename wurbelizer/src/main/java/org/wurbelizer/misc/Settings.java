@@ -26,7 +26,7 @@ import java.nio.charset.StandardCharsets;
  *
  * @author harald
  */
-public class Settings {
+public final class Settings {
 
   private static Charset encodingCharset = StandardCharsets.UTF_8;
 
@@ -51,6 +51,6 @@ public class Settings {
   }
 
 
-  private Settings() {
-  }
+  private Settings() {}
+
 }

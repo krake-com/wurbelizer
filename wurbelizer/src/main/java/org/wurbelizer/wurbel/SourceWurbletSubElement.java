@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 package org.wurbelizer.wurbel;
 
 import java.util.ArrayList;
@@ -41,7 +40,6 @@ import java.util.Properties;
  *
  * @author harald
  */
-
 public class SourceWurbletSubElement extends SourceSubElement {
 
   private String wurbletName;       // the name of the wurblet
