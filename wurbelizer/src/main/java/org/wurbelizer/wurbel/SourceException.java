@@ -16,18 +16,20 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
-
 package org.wurbelizer.wurbel;
+
+import java.io.Serial;
 
 /**
  * Exception thrown whenever scanning of the sourcefile failed.<br>
  *
  * @author harald
  */
-
-@SuppressWarnings("serial")
 public class SourceException extends Exception {
+
+  @Serial
+  static final long serialVersionUID = 1L;
+
 
   private final transient SourceElement elem;
   private final transient SourceDocument doc;

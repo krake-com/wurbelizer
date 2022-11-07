@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 package org.wurbelizer.wurbel;
 
 import org.wurbelizer.misc.Settings;
@@ -27,17 +26,17 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.StringTokenizer;
 
-
 /**
  * Helper methods for the Wurbelizer.
  */
-public class WurbelHelper {
+public final class WurbelHelper {
 
   private static final String LINE_DELIM = "\n";
   private static Properties envProperties   = null;         // properties from environment
@@ -229,8 +228,10 @@ public class WurbelHelper {
   /**
    * Gets the environment variables.
    */
-  @SuppressWarnings("serial")
   private static class Environment extends Properties {
+
+    @Serial
+    static final long serialVersionUID = 1L;
 
     public Environment() {
 
@@ -506,7 +507,6 @@ public class WurbelHelper {
     return count;
   }
 
-  private WurbelHelper() {
-  }
+  private WurbelHelper() {}
 
 }

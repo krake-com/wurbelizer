@@ -20,12 +20,16 @@ package org.wurbelizer.maven;
 
 import org.apache.maven.model.Dependency;
 
+import java.io.Serial;
+
 /**
  * Resource the wurblets depend on.
  *
  * @author harald
  */
-@SuppressWarnings("serial")
 public class WurbletDependency extends Dependency {
+
+  @Serial
+  static final long serialVersionUID = 1L;
 
 }

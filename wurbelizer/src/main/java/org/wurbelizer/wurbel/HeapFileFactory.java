@@ -26,7 +26,7 @@ import java.util.Map;
  *
  * @author harald
  */
-public class HeapFileFactory {
+public final class HeapFileFactory {
 
   // all heapfiles
   private static final Map<String,HeapFile> HEAP_FILES = new HashMap<>();
@@ -110,7 +110,6 @@ public class HeapFileFactory {
   }
 
 
-  private HeapFileFactory() {
-  }
+  private HeapFileFactory() {}
 
 }

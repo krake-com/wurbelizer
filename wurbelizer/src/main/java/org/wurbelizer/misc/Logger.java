@@ -83,7 +83,6 @@ public interface Logger {
    */
   void error(String message);
 
-
   /**
    * Logs a message with level DEBUG.
    *

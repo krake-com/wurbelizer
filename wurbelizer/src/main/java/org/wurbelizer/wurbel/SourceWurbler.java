@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 package org.wurbelizer.wurbel;
 
 import org.wurbelizer.misc.Constants;
@@ -37,8 +36,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-
-
 /**
  * A wurblet container.<br>
  * Reads a source file, scans for &#64;wurblets and sub elements and applies them
@@ -48,7 +45,6 @@ import java.util.StringTokenizer;
  *
  * @author harald
  */
-
 public class SourceWurbler extends AbstractWurbler {
 
   private static final String PROPERTY_GUARDTYPE = "guardtype";

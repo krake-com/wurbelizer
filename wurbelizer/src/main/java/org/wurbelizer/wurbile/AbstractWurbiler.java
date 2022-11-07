@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 package org.wurbelizer.wurbile;
 
 import org.wurbelizer.misc.Logger;
@@ -36,7 +35,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
-
 
 /**
  * Provides basic functionality of a wurblet compiler.<br>
@@ -100,7 +98,6 @@ import java.util.TreeSet;
  *
  * @author harald
  */
-
 public abstract class AbstractWurbiler implements Wurbiler {
 
   private static final String OUTNAME      = "out";      // default for outName

@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 package org.wurbelizer.wurbel;
 
 import org.wurbelizer.misc.Constants;
@@ -49,7 +48,6 @@ import java.util.StringTokenizer;
  *
  * @author harald
  */
-
 public class SourceElement {
 
   /**
@@ -550,7 +548,6 @@ public class SourceElement {
   }
 
 
-
   /**
    * Prints the name and line info of the element.
    *
@@ -560,6 +557,5 @@ public class SourceElement {
   public String toString()  {
     return doc + " (line " + doc.getLineNumber(begin) + " - " + doc.getLineNumber(end) + ")";
   }
-
 
 }

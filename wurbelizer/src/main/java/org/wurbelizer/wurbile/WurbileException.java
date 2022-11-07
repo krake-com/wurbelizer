@@ -16,16 +16,19 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 package org.wurbelizer.wurbile;
+
+import java.io.Serial;
 
 /**
  * An exception thrown while compiling a wurblet source.
  *
  * @author harald
  */
-@SuppressWarnings("serial")
 public class WurbileException extends Exception {
+
+  @Serial
+  static final long serialVersionUID = 1L;
 
   /**
    * Creates a wurbile exception.
@@ -60,6 +63,5 @@ public class WurbileException extends Exception {
    */
   public WurbileException() {
   }
-
 
 }

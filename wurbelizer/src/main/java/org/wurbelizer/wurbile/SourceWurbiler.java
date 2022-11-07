@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 package org.wurbelizer.wurbile;
 
 import org.wurbelizer.misc.Constants;
@@ -36,7 +35,6 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.util.Collection;
 import java.util.List;
-
 
 /**
  * Default implementation of a wurblet compiler.

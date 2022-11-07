@@ -26,7 +26,7 @@ import java.util.Map;
  *
  * @author harald
  */
-public class SourceFileFactory {
+public final class SourceFileFactory {
 
   // all sourcefiles <filename>:<file>
   private static final Map<String,SourceFile> FILE_MAP = new HashMap<>();
@@ -86,7 +86,6 @@ public class SourceFileFactory {
   }
 
 
-  private SourceFileFactory() {
-  }
+  private SourceFileFactory() {}
 
 }

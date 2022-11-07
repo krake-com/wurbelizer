@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 package org.wurbelizer.wurbile;
 
 import org.wurbelizer.misc.Logger;
@@ -24,11 +23,9 @@ import org.wurbelizer.misc.Verbosity;
 
 import java.util.List;
 
-
 /**
  * The wurblet compiler.
  */
-
 public interface Wurbiler {
 
   /**

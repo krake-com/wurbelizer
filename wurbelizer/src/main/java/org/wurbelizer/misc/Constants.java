@@ -24,7 +24,7 @@ package org.wurbelizer.misc;
  *
  * @author harald
  */
-public class Constants {
+public final class Constants {
 
   /**
    * file extension for the wurblet source
@@ -47,7 +47,6 @@ public class Constants {
   public static final String ORIGIN_INFO_LEAD = "#@";
 
 
-  private Constants() {
-  }
+  private Constants() {}
 
 }
