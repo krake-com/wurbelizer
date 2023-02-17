@@ -527,7 +527,7 @@ public class SourceDocument {
     }
 
     // now check single-line comments for guarded patterns
-    List<SourceElement> guardedList = new ArrayList<>();    // new created guarded list
+    List<SourceElement> guardedList = new ArrayList<>();    // new processed element list with guarded sections
     String guardedName = null;                              // != null if in guarded region
     SourceElement guardedStart = null;                      // != null if first guarded start element
     SourceRegion guardedType = null;                        // != null if in guarded region
@@ -560,13 +560,31 @@ public class SourceDocument {
           }
         }
         if (guardedName == null) {
+          // some other section
           if (verbosity.isDebug()) {
-            logger.info("found guarded section " + elem);
+            logger.info("found section " + elem);
           }
-          guardedList.add(elem);    // copy to output list
+          guardedList.add(elem);
         }
       }
     }
+
+    if (guardedStart != null && guardedName != null) {
+      /*
+       * Orphan end tags are simply ignored, but orphan start tags effectively stop further processing
+       * up to the end of the source document.
+       * Hence, we must abort the build process with an error.
+       * Notice that duplicate or unreferenced blocks will be detected later.
+       */
+      for (SourceElement element : guardedList) {
+        if (element.isGuarded() && guardedName.equals(element.getGuardedName())) {
+          // hangover from c&p, whatever
+          throw new SourceException(guardedStart, "odd start of guarded section '" + guardedName + "', duplicates " + element);
+        }
+      }
+      throw new SourceException(guardedStart, "missing end of guarded section '" + guardedName + "'");
+    }
+
     elements = guardedList;
 
     // phase 3: insert CODE-elements for the rest
