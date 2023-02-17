@@ -665,6 +665,23 @@ public class SourceDocument {
         }
       }
     }
+
+    if (guardedStart != null && guardedName != null) {
+      /*
+       * Orphan end tags are simply ignored, but orphan start tags effectively stop further processing
+       * up to the end of the source document.
+       * Hence, we must abort the build process with an error.
+       * Notice that duplicate or unreferenced blocks will be detected later.
+       */
+      for (SourceElement element : guardedList) {
+        if (element.isGuarded() && guardedName.equals(element.getGuardedName())) {
+          // hangover from c&p, whatever
+          throw new SourceException(guardedStart, "odd start of guarded section '" + guardedName + "', duplicates " + element);
+        }
+      }
+      throw new SourceException(guardedStart, "missing end of guarded section '" + guardedName + "'");
+    }
+
     elements = guardedList;
 
     // phase 3: insert CODE-elements for the rest
