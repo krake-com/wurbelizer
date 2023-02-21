@@ -60,6 +60,18 @@ public class VisualStudioRegion extends AbstractSourceRegion {
   }
 
   @Override
+  public String getEndName(String comment) {
+    String name = null;
+    if (matches(comment, MATCH_END)) {
+      int ndx = comment.indexOf(GUARD_END);
+      if (ndx >= 0) {
+        name = comment.substring(ndx + GUARD_END.length()).trim();
+      }
+    }
+    return name;
+  }
+
+  @Override
   public boolean isEnd(String comment, String name) {
     return matches(comment, MATCH_END) && comment.contains(GUARD_END + name);
   }
