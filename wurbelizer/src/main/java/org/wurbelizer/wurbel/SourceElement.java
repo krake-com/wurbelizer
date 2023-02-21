@@ -555,7 +555,13 @@ public class SourceElement {
    */
   @Override
   public String toString()  {
-    return doc + " (line " + doc.getLineNumber(begin) + " - " + doc.getLineNumber(end) + ")";
+    StringBuilder buf = new StringBuilder();
+    buf.append(doc).append(" (line ").append(doc.getLineNumber(begin));
+    if (type != Type.SINGLE_COMMENT) {
+      buf.append(" - ").append(doc.getLineNumber(end));
+    }
+    buf.append(')');
+    return buf.toString();
   }
 
 }

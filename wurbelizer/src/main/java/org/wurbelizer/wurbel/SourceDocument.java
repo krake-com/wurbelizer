@@ -557,6 +557,18 @@ public class SourceDocument {
               guardedStart = elem;
               break;
             }
+            else {
+              guardedName = region.getEndName(elemText);
+              if (guardedName != null) {
+                for (SourceElement element : guardedList) {
+                  if (element.isGuarded() && guardedName.equals(element.getGuardedName())) {
+                    // hangover from c&p, whatever
+                    throw new SourceException(elem, "odd end of guarded section '" + guardedName + "', duplicates " + element);
+                  }
+                }
+                throw new SourceException(elem, "missing start of guarded section '" + guardedName + "'");
+              }
+            }
           }
         }
         if (guardedName == null) {
