@@ -86,6 +86,14 @@ public interface SourceRegion {
   String getBeginName(String comment);
 
   /**
+   * Gets the region's name (wurblet tag) if this is the end comment is of this region type.
+   *
+   * @param comment the comment string
+   * @return the region's name if is of this type
+   */
+  String getEndName(String comment);
+
+  /**
    * Returns whether this is the end comment for the given region's name.
    *
    * @param comment the comment string
