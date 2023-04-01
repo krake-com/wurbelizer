@@ -19,6 +19,7 @@
 
 package org.wurbelizer.maven;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -49,6 +50,11 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
              required = true,
              readonly = true)
   protected MavenProject project;
+
+  @Parameter(defaultValue = "${session}",
+             required = true,
+             readonly = true)
+  protected MavenSession session;
 
   /**
    * The list of file sets to wurbile.<br>
