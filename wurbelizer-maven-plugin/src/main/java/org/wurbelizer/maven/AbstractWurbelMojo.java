@@ -20,7 +20,6 @@
 package org.wurbelizer.maven;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -180,15 +179,6 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
    */
   @Component
   private RepositorySystem repositorySystem;
-
-  /**
-   * The local repository to resolve the artifacts.
-   */
-  @Parameter(defaultValue = "${localRepository}")
-  private ArtifactRepository localRepository;
-
-
-
 
   /**
    * Total number of errors
@@ -629,7 +619,7 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
         ArtifactResolutionRequest artifactRequest = new ArtifactResolutionRequest()
                 .setArtifact(artifact)
                 .setResolveTransitively(true)
-                .setLocalRepository(localRepository)
+                .setLocalRepository(session.getLocalRepository())
                 .setRemoteRepositories(project.getRemoteArtifactRepositories())
                 .setForceUpdate(false)
                 .setManagedVersionMap(project.getManagedVersionMap());
