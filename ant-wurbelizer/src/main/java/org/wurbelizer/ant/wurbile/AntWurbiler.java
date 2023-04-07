@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -94,7 +95,7 @@ public class AntWurbiler extends MatchingTask {
    */
   public void setVerbosity(String verbosity) {
     try {
-      this.verbosity = Verbosity.valueOf(verbosity.toUpperCase());
+      this.verbosity = Verbosity.valueOf(verbosity.toUpperCase(Locale.ROOT));
     }
     catch (RuntimeException ex) {
       this.verbosity = Verbosity.DEFAULT;
@@ -107,7 +108,7 @@ public class AntWurbiler extends MatchingTask {
    * @return the verbosity
    */
   public String getVerbosity() {
-    return verbosity.toString().toLowerCase();
+    return verbosity.toString().toLowerCase(Locale.ROOT);
   }
 
 

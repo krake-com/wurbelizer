@@ -42,6 +42,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -104,7 +105,7 @@ public class AntWurbler extends MatchingTask {
    */
   public void setVerbosity(String verbosity) {
     try {
-      this.verbosity = Verbosity.valueOf(verbosity.toUpperCase());
+      this.verbosity = Verbosity.valueOf(verbosity.toUpperCase(Locale.ROOT));
     }
     catch (RuntimeException ex) {
       this.verbosity = Verbosity.DEFAULT;
@@ -117,7 +118,7 @@ public class AntWurbler extends MatchingTask {
    * @return the verbosity
    */
   public String getVerbosity() {
-    return verbosity.toString().toLowerCase();
+    return verbosity.toString().toLowerCase(Locale.ROOT);
   }
 
 
