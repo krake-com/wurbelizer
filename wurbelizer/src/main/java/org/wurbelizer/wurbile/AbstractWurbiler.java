@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
@@ -342,7 +343,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
                   else if (wurbletMode == WURBLET_COMMAND) {
                     StringTokenizer stok = new StringTokenizer(wurbletBuf.toString(), " \t\n\r");
                     if (stok.hasMoreTokens()) {
-                      String cmd = stok.nextToken().toLowerCase();
+                      String cmd = stok.nextToken().toLowerCase(Locale.ROOT);
                       boolean cmdOk;
                       switch (cmd) {
                         case CMD_INCLUDE:

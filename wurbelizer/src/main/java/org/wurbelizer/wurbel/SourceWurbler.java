@@ -32,6 +32,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -115,7 +116,7 @@ public class SourceWurbler extends AbstractWurbler {
     String fileExtension = null;    // default type
     int ndx = filename.lastIndexOf('.');
     if (ndx >= 0) {
-      fileExtension = filename.substring(ndx).toLowerCase();    // e.g. ".java"
+      fileExtension = filename.substring(ndx).toLowerCase(Locale.ROOT);    // e.g. ".java"
     }
     sourceType = SourceType.get(fileExtension);
 
@@ -354,7 +355,7 @@ public class SourceWurbler extends AbstractWurbler {
                     invoke = simpleCondition(warg.substring(5));
                   }
                   else if (warg.startsWith("fold=")) {
-                    String val = warg.substring(5).toUpperCase();
+                    String val = warg.substring(5).toUpperCase(Locale.ROOT);
                     if (!val.equals("NONE")) {
                       foldType = SourceRegion.FoldType.valueOf(val);
                     }
@@ -615,7 +616,7 @@ public class SourceWurbler extends AbstractWurbler {
    */
   private void setDefaultFoldType(String value)  {
     if (value != null) {
-      value = value.toUpperCase();
+      value = value.toUpperCase(Locale.ROOT);
       if (!"NONE".equals(value)) {
         defaultFoldType = SourceRegion.FoldType.valueOf(value);
       }

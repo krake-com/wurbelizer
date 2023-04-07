@@ -34,6 +34,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 
 /**
@@ -106,7 +107,7 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
   protected void determineVerbosity() {
     if (verbosity != null) {
       try {
-        verbosityLevel = Verbosity.valueOf(verbosity.toUpperCase());
+        verbosityLevel = Verbosity.valueOf(verbosity.toUpperCase(Locale.ROOT));
       }
       catch (RuntimeException ex) {
         verbosityLevel = Verbosity.DEFAULT;
