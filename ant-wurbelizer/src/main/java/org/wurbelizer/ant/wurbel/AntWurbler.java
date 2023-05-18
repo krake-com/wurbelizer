@@ -401,7 +401,7 @@ public class AntWurbler extends MatchingTask {
   /**
    * Gets the list of files to be wurbelized.
    *
-   * @return the list of files as an array
+   * @return the array of files, never null
    */
   public File[] getFileList() {
     return wurbleList;

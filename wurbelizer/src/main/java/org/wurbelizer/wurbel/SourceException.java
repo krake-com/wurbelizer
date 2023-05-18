@@ -28,7 +28,7 @@ import java.io.Serial;
 public class SourceException extends Exception {
 
   @Serial
-  static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
 
   private final transient SourceElement elem;

@@ -344,7 +344,7 @@ public class AntWurbiler extends MatchingTask {
   /**
    * Gets the list of files to be compiled.
    *
-   * @return the list of files as an array
+   * @return the array of files, never null
    */
   public File[] getFileList() {
     return wurbleList;
