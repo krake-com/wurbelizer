@@ -32,7 +32,7 @@ import java.io.Serial;
 public class WurbelTerminationException extends WurbelException {
 
   @Serial
-  static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
   /**
    * Creates a wurbel exception.

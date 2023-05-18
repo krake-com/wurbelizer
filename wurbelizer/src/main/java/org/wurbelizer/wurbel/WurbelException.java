@@ -33,7 +33,7 @@ import java.io.Serial;
 public class WurbelException extends Exception {
 
   @Serial
-  static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
   /**
    * true if message contains a hint to the source of the error, false if default to file.

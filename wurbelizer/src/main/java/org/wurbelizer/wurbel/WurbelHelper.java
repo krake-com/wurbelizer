@@ -231,7 +231,7 @@ public final class WurbelHelper {
   private static class Environment extends Properties {
 
     @Serial
-    static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     public Environment() {
 
