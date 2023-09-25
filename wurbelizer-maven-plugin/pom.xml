@@ -58,10 +58,6 @@
             </goals>
           </execution>
         </executions>
-        <configuration>
-          <requiredMavenVersion>${maven.version}</requiredMavenVersion>
-          <requiredJavaVersion>${javac.version}</requiredJavaVersion>
-        </configuration>
       </plugin>
 
       <plugin>
