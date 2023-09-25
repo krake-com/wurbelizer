@@ -59,6 +59,7 @@ public class SourceWurbiler extends AbstractWurbiler {
    * @param verbosity the verbosity
    * @throws IOException if source file could not be loaded
    */
+  @SuppressWarnings("this-escape")
   public SourceWurbiler(File wrblFile, File outputJavaDir, File outputTextDir, Logger logger, Verbosity verbosity)
          throws IOException {
 

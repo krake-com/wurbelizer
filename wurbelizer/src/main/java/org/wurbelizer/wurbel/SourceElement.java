@@ -91,6 +91,7 @@ public class SourceElement {
    *
    * @throws org.wurbelizer.wurbel.SourceException if creating the element failed
    */
+  @SuppressWarnings("this-escape")
   public SourceElement(SourceDocument doc, Type type, int begin, int end,
                        SourceWurbletSubElement parentWurbletElement) throws SourceException {
 

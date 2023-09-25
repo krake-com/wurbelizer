@@ -40,7 +40,7 @@ public final class ExceptionHelper {
     while (cause != null) {
       String subMsg = cause.getMessage();
       if (subMsg != null && buf.indexOf(subMsg) < 0) {
-        if (buf.length() > 0) {
+        if (!buf.isEmpty()) {
           buf.append('\n');
         }
         buf.append(subMsg);

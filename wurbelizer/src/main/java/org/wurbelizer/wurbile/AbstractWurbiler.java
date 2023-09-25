@@ -163,6 +163,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
    * @param out the output writer
    * @param sourceList the fixed source list (null to create it)
    */
+  @SuppressWarnings("this-escape")
   public AbstractWurbiler(BufferedReader in, String inName, Writer out, List<String> sourceList) {
 
     this.out = out;
@@ -861,7 +862,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
       if (buf == null) {
         buf = new StringBuilder();
       }
-      if (buf.length() > 0) {
+      if (!buf.isEmpty()) {
         buf.append('\n');
       }
       buf.append(str);
@@ -1140,13 +1141,13 @@ public abstract class AbstractWurbiler implements Wurbiler {
    * Flushes the source buffer.
    */
   private void flushSource() throws IOException {
-    if (sourceBuf.length() > 0) {
+    if (!sourceBuf.isEmpty()) {
       // cut first newline, if any (comes from @[ ... newline)
       if ((wurbletMode == WURBLET_BLOCK || wurbletMode == WURBLET_COMMAND) &&
           sourceBuf.charAt(0) == '\n')  {
         sourceBuf.deleteCharAt(0);
       }
-      if (sourceBuf.length() > 0) {
+      if (!sourceBuf.isEmpty()) {
         if (isAutoIndent()) {
           setIndent(autoIndent + (lastWasOpenBlock ? 2 : 0));
         }

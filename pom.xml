@@ -7,7 +7,7 @@
 
   <groupId>org.wurbelizer</groupId>
   <artifactId>wurbelizer-parent</artifactId>
-  <version>20.0-SNAPSHOT</version>
+  <version>21.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Wurbelizer Parent</name>
@@ -49,7 +49,7 @@
     <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <dependency.locations.enabled>false</dependency.locations.enabled>
-    <javac.version>20</javac.version>
+    <javac.version>21</javac.version>
     <javac.lint>all,-processing</javac.lint>
     <ow2.asm.version>9.5</ow2.asm.version>
     <maven.version>3.9.0</maven.version>
@@ -220,6 +220,7 @@
             <showDeprecation>true</showDeprecation>
             <compilerArgs>
               <arg>-Xlint:${javac.lint}</arg>
+              <arg>-proc:full</arg>
             </compilerArgs>
           </configuration>
           <dependencies>

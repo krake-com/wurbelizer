@@ -361,7 +361,7 @@ public class AntWurbiler extends MatchingTask {
     if (src == null) {
       throw new BuildException("srcdir attribute must be set!", getLocation());
     }
-    if (src.size() == 0) {
+    if (src.isEmpty()) {
       throw new BuildException("srcdir attribute must be set!", getLocation());
     }
   }

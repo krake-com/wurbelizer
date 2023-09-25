@@ -40,6 +40,7 @@ public class HeapStream {
    * @param heapName the name of the code stream
    * @throws WurbelException if stream could not be created
    */
+  @SuppressWarnings("this-escape")
   public HeapStream(Wurbler container, String heapName) throws WurbelException {
     // remember invocation params
     invocationCount = container.getInvocationCount();

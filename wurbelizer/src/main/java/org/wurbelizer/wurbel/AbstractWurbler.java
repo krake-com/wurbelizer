@@ -54,6 +54,7 @@ public abstract class AbstractWurbler implements Wurbler {
    * Creates a wurbler.<br>
    * The output of the wurblet output by default goes to stdout.
    */
+  @SuppressWarnings("this-escape")
   public AbstractWurbler()  {
     setPrintStream(System.out);   // default output goes to stdout
     setArgs(null);                // default is no extra args
@@ -304,20 +305,15 @@ public abstract class AbstractWurbler implements Wurbler {
       return System.getProperties();
     }
     else {
-      switch (nameSpace) {
-        case PROPSPACE_ENV:
-          return WurbelHelper.getEnvProperties();
-
-        case PROPSPACE_EXTRA:
-          return WurbelHelper.getExtraProperties();
-
-        case PROPSPACE_WURBLET:
-          return otherProps;
-
-        default:
+      return switch (nameSpace) {
+        case PROPSPACE_ENV -> WurbelHelper.getEnvProperties();
+        case PROPSPACE_EXTRA -> WurbelHelper.getExtraProperties();
+        case PROPSPACE_WURBLET -> otherProps;
+        default -> {
           getLogger().warning("invalid properties namespace: " + nameSpace);
-          return null;
-      }
+          yield null;
+        }
+      };
     }
   }
 

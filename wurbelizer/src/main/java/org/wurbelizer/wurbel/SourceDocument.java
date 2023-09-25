@@ -62,6 +62,7 @@ public class SourceDocument {
    * @param verbosity the verbosity
    * @throws org.wurbelizer.wurbel.SourceException if parsing the document failed
    */
+  @SuppressWarnings("this-escape")
   public SourceDocument(StringBuilder text, String name, Properties wurbProps, Logger logger, Verbosity verbosity)
          throws SourceException {
 
@@ -654,7 +655,7 @@ public class SourceDocument {
         }
       }
     }
-    if (buf.length() > 0) {
+    if (!buf.isEmpty()) {
       throw new SourceException(buf.toString());
     }
   }

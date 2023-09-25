@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.wurbelizer</groupId>
     <artifactId>wurbelizer-parent</artifactId>
-    <version>20.0-SNAPSHOT</version>
+    <version>21.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>wurbelizer-maven-plugin</artifactId>
@@ -58,8 +58,12 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <requiredMavenVersion>${maven.version}</requiredMavenVersion>
+          <requiredJavaVersion>${javac.version}</requiredJavaVersion>
+        </configuration>
       </plugin>
-      
+
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
@@ -75,4 +79,3 @@
   </build>
 
 </project>
-
