@@ -59,6 +59,7 @@ public class SourceWurbletSubElement extends SourceSubElement {
    *
    * @throws org.wurbelizer.wurbel.SourceException if creation failed
    */
+  @SuppressWarnings("this-escape")
   public SourceWurbletSubElement(SourceElement element, String commentLead, int wurbletBegin, int wurbletEnd)
          throws SourceException {
 
@@ -282,7 +283,7 @@ public class SourceWurbletSubElement extends SourceSubElement {
    * @return the stripped text
    */
   private String filterCommentLeads(String text, String commentLead) {
-    if (commentLead != null && commentLead.length() > 0) {
+    if (commentLead != null && !commentLead.isEmpty()) {
       String line = text;
       StringBuilder buf = new StringBuilder();
       while (line != null) {

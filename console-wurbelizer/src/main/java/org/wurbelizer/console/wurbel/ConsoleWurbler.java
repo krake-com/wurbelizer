@@ -71,6 +71,7 @@ public class ConsoleWurbler extends AbstractWurbler {
    *
    * @throws WurbelException if creating the wurbler failed
    */
+  @SuppressWarnings("this-escape")
   public ConsoleWurbler(String[] args, int phase, Set<Integer> collectedPhases) throws WurbelException {
 
     this.phase = phase;

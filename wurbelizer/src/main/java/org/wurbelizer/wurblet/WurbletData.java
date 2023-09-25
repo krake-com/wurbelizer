@@ -40,8 +40,8 @@ public class WurbletData implements Serializable {
    * null = get default from container.
    */
   private String[] args;
-  
-  
+
+
   /**
    * Creates an instance of the wurblet data. This is usually
    * done by the wurbiler.
@@ -49,12 +49,13 @@ public class WurbletData implements Serializable {
    * @param source the fixed source part.
    * @param args the wurblet args. null = provided by container.
    */
+  @SuppressWarnings("this-escape")
   public WurbletData(String[] source, String[] args) {
     setSource(source);
     setArgs(args);
   }
-  
-  
+
+
   /**
    * Gets the preset arguments for the wurblet.
    *
@@ -62,9 +63,9 @@ public class WurbletData implements Serializable {
    */
   public String[] getArgs() {
     return this.args;
-  }  
-  
-  
+  }
+
+
   /**
    * Sets the wurblet arguments (e.g. by the @{args} wurblet command).
    *
@@ -72,8 +73,8 @@ public class WurbletData implements Serializable {
    */
   public void setArgs(String[] args) {
     this.args = args;
-  }  
-  
+  }
+
   /**
    * Get the fixed source.
    *
@@ -82,8 +83,8 @@ public class WurbletData implements Serializable {
   public String[] getSource() {
     return this.source;
   }
-  
-  
+
+
   /**
    * Set the fixed source.
    *
@@ -92,5 +93,5 @@ public class WurbletData implements Serializable {
   public void setSource(String[] source) {
     this.source = source;
   }
-  
+
 }

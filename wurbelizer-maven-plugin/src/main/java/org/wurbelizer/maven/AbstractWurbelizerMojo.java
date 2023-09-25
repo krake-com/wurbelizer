@@ -129,7 +129,7 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
    */
   protected String getPathRelativeToBasedir(String path) {
     String basePath = project.getBasedir().getAbsolutePath();
-    while (basePath.length() > 0) {
+    while (!basePath.isEmpty()) {
       if (path.startsWith(basePath)) {
         int len = basePath.lastIndexOf(File.separatorChar);
         if (len > 0) {
