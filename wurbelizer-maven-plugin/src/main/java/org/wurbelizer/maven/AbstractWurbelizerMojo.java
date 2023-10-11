@@ -52,6 +52,9 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
              readonly = true)
   protected MavenProject project;
 
+  /**
+   * The maven session.
+   */
   @Parameter(defaultValue = "${session}",
              required = true,
              readonly = true)
@@ -78,6 +81,12 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
   @Parameter(defaultValue = "${project.build.sourceEncoding}")
   protected String charset;   // don't use the name "encoding" as this is handled by maven
 
+  /**
+   * Skips processing.<br>
+   * Defaults to true if packaging is "pom".
+   */
+  @Parameter
+  protected Boolean skip;
 
   /**
    * mapped verbosity level
@@ -229,6 +238,22 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
         }
       }
     }
+  }
+
+  /**
+   * Returns whether the execution should be skipped.
+   *
+   * @return true to do nothing
+   */
+  protected boolean isSkipped() {
+    if (skip == null && "pom".equals(project.getPackaging())) {
+      skip = true;    // pom artifacts are skipped by default
+    }
+    if (Boolean.TRUE.equals(skip)) {
+      getLog().info("skipped");
+      return true;
+    }
+    return false;
   }
 
 }

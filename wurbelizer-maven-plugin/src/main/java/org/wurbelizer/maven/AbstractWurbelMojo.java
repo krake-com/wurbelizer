@@ -189,6 +189,10 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
 
+    if (isSkipped()) {
+      return;
+    }
+
     // validate configuration
     validate();
 
