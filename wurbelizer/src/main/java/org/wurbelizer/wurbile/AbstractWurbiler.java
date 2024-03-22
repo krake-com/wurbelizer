@@ -886,7 +886,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
         String path = WurbelHelper.translateVariables(stok.nextToken(), null);
         if (paths.add(path))  {
           in = new NestedReader(path);
-          readers.add(0, in);
+          readers.addFirst(in);
           sourceLoc = srcLocation();
           if (verbosity.isDebug()) {
             logger.info("{" + CMD_INCLUDE + " " + path + "}");
