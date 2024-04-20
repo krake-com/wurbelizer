@@ -60,6 +60,11 @@ public interface Wurbler {
   String WURBLET_FILENAME = "filename";
 
   /**
+   * property in wurblet namespace holding the contents of the source file.
+   */
+  String WURBLET_FILECONTENTS = "filecontents";
+
+  /**
    * property in wurblet namespace holding the pathname of the *.wurb-file (additional properties), null if none.
    */
   String WURBLET_WURBNAME = "wurbname";

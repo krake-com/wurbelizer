@@ -217,6 +217,7 @@ public class SourceWurbler extends AbstractWurbler {
     // read the source file according to the systems encoding
     SourceFile sourceFile = SourceFileFactory.open(filename);
     String text = sourceFile.getOrgText();
+    wurbProps.setProperty(WURBLET_FILECONTENTS, text);
 
     int errors = 0;                     // > 0: some wurblets failed
     int wurbletCount = 0;               // number of processed wurblets
