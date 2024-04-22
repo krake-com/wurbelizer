@@ -113,7 +113,7 @@ public class SourceWurbiler extends AbstractWurbiler {
           throw new WurbileException("output directory missing or " + javaDirName + " isn't a directory");
         }
 
-        javaFileName = javaDirName + File.separator + wurbletName + ".java";
+        javaFileName = javaDirName + File.separator + wurbletName + Constants.JAVA_SOURCE_EXTENSION;
         writer = new OutputStreamWriter(new FileOutputStream(javaFileName), Settings.getEncodingCharset());
 
         // write intro
