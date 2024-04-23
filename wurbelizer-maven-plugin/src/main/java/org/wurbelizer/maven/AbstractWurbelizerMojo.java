@@ -201,7 +201,8 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
    */
   protected Properties createExtraProperties() {
     Properties props = new Properties();
-    props.setProperty("project", project.getBasedir().getPath());
+    String projectRootPath = project.getBasedir().getPath();
+    props.setProperty("project", projectRootPath);
     // create parentProject, parentParentProject, etc...
     MavenProject parentProject = project.getParent();
     StringBuilder projectKey = new StringBuilder();
@@ -211,11 +212,12 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
         getLog().warn("parent project " + parentProject.getName() + " not in filesystem");
         break;
       }
+      projectRootPath = baseDir.getPath();
       projectKey.append("Parent");
-      props.setProperty(Character.toLowerCase(projectKey.charAt(0)) + projectKey.substring(1) + "Project",
-                        baseDir.getPath());
+      props.setProperty(Character.toLowerCase(projectKey.charAt(0)) + projectKey.substring(1) + "Project", projectRootPath);
       parentProject = parentProject.getParent();
     }
+    props.setProperty("projectRoot", projectRootPath);
     return props;
   }
 
