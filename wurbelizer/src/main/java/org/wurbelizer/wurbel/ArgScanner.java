@@ -27,15 +27,15 @@ import java.util.Properties;
  * However, sometimes arguments must include whitespaces, i.e.
  * must be quoted. There are two kinds quotes:<p>
  *
- * double-quotes like @{code "test: $remote == --remote"}. The $remote will be translated.
+ * double-quotes like {@code "test: $remote == --remote"}. The {@code $remote} will be translated.
  * A single-quote in a double-quoted string is allowed.<p>
  *
- * single-quotes like @{code --orderby='" ORDER BY " + CN_ID + " DESC"'}.
+ * single-quotes like {@code --orderby='" ORDER BY " + CN_ID + " DESC"'}.
  * No translation will take place and such args may contain double-quotes.<p>
  *
  * Double-quotes in a double-quoted string must be quoted with a backslash.
  * Same is true for single-quotes in a single quoted string.
- * A backslash is written as \\.<p>
+ * A backslash is written as {@code \\}.<p>
  *
  * Notice that variable translation takes place <strong>after</strong> the arguments have been separated.
  * Thus, a variable may contain quotes and these quotes need <strong>not</strong> be escaped.
