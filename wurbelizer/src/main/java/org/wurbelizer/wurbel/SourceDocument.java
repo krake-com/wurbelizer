@@ -42,7 +42,12 @@ import java.util.Properties;
  */
 public class SourceDocument {
 
-  private static final String INLINE_COMMENT = "/**/";    // comment bounds for inline replacement
+  // comment bounds for inline replacement
+  private static final String INLINE_COMMENT = "/**/";
+  private static final int INLINE_COMMENT_LEN = INLINE_COMMENT.length();
+  // avoid warning "documentation comment is not attached to any declaration" since Java 23
+  private static final String INLINE_COMMENT_23 = "/*@*/";
+  private static final int INLINE_COMMENT_23_LEN = INLINE_COMMENT_23.length();
 
   private StringBuilder text;               // whole document as one String
   private final String name;                // the documents name
@@ -312,19 +317,34 @@ public class SourceDocument {
       int start = -1;
       int end = -1;
       if (wurblet.isInlinePreviousBlock()) {
+        boolean inline23 = false;
         end = elemText.lastIndexOf(INLINE_COMMENT);
+        if (end < 0) {
+          end = elemText.lastIndexOf(INLINE_COMMENT_23);
+          if (end >= 0) {
+            inline23 = true;
+          }
+        }
         if (end >= 0) {
-          start = elemText.substring(0, end).lastIndexOf(INLINE_COMMENT);
+          String lead = elemText.substring(0, end);
+          start = lead.lastIndexOf(inline23 ? INLINE_COMMENT_23 : INLINE_COMMENT);
           if (start >= 0) {
-            start += 4;
+            start += inline23 ? INLINE_COMMENT_23_LEN : INLINE_COMMENT_LEN;
           }
         }
       }
       else {
+        boolean inline23 = false;
         start = elemText.indexOf(INLINE_COMMENT);
+        if (start < 0) {
+          start = elemText.indexOf(INLINE_COMMENT_23);
+          if (start >= 0) {
+            inline23 = true;
+          }
+        }
         if (start >= 0) {
-          start += 4;
-          end = elemText.indexOf(INLINE_COMMENT, start);
+          start += inline23 ? INLINE_COMMENT_23_LEN : INLINE_COMMENT_LEN;
+          end = elemText.indexOf(inline23 ? INLINE_COMMENT_23 : INLINE_COMMENT, start);
         }
       }
 
@@ -343,7 +363,11 @@ public class SourceDocument {
         }
         return;
       }
-      throw new SourceException(elem, "no /**/.../**/ found in code section for inline wurblet " + wurblet);
+      throw new SourceException(elem, "no " +
+                                      INLINE_COMMENT + "..." + INLINE_COMMENT +
+                                      " or " +
+                                      INLINE_COMMENT_23 + "..." + INLINE_COMMENT_23 +
+                                      " found in code section for inline wurblet " + wurblet);
     }
     else  {
       throw new SourceException(this, "inline wurblet out of document bounds: " + wurblet);
@@ -468,15 +492,18 @@ public class SourceDocument {
             begin = pos;
           }
           else if (c == '*')  {
-            // block comment start (if not /**/)
-            if (remains < 3 || text.charAt(pos+2) != '*' || text.charAt(pos+3) != '/') {
+            // block comment start (if not /**/ or /*@*/)
+            if (startsWith(pos, INLINE_COMMENT)) {
+              pos += INLINE_COMMENT_LEN;
+              remains -= INLINE_COMMENT_LEN;
+            }
+            else if (startsWith(pos, INLINE_COMMENT_23)) {
+              pos += INLINE_COMMENT_23_LEN;
+              remains -= INLINE_COMMENT_23_LEN;
+            }
+            else {
               type = SourceElement.Type.BLOCK_COMMENT;
               begin = pos;
-            }
-            else  {
-              // skip **/
-              pos += 3;
-              remains -= 3;
             }
           }
         }
@@ -681,6 +708,21 @@ public class SourceDocument {
         elem.setEnd(elem.getEnd() - diff);
       }
     }
+  }
+
+
+  // faster replacement for StringBuilder#indexOf(String, int)
+  private boolean startsWith(int pos, String str) {
+    int len = str.length();
+    if (pos + len <= text.length()) {
+      for (int i=0; i < len; i++) {
+        if (text.charAt(pos + i) != str.charAt(i)) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
   }
 
 }
