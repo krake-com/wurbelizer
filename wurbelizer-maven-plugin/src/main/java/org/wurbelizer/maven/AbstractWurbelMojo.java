@@ -151,6 +151,20 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
   private List<String> excludeAnchors;
 
   /**
+   * Optional wurbel phase to start with.<br>
+   * Default is 0 (collect heredocs).
+   */
+  @Parameter
+  private int firstPhase = 0;
+
+  /**
+   * Optional wurbel phase to end with (including).<br>
+   * Default is <code>Integer.MAX_VALUE</code>, i.e. unlimited.
+   */
+  @Parameter
+  private int lastPhase = Integer.MAX_VALUE;
+
+  /**
    * Optional wurblet execution filter.
    */
   private WurbelFilter wurbelFilter;
@@ -237,7 +251,11 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
 
 
     TreeSet<Integer> collectedPhases = new TreeSet<>();
-    int phase = 0;    // phase 0 is heredocs only (no wurblets processed -> this will update the model first)
+    collectedPhases.add(0);     // usually not part of any wurblet definition
+    int phase = firstPhase;     // phase 0 is heredocs only (no wurblets processed -> this will update the model first)
+    if (phase > 0) {
+      getLog().info("beginning first phase " + phase + " -> skipping phases " + collectedPhases.subSet(0, phase));
+    }
 
     for (;;) {
 
@@ -305,7 +323,12 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
       if (totalErrors > 0 || nextPhase == null) {
         break;
       }
+      if (nextPhase > lastPhase) {
+        getLog().info("last phase " + lastPhase + " completed -> skipping remaining phases " + collectedPhases.subSet(nextPhase, Integer.MAX_VALUE));
+        break;
+      }
       phase = nextPhase;
+
     }
 
     if (totalErrors > 0) {
