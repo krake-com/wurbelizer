@@ -7,7 +7,7 @@
 
   <groupId>org.wurbelizer</groupId>
   <artifactId>wurbelizer-parent</artifactId>
-  <version>23.0-SNAPSHOT</version>
+  <version>24.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Wurbelizer Parent</name>
@@ -51,23 +51,23 @@
     <dependency.locations.enabled>false</dependency.locations.enabled>
     <netbeans.hint.license>wurbelizer</netbeans.hint.license>
 
-    <javac.version>23</javac.version>
+    <javac.version>24</javac.version>
     <javac.lint>all,-processing</javac.lint>
 
     <maven.version>3.9.0</maven.version>
 
-    <maven.clean.plugin.version>3.4.0</maven.clean.plugin.version>
-    <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
+    <maven.clean.plugin.version>3.4.1</maven.clean.plugin.version>
+    <maven.compiler.plugin.version>3.14.0</maven.compiler.plugin.version>
     <maven.dependency.plugin.version>3.8.1</maven.dependency.plugin.version>
-    <maven.deploy.plugin.version>3.1.3</maven.deploy.plugin.version>
+    <maven.deploy.plugin.version>3.1.4</maven.deploy.plugin.version>
     <maven.enforcer.plugin.version>3.5.0</maven.enforcer.plugin.version>
     <maven.gpg.plugin.version>3.2.7</maven.gpg.plugin.version>
     <maven.help.plugin.version>3.5.1</maven.help.plugin.version>
-    <maven.install.plugin.version>3.1.3</maven.install.plugin.version>
+    <maven.install.plugin.version>3.1.4</maven.install.plugin.version>
     <maven.jar.plugin.version>3.4.2</maven.jar.plugin.version>
     <maven.javadoc.plugin.version>3.11.2</maven.javadoc.plugin.version>
     <maven.jxr.plugin.version>3.6.0</maven.jxr.plugin.version>
-    <maven.owasp.plugin.version>12.0.2</maven.owasp.plugin.version>
+    <maven.owasp.plugin.version>12.1.0</maven.owasp.plugin.version>
     <maven.plugin.plugin.version>3.15.0</maven.plugin.plugin.version>
     <maven.plugin.report.plugin.version>3.15.1</maven.plugin.report.plugin.version>
     <maven.project.info.reports.plugin.version>3.6.2</maven.project.info.reports.plugin.version>
@@ -83,8 +83,8 @@
     <maven.plugin.annotations.version>3.14.0</maven.plugin.annotations.version>
     <mavengem.wagon.version>1.0.3</mavengem.wagon.version>
     <plexus.component.metadata.version>2.2.0</plexus.component.metadata.version>
-    <slf4j.version>1.7.36</slf4j.version>   <!-- see below -->
-    <testng.version>7.10.2</testng.version>
+    <slf4j.version>2.0.17</slf4j.version>
+    <testng.version>7.11.0</testng.version>
     <wagon.ssh.version>3.5.3</wagon.ssh.version>
 
   </properties>
