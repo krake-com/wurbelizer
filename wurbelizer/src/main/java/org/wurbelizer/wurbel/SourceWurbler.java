@@ -125,7 +125,7 @@ public class SourceWurbler extends AbstractWurbler {
     // extract names
     ndx = filename.lastIndexOf(File.separatorChar);
     String dirname = ndx > 0 ? filename.substring(0, ndx) : ".";
-    String basename = ndx > 0 && filename.length() > ndx ? filename.substring(ndx + 1) : filename;
+    String basename = ndx > 0 ? filename.substring(ndx + 1) : filename;
     ndx = basename.lastIndexOf('.');
     if (ndx > 0)  {
       basename = basename.substring(0, ndx);
@@ -448,7 +448,7 @@ public class SourceWurbler extends AbstractWurbler {
                     // stacktraces may contain file path names, which on Windows contain backslashes.
                     // Those backslashes can be harmful in many ways, for example, if a
                     // backslash is followed by the lower-case letter 'u', the compiler will treat this as
-                    // a unicode character and compilation could fail due to an illegal unicode sequence.
+                    // a Unicode character and compilation could fail due to an illegal Unicode sequence.
                     // -> simply replace all backslashes with forward slashes!
                     HeapFile stackTrace = new HeapFile("",null);
                     ex.printStackTrace(stackTrace.getPrintStream());

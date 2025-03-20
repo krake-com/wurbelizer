@@ -350,7 +350,7 @@ public class AntWurbler extends MatchingTask {
 
   /**
    * Checks if given filename applies.<br>
-   * By default java and wurb-files are ok.
+   * By default, Java and wurb-files are ok.
    *
    * @param srcDir the source directory
    * @param fileName the file to check

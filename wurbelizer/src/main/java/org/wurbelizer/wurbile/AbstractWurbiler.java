@@ -515,9 +515,9 @@ public abstract class AbstractWurbiler implements Wurbiler {
         catch (IOException ex) {
           // ignored
         }
-        readers.remove(0);
+        readers.removeFirst();
         paths.remove(in.getPath());
-        in = readers.get(0);
+        in = readers.getFirst();
       }
     }
   }
@@ -1126,9 +1126,9 @@ public abstract class AbstractWurbiler implements Wurbiler {
         return -1;   // EOF on main reader
       }
       // EOF was on an included reader
-      readers.remove(0);
+      readers.removeFirst();
       paths.remove(in.getPath());
-      in = readers.get(0);
+      in = readers.getFirst();
       flushSource();
       return read();
     }
