@@ -26,7 +26,7 @@ package org.wurbelizer.wurbel;
 public class SourceHereSubElement extends SourceSubElement {
 
   /**
-   * Creates a here document.
+   * Creates a here-document.
    *
    * @param element the {@link SourceElement} containing the here-document
    * @param name the name of the here-document

@@ -115,7 +115,7 @@ public abstract class AbstractWurbler implements Wurbler {
     // make className relative, if absolute
     int ndx = className.lastIndexOf('.');
     String serName = (ndx > 0 ? className.substring(ndx+1) : className) + Constants.FILE_SOURCE_EXTENSION;
-    InputStream inp = clazz.getResourceAsStream(serName);
+    InputStream inp = clazz.getResourceAsStream(serName);   // clazz cannot be null due to wurblet != null and setWurblet above
     if (inp == null) {
       throw new WurbelException("no such fixed text object '" + serName + "'");
     }
