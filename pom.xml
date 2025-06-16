@@ -580,6 +580,7 @@
             <extensions>true</extensions>
             <configuration>
               <publishingServerId>central</publishingServerId>
+              <deploymentName>wurbelizer</deploymentName>
             </configuration>
           </plugin>
         </plugins>
