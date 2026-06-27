@@ -15,6 +15,17 @@ The core pipeline:
 - A **wurbler** scans application sources for `@wurblet` anchors, instantiates the compiled wurblets, and merges generated code into guarded blocks within those source files
 - The wurbler repeats until no more changes occur (generated code can itself contain new anchors)
 
+## Documentation
+
+This repository ships a documentation set:
+
+- Project-wide docs live in `src/docs/`.
+- [`README.md`](README.md) — the public-facing overview.
+
+When adding or changing a document, keep it in sync with `toc.md` and `index.md`.
+
+Use American English spelling for all code comments and documentation (e.g. "behavior", "serialize", "color").
+
 ## Build Commands
 
 Requires Java 25+ and Maven 3.9.0+. The enforcer requires `file.encoding=UTF-8`:
