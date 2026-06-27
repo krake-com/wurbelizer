@@ -1,19 +1,16 @@
 # Datenschutzerklärung / Privacy Policy
 
-!!! warning "TODO — review required"
-    This is a **placeholder** describing how this documentation site is built to be
-    privacy-friendly. The operator must fill in every `TODO` (controller, hosting
-    provider, server-log retention) and have the text reviewed before publishing.
-    Nothing here is legal advice.
-
 ## Deutsch
 
 ### Verantwortlicher
 
 ```
-TODO: Name / Firma
-TODO: Anschrift
-TODO: E-Mail
+Harald Krake
+Krake Softwaretechnik
+Bergstr. 48
+78098 Triberg
+Germany
+info@krake.de
 ```
 
 Siehe auch das [Impressum](impressum.md).
@@ -43,9 +40,12 @@ User-Agent). Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes
 Interesse am sicheren und stabilen Betrieb).
 
 ```
-TODO: Hosting-Provider benennen
-TODO: Speicherdauer der Logfiles angeben
-TODO: ggf. Auftragsverarbeitungsvertrag (AVV) erwähnen
+Krake Softwaretechnik
+Bergstr. 48
+78098 Triberg
+Germany
+info@krake.de
+Logfiles werden nach 14 Tagen geloescht.
 ```
 
 ### Ihre Rechte
@@ -60,12 +60,15 @@ bei einer Aufsichtsbehörde.
 ### Controller
 
 ```
-TODO: name / company
-TODO: address
-TODO: e-mail
+Harald Krake
+Krake Softwaretechnik
+Bergstr. 48
+78098 Triberg
+Germany
+info@krake.de
 ```
 
-See also the [Impressum / Legal Notice](impressum.md).
+See also the [Imprint / Legal Notice](impressum.md).
 
 ### Data minimisation by design
 
@@ -89,9 +92,12 @@ legal basis is Art. 6(1)(f) GDPR (legitimate interest in secure, stable
 operation).
 
 ```
-TODO: name the hosting provider
-TODO: state the log-file retention period
-TODO: mention a data-processing agreement (DPA) if applicable
+Krake Softwaretechnik
+Bergstr. 48
+78098 Triberg
+Germany
+info@krake.de
+Logfile retention period: 14 days
 ```
 
 ### Your rights

@@ -1,10 +1,5 @@
 # Impressum / Legal Notice
 
-!!! warning "TODO — operator details required"
-    This is a **placeholder**. The operator must complete every `TODO` below with
-    real data before publishing. The wording must be reviewed for legal accuracy;
-    nothing here is legal advice.
-
 ## Deutsch
 
 Angaben gemäß § 5 DDG (ehemals § 5 TMG):
@@ -12,41 +7,38 @@ Angaben gemäß § 5 DDG (ehemals § 5 TMG):
 **Diensteanbieter**
 
 ```
-TODO: Name / Firma
-TODO: Straße und Hausnummer
-TODO: PLZ und Ort
-TODO: Land
+Krake Softwaretechnik
+Bergstr. 48
+78098 Triberg
+Germany
 ```
 
 **Vertreten durch**
 
 ```
-TODO: vertretungsberechtigte Person(en)
+Harald Krake
 ```
 
 **Kontakt**
 
 ```
-Telefon: TODO
-E-Mail:   TODO
+Telefon: +49 7722 9169770
+E-Mail:  info@krake.de
 ```
 
-**Registereintrag** (falls zutreffend)
+**Umsatzsteuer-ID**
 
 ```
-TODO: Registergericht und Registernummer
-```
-
-**Umsatzsteuer-ID** (falls zutreffend)
-
-```
-TODO: USt-IdNr. gemäß § 27 a UStG
+DE 142 968 021
 ```
 
 **Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV**
 
 ```
-TODO: Name und Anschrift
+Harald Krake
+Bergstr. 48
+78098 Triberg
+Germany
 ```
 
 ## English
@@ -56,33 +48,27 @@ Information pursuant to § 5 DDG (German Digital Services Act).
 **Service provider**
 
 ```
-TODO: name / company
-TODO: street and number
-TODO: postal code and city
-TODO: country
+Krake Softwaretechnik
+Bergstr. 48
+78098 Triberg
+Germany
 ```
 
 **Represented by**
 
 ```
-TODO: authorised representative(s)
+Harald Krake
 ```
 
 **Contact**
 
 ```
-Phone:  TODO
-E-mail: TODO
+Phone:  +49 7722 9169770
+E-mail: info@krake.de
 ```
 
-**Register entry** (if applicable)
+**VAT identification number**
 
 ```
-TODO: register court and registration number
-```
-
-**VAT identification number** (if applicable)
-
-```
-TODO: VAT ID pursuant to § 27 a German VAT Act
+DE 142 968 021
 ```
