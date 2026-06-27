@@ -5,9 +5,10 @@ wurbler for wurblet anchors, variables and here-documents.
 This applies to generated comments as well! Consequently, generated code may include new
 anchors, variables or documents that in turn are evaluated by the wurbler
 and so on. This is an important feature because it allows bootstrapping
-from a rudimentary template similar to a software developer starting with
-a sketch (you won’t understand until you know how it became).
-Special significance of a character can be turned off by preceding it with
+from a rudimentary template, similar to a software developer starting with
+a sketch (the finished result only makes full sense once you know how it
+came to be).
+The special significance of a character can be turned off by preceding it with
 a backslash. A line terminated by a backslash is concatenated with the
 following line (continuation line). The backslash itself is expressed by a
 double backslash.
@@ -37,14 +38,15 @@ where:
 - `@wurblet`: starts an anchor
 - `(wurbler-directive1 ... N)`: optional directives to the wurbler
 - `<tag>`: is a tag uniquely identifying the anchor within the source file
-- `<wurblet>`: is either the classname of the wurblet. This is either an
-absolute classname or a basename to which the wurbler will prepend
+- `<wurblet>`: the class name of the wurblet. This is either a fully
+qualified class name or a basename to which the wurbler prepends
 the package names provided by 
 the [wurbletPaths](https://wurbelizer.org/static-content/sitedocs/wurbelizer/latest/wurbelizer-maven-plugin/wurbel-mojo.html#wurbletPaths)
 configuration. 
 
 - `<arg1>...`: optional wurblet arguments. 
-Usually, the wurblet arguments carry model information or refer to such.
+Usually these arguments carry model information, or point to where such
+information can be found.
 
 Anchors that span more than one line must be concatenated by a trailing
 backslash at the end of the lines to be continued. Arguments are separated
@@ -107,7 +109,7 @@ Currently, only the operators `==` and `!=` are supported.
 
 ### Extra Indentation
 
-The generated code may be indended by extra spaces with the indent wurbler
+The generated code may be indented by extra spaces with the indent wurbler
 directive. 0 means no extra indent, a negative value is interpreted as *smart indent*,
 which is the default for Java sources.
 Smart indent aligns the generated code with the comment block containing the 

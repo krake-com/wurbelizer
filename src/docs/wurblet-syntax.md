@@ -21,10 +21,10 @@ Changing the level can be achieved in two ways:
 1. code switching
 2. value extraction
 
-With code switching the wurblet changes the code level between the generated 
-output and the control flow of the wurblet’s execution, and vice versa.
-With value extraction it is possible to insert values of the wurblet level into
-the generated output stream.
+Code switching toggles between emitting text at the output level and running the
+wurblet’s own control flow at the wurblet level (and back again).
+Value extraction lets you insert a value computed at the wurblet level directly
+into the generated output stream.
 
 ### Code Switching
 
@@ -63,7 +63,7 @@ For example, the wurblet source:
     }
 ]@
 ```
-Will generated the following code:
+Will generate the following code:
 ```java
 System.out.println("This is line 1");
 System.out.println("This is line 2");
@@ -84,8 +84,8 @@ The following directives are supported:
 ### include
 
 `@{include <filename>}@` includes the source file given by `<filename>`. 
-Includes may be nested to any depth. Loops are detected by the wurbiler. The
-filename allows $-variables that will be replaced at compile time.
+Includes may be nested to any depth, and the wurbiler detects circular includes.
+The filename may contain $-variables, which are replaced at compile time.
 
 Example:
 
@@ -107,12 +107,12 @@ are processed.
 
 ### to
 
-A wurblet may generate code into more than one stream. The default stream
-out is already provided by the container and thus does not need to be
-explicitly opened or closed by the wurblet. Other streams, however, must be
-managed by the wurblet. `@{to <outputstream>}@` sets the output stream
-the generated code will be written to. `@{to out}` resets to the default
-stream, which is equivalent to `@{to}@`.
+A wurblet may generate code into more than one stream. The default stream, named
+`out`, is already provided by the container, so it does not need to be explicitly
+opened or closed by the wurblet. Any other stream, however, must be managed by the
+wurblet itself. `@{to <outputstream>}@` selects the stream that the generated code
+is written to. `@{to out}@` switches back to the default stream, which is equivalent
+to `@{to}@`.
 
 Example:
 ```
@@ -158,7 +158,7 @@ wurblet contains only wurblet code.
 ### implements
 
 `@{implements <interface1> ... <interfaceN>}@` adds interfaces the
-wurblet will implement. Multiple `@{interface}@`-directives will be
+wurblet will implement. Multiple `@{implements}@` directives are
 concatenated. 
 
 Example:
