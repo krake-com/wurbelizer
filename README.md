@@ -1,4 +1,4 @@
-![Wurbelizer](./src/docs/assets/logo-wurbelizer.png)
+![Wurbelizer](./src/docs/assets/Logo_wurbelizer_V4.png)
 
 The Wurbelizer is a code generator, written in Java, using Java as its
 template language and embedded within source files, usually Java. Rather than creating entire

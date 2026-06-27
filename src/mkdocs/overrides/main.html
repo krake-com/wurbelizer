@@ -20,7 +20,7 @@
   <script>
     if (!("ResizeObserver" in window)) {
       document.write(
-        '<script src="{{ base_url }}/assets/javascripts/resize-observer-polyfill.js"><\/script>'
+        '<script src="{{ "assets/javascripts/resize-observer-polyfill.js" | url }}"><\/script>'
       );
     }
   </script>
