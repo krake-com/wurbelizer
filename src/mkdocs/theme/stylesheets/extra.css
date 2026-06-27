@@ -1,0 +1,76 @@
+/*
+ * Brand styling for the Wurbelizer docs — mimics wurbelizer.org.
+ *
+ * Palette (extracted from the original Divi site):
+ *   primary red      #de1d26   header / nav / primary accents
+ *   dark red         #9d141b   hover / shadow
+ *   link blue        #2ea3f2   body links
+ * Signature look: UPPERCASE red h2/h3, square (0-radius) buttons, header shadow.
+ */
+
+/* ---- Custom primary color (Material `primary: custom`) ---- */
+[data-md-color-primary="custom"] {
+  --md-primary-fg-color:        #de1d26;
+  --md-primary-fg-color--light: #e54b52;
+  --md-primary-fg-color--dark:  #9d141b;
+  --md-primary-bg-color:        #ffffff;
+  --md-primary-bg-color--light: rgba(255, 255, 255, 0.7);
+}
+
+/* ---- Custom accent color (Material `accent: custom`) — site link blue ---- */
+[data-md-color-accent="custom"] {
+  --md-accent-fg-color:             #2ea3f2;
+  --md-accent-fg-color--transparent: rgba(46, 163, 242, 0.1);
+  --md-accent-bg-color:             #ffffff;
+  --md-accent-bg-color--light:      rgba(255, 255, 255, 0.7);
+}
+
+/* Body links in the site's blue, in both schemes. */
+[data-md-color-scheme="default"] {
+  --md-typeset-a-color: #2ea3f2;
+}
+[data-md-color-scheme="slate"] {
+  /* Keep the brand red header in dark mode; lighten links for contrast. */
+  --md-typeset-a-color: #5bb8f5;
+}
+
+/* ---- Signature typography: uppercase, red h2/h3 like the original ---- */
+.md-typeset h1 {
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.md-typeset h2,
+.md-typeset h3 {
+  text-transform: uppercase;
+  color: #de1d26;
+}
+[data-md-color-scheme="slate"] .md-typeset h2,
+[data-md-color-scheme="slate"] .md-typeset h3 {
+  color: #f06a70; /* lighter red for readability on dark */
+}
+
+/* ---- Square, uppercase buttons like the site ---- */
+.md-typeset .md-button {
+  border-radius: 0;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.md-typeset .md-button--primary {
+  background-color: #de1d26;
+  border-color: #de1d26;
+  color: #ffffff;
+}
+.md-typeset .md-button--primary:hover {
+  background-color: #9d141b;
+  border-color: #9d141b;
+}
+
+/* ---- Header shadow, echoing the original's elevated red bar ---- */
+.md-header {
+  box-shadow: 0 4px 20px -8px rgba(0, 0, 0, 0.35);
+}
+
+/* Give the wordmark logo a little breathing room. */
+.md-header__button.md-logo img {
+  height: 1.6rem;
+}
