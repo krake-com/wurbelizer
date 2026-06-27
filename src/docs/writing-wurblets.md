@@ -1,16 +1,16 @@
 # Writing Wurblets
 
-As the wurblet level code is Java, you can use all of its features and eco system.
-Especially an object oriented design helps a lot to keep the `.wrbl` files small 
-and readable.
+Because the wurblet-level code is Java, you can use all of its features and its
+ecosystem. An object-oriented design in particular helps to keep the `.wrbl` files
+small and readable.
 
 Remember that wurblets can generate any kind of code, not only Java code.
 
 When designing your own wurblets, always keep in mind that wurblets should generate only
 a certain _aspect_ or _code fragment_, for example a single method or a few methods that
-semantically belong together. You can have as much wurblet anchors in your
-source files as needed. For larger contexts it's better to use different wurblets
-than a single one doing the whole job. Furthermore, it's perfectly possible to
+semantically belong together. You can have as many wurblet anchors in your
+source files as needed. For larger contexts it is better to use several specialized
+wurblets than a single one that does the whole job. Furthermore, it's perfectly possible to
 combine the wurbelizer with traditional template engines such as [Velocity](https://velocity.apache.org/)
 or [Freemarker](https://freemarker.apache.org/).
 For example, the [Tentackle Wizard](https://tentackle.org/static-content/sitedocs/tentackle/latest/tentackle-wizard-maven-plugin/plugin-info.html) first generates the source files which contain the
@@ -82,7 +82,7 @@ This is javadoc!
 
 ## Errorhandling
 
-There wurblet should throw one of the following exceptions if code generation failed:
+A wurblet should throw one of the following exceptions when code generation fails:
 
 - `org.wurbelizer.wurbel.WurbelException`: is counted as a build error and terminates the
 build process at the end of the corresponding build phase. The generated output is replaced

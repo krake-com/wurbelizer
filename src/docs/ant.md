@@ -37,12 +37,12 @@ The wurbile target then looks like this:
 
 Where:
 
-- `${wrbl}`: directory holding the wurblet sources (filanames with exten-
-sion `.wrbl`).
+- `${wrbl}`: directory holding the wurblet sources (filenames with the
+extension `.wrbl`).
 - `${wsrc}`: optional directory holding additional wurblet sources in Java
-(i.e. parent classes, interfaces, etc...)
+(for example parent classes, interfaces, and so on).
 - `${wbuild}`: directory where the wurbiled sources and compiled classes
-go.
+are placed.
 
 The `wurb-cp` classpath defines all archives necessary to compile
 the wurbiled wurblets. An optional step may create a jar archive of all
@@ -77,7 +77,7 @@ must at least contain the following setup:
     <pathelement location="${ext}/wurbelizer.jar"/>
 </path>
 ```
-Additional jar files can can be added as required by the wurblets.
+Additional jar files can be added as required by the wurblets.
 A very basic example of an ant target to run the wurbler looks like this:
 
 ```xml
@@ -104,41 +104,38 @@ An advanced example of the wurbler ant target may look like this:
 ```
 The above example splits the wurbelization into 3 steps:
 
-The first step is an alternative to select java sources for wurbilation: the
-wurbiler locates files with the extension `.wurb` which are property files 
-optionally defining additional wurblet variables. For each `.wurb`-file the wurbler
-assumes a corresponding `.java`-file. This is a convenient way in a large
-project to speed up wurbilation because the wurbiler does not need to scan
-all java sources, where most of them may not refer to any wurblet. Example
-for such a property file:
+The first step is an alternative way of selecting the Java sources for wurbilation: the
+wurbler locates files with the extension `.wurb`, which are property files that may
+optionally define additional wurblet variables. For each `.wurb` file the wurbler
+assumes a corresponding `.java` file. In a large project this is a convenient way to
+speed up wurbilation, because the wurbler then does not need to scan every Java source,
+most of which may not refer to any wurblet. An example of such a property file:
 ```
 # this is MyClass.wurb
 scriptpath=$scripts/myclass.scr
 ```
-This declares the wurblet variable `$scriptpath` and set its value to
-`$scripts/myclass.scr` while $scripts is an ant property (or environment
-variable).
+This declares the wurblet variable `$scriptpath` and sets its value to
+`$scripts/myclass.scr`, where `$scripts` is itself an Ant property (or
+environment variable).
 
 Steps 2 and 3 reveal some other options:
 
-- `wurbletpath` sets the package names that the wurbler will try to load
-wurblets without an absolute classname. Package names are separated by colons. 
-In the example above, the wurbler will first attempt 
-to prepend `org.tentackle.wurblets`. and if that fails use
-`de.krake.myapp.wurblets`.
-- `printstacktrace` enables or disables a stacktrace for errors encoun-
-tered during the execution of wurblets (boolean, default is `false`). This
-is not to be confused with exceptions thrown by the wurblets them-
-selves!
-- `printwurblet` logs the name of the wurblets processed including their
-filename to (bool, default `false`). This is useful for verifying the order
-in which wurblets are invoked, especially if wurblets rely on data produced 
-by other wurblets. By default, only the names of the files that
-were modified are printed.
+- `wurbletpath` sets the package names the wurbler uses to load
+wurblets that are referenced without an absolute class name. Package names are
+separated by colons. In the example above, the wurbler first tries to prepend
+`org.tentackle.wurblets`, and if that fails, `de.krake.myapp.wurblets`.
+- `printstacktrace` enables or disables a stacktrace for errors encountered
+during the execution of wurblets (boolean, default is `false`). This is not to
+be confused with exceptions thrown by the wurblets themselves!
+- `printwurblet` logs the name of each processed wurblet together with its
+filename (bool, default `false`). This is useful for verifying the order
+in which wurblets are invoked, especially if some wurblets rely on data
+produced by others. By default, only the names of the files that were
+modified are printed.
 - `infodir` defines a directory containing extra data for wurblet processing, 
 usually to exchange information between wurblets. For example,
-an JDK ”apt” run may create information other wurblets rely on (as
-this is the case in tentackle).
+a JDK "apt" (annotation processing) run may produce information that other
+wurblets rely on (as is the case in Tentackle).
 - `runonce` determines whether wurbelizing a file is allowed more than
 once within an ant build (bool, default `true`).
 - `verbose` sets the verbosity (bool, default `false`).
