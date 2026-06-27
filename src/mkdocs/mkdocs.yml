@@ -65,7 +65,7 @@ nav:
   - Guard Types: guard-types.md
   - Writing Wurblets: writing-wurblets.md
   - Legal Notice:
-      - Impressum: impressum.md
+      - Impressum / Imprint: impressum.md
       - Datenschutz / Privacy: datenschutz.md
 
 markdown_extensions:

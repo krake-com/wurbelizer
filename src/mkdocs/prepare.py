@@ -48,15 +48,11 @@ def strip_nav_footer(text: str) -> str:
 def readme_to_index(text: str) -> str:
     """Turn the repo README into the site home page (index.md).
 
-    - drop the leading white-on-transparent logo image (invisible on a white body;
-      the red header already shows the logo) and give the page a proper H1;
+    - the README's leading logo image is promoted to the page's H1, so it becomes
+      the title/hero (and MkDocs does not inject the nav title "Home" as a heading);
     - drop helper paragraphs that point at the excluded toc.md / index.md pages;
     - rewrite ``./src/docs/`` links so they resolve inside the site.
     """
-    # Drop a leading logo image line, e.g. ![Wurbelizer](./src/docs/assets/...logo...png)
-    text = re.sub(r"^!\[[^\]]*\]\([^)]*logo[^)]*\)\s*\n+", "", text, count=1,
-                  flags=re.IGNORECASE)
-
     # Drop whole paragraphs that reference the excluded helper pages.
     paragraphs = re.split(r"\n\s*\n", text)
     paragraphs = [p for p in paragraphs if "toc.md" not in p and "index.md" not in p]
@@ -77,9 +73,9 @@ def readme_to_index(text: str) -> str:
     #   ./src/docs/quickstart.md -> quickstart.md
     text = text.replace("./src/docs/", "")
 
-    # Ensure the home page has a title.
-    if not text.lstrip().startswith("#"):
-        text = "# Wurbelizer\n\n" + text.lstrip()
+    # Promote the leading logo image to the page H1 (the title), so MkDocs uses it
+    # as the heading instead of injecting the nav title "Home" above the content.
+    text = re.sub(r"^(!\[[^\]]*\]\([^)]*\))", r"# \1", text.lstrip(), count=1)
 
     return text.rstrip() + "\n"
 
