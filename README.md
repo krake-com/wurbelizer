@@ -1,20 +1,9 @@
 # Wurbelizer
 
-> Agility in code generation.
-
-The Wurbelizer is a code generator for Java, written in Java, using Java as its
-template language and embedded within Java sources. Rather than creating entire
+The Wurbelizer is a code generator, written in Java, using Java as its
+template language and embedded within source files, usually Java. Rather than creating entire
 source files, it modifies well-defined regions of code. It is lightweight, easy to
 integrate, easy to learn — and yet flexible and powerful.
-
-To put it in perspective, the Wurbelizer is deliberately *not* several things it is
-sometimes mistaken for:
-
-- **Not a template engine** — though it can act as one.
-- **Not a preprocessor** — though it manipulates source files.
-- **Not a model-driven-development tool** — though it generates code from models.
-- **Not an aspect-oriented framework** — though it can weave aspect implementations
-  into sources.
 
 This document covers the usage and integration. New here? Start with the
 [5-minute quickstart](./src/docs/quickstart.md), or visit
