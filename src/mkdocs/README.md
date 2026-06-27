@@ -68,16 +68,25 @@ Both `serve` and `build` run `prepare.py` first, so edits to `../docs`, the repo
   Fonts requests at runtime.
 - No analytics, no tracking cookies. Only `localStorage` is used (colour-scheme
   choice + consent), disclosed in the bilingual consent banner and the privacy page.
+- The **ResizeObserver polyfill is self-hosted** (see below) — no `unpkg.com`
+  request is ever made.
 - An Impressum and a Datenschutzerklärung (both German/English placeholders) are
   linked from the navigation and the footer.
 
-### Known residual
+### Self-hosted ResizeObserver polyfill
 
-Material's JavaScript bundle contains a conditional dynamic import of a
-`resize-observer-polyfill` from `unpkg.com`, guarded by
-`typeof ResizeObserver == "undefined"`. It is only fetched by browsers that lack
-`ResizeObserver` (pre-2020 browsers); every current browser ships `ResizeObserver`,
-so the request is never made in practice. The privacy plugin cannot rewrite URLs
-embedded inside minified JS, so this string remains in `bundle.*.min.js`. If you
-must guarantee *zero* third-party URLs even in dead code paths, self-host that
-polyfill via a theme override or post-process the bundle.
+Material's JavaScript bundle would, on browsers that lack a native
+`ResizeObserver` (pre-2020 browsers), inject `<script src="https://unpkg.com/
+resize-observer-polyfill">`. To avoid that third-party request, a copy of the
+polyfill is vendored in [`theme/vendor/`](theme/vendor) and served from this
+site's own origin. The theme override [`overrides/main.html`](overrides/main.html)
+loads it in `<head>`, **only when `ResizeObserver` is missing**, synchronously, so
+the global is defined before Material's bundle runs — Material therefore never
+reaches its `unpkg.com` fallback. Native implementations are never overwritten and
+modern browsers download nothing extra.
+
+> The literal string `https://unpkg.com/...` still exists as an **unreachable
+> dead-code branch** inside Material's prebuilt `bundle.*.min.js` (and its source
+> map). It is never executed and never requested. Removing the string itself would
+> require post-processing Material's compiled bundle, which this setup deliberately
+> avoids so that theme upgrades stay clean.
