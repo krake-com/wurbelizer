@@ -7,3 +7,7 @@ The wurbiler and wurbler can be used with the following build tools/environments
 [Ant](ant.md)
 
 [Console](console.md)
+
+---
+
+**Navigation:** [← Previous: Code Levels](code-levels.md) | [Contents](toc.md) · [Index](index.md) | [Next: Maven Integration →](maven.md)

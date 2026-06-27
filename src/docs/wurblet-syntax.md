@@ -198,3 +198,12 @@ an explicit phase.
 `@{code ...}@` adds the code to the class level code. This code is appended to the
  end of the wurblet's java code and can be used to override or implement wurblet methods.
  This is an alternative to subclassing.
+
+## Further reading
+
+- [Source Level Syntax](source-syntax.md) — the anchors and here-documents that drive wurblets
+- [Writing Wurblets](writing-wurblets.md) — designing your own wurblets with the Wurbelizer API
+
+---
+
+**Navigation:** [← Previous: Console Integration](console.md) | [Contents](toc.md) · [Index](index.md) | [Next: Source Level Syntax →](source-syntax.md)
