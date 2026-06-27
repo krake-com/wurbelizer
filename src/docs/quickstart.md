@@ -1,5 +1,7 @@
 # Quickstart
 
+![Quickstart](assets/icon-jump-start.png)
+
 This 5-minute tutorial gives a first impression of agile generative programming with
 the Wurbelizer. You will build a small wurblet that generates the code for a *data
 transfer object* (DTO) and let the wurbler weave it into a hand-written source file.
@@ -418,6 +420,10 @@ public class SampleDTO {
 
 }
 ```
+
+Take a look at the file in your IDE and see what happened:
+
+![The generated DTO code inside a guarded block in SampleDTO.java, shown in the IDE](assets/sample-dto.png)
 
 In the IDE the block appears collapsed. You can expand it, but you should not edit
 inside it: the region belongs to the wurblet and **manual changes are overwritten on the

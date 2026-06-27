@@ -1,4 +1,4 @@
-# Wurbelizer
+![Wurbelizer](./src/docs/assets/logo-wurbelizer.png)
 
 The Wurbelizer is a code generator, written in Java, using Java as its
 template language and embedded within source files, usually Java. Rather than creating entire
@@ -12,6 +12,8 @@ This document covers the usage and integration. New here? Start with the
 To navigate the documentation, see the
 [Table of Contents](./src/docs/toc.md) for all topics in reading order, or the
 [Index](./src/docs/index.md) for an alphabetical list of terms.
+
+![How it works: from wurblet sources, the wurbiler builds wurblets that the wurbler loads from a container and weaves — together with the model — into your source files](./src/docs/assets/big-picture.png)
 
 ## Key Features
 
