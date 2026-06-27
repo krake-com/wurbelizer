@@ -17,3 +17,12 @@ the guarded blocks of the source file.
 The wurbler repeats these steps until there is no more change (generated code could
 contain new wurblet anchors!) and finally writes back the
 source file to the filesystem (if there was any change at all).
+
+## Further reading
+
+- [Source Level Syntax](source-syntax.md) — what the wurbler parses at the source level
+- [Wurblet Level Syntax](wurblet-syntax.md) — mixing the wurblet and output levels
+
+---
+
+**Navigation:** [← Previous: Quickstart](quickstart.md) | [Contents](toc.md) · [Index](index.md) | [Next: Build Tool Integration →](integration.md)

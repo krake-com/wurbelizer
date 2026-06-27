@@ -156,3 +156,9 @@ the following property:
 ```xml
 <property name="guardtype" value="netbeans" />
 ```
+
+See [Guard Types](guard-types.md) for the available guard types.
+
+---
+
+**Navigation:** [← Previous: Maven Integration](maven.md) | [Contents](toc.md) · [Index](index.md) | [Next: Console Integration →](console.md)

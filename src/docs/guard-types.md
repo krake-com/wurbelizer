@@ -15,3 +15,7 @@ Custom guard types can be added as well.
 A guard type must implement the interface `org.wurbelizer.wurbel.SourceRegion` and is
 registered via `META-INF/services`. 
 See `org.wurbelizer.wurbel.NetbeansRegion` for an example.
+
+---
+
+**Navigation:** [← Previous: Source Level Syntax](source-syntax.md) | [Contents](toc.md) · [Index](index.md) | [Next: Writing Wurblets →](writing-wurblets.md)

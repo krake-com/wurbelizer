@@ -187,3 +187,12 @@ Variables can be used in comments or other variable definitions in two ways:
 
 1. `$<variable>`: e.g. `$tablename.map` where the dot automatically ends the variable name
 2. `${<variable>}`: e.g. `${tablename}xx` to add the string `xx` to the tablename's value
+
+## Further reading
+
+- [Guard Types](guard-types.md) — the patterns that delimit the generated blocks
+- [Writing Wurblets](writing-wurblets.md) — how a wurblet consumes anchors, here-documents and variables
+
+---
+
+**Navigation:** [← Previous: Wurblet Level Syntax](wurblet-syntax.md) | [Contents](toc.md) · [Index](index.md) | [Next: Guard Types →](guard-types.md)

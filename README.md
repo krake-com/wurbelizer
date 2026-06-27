@@ -9,6 +9,10 @@ This document covers the usage and integration. New here? Start with the
 [5-minute quickstart](./src/docs/quickstart.md), or visit
 [wurbelizer.org](https://wurbelizer.org) for the full overview.
 
+To navigate the documentation, see the
+[Table of Contents](./src/docs/toc.md) for all topics in reading order, or the
+[Index](./src/docs/index.md) for an alphabetical list of terms.
+
 ## Key Features
 
 - **Java is the meta language.** The logic that decides *what* to generate is written
@@ -96,16 +100,5 @@ generation the Wurbelizer is designed for.
 
 ## Contents
 
-[0. Quickstart](./src/docs/quickstart.md)
-
-[1. Code Levels](./src/docs/code-levels.md)
-
-[2. Build Tool Integration](./src/docs/integration.md)
-
-[3. Wurblet Level Syntax](./src/docs/wurblet-syntax.md)
-
-[4. Source Level Syntax](./src/docs/source-syntax.md)
-
-[5. Guard Types](./src/docs/guard-types.md)
-
-[6. Writing Wurblets](./src/docs/writing-wurblets.md)
+See the full [Table of Contents](./src/docs/toc.md) and the [Index](./src/docs/index.md)
+for detailed, section-level navigation.

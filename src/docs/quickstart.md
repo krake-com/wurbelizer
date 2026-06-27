@@ -430,3 +430,7 @@ next build**. Change the model and re-run — the generated code follows.
 - [Wurblet Level Syntax](./wurblet-syntax.md)
 - [Source Level Syntax](./source-syntax.md)
 - [Writing Wurblets](./writing-wurblets.md)
+
+---
+
+**Navigation:** [← README](../../README.md) | [Contents](toc.md) · [Index](index.md) | [Next: Code Levels →](code-levels.md)

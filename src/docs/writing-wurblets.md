@@ -119,3 +119,7 @@ A lot of real-world examples can be found in the Tentackle framework:
 [Tentackle wurblets](https://tentackle.org/static-content/sitedocs/tentackle/latest/tentackle-wurblets/apidocs/org/tentackle/wurblet/package-summary.html)
 
 [Tentackle persistence wurblets](https://tentackle.org/static-content/sitedocs/tentackle/latest/tentackle-persistence-wurblets/apidocs/org/tentackle/persist/wurblet/package-summary.html)
+
+---
+
+**Navigation:** [← Previous: Guard Types](guard-types.md) | [Contents](toc.md) · [Index](index.md) | [README ↑](../../README.md)
