@@ -6,8 +6,9 @@ source files, it modifies well-defined regions of code. It is lightweight, easy 
 integrate, easy to learn — and yet flexible and powerful.
 
 This document covers the usage and integration. New here? Start with the
-[5-minute quickstart](./src/docs/quickstart.md), or visit
-[wurbelizer.org](https://wurbelizer.org) for the full overview.
+[5-minute quickstart](./src/docs/quickstart.md), or visit the
+[site docs](https://wurbelizer.org/static-content/sitedocs/wurbelizer/latest/) 
+as a reference.
 
 To navigate the documentation, see the
 [Table of Contents](./src/docs/toc.md) for all topics in reading order, or the
