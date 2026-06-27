@@ -105,6 +105,12 @@ def main() -> None:
     shutil.copytree(SRC_DOCS / "assets", OUT / "assets")
     # ... plus the favicon (an MkDocs-only brand asset).
     shutil.copy2(THEME / "assets" / "favicon.ico", OUT / "assets" / "favicon.ico")
+    # ... plus the self-hosted ResizeObserver polyfill loaded by overrides/main.html,
+    # so the site never requests it from a third party (unpkg).
+    js_dir = OUT / "assets" / "javascripts"
+    js_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(THEME / "vendor" / "resize-observer-polyfill.js",
+                 js_dir / "resize-observer-polyfill.js")
 
     # 4. Brand stylesheet.
     (OUT / "stylesheets").mkdir()
