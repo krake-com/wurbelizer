@@ -1,37 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="${project.name}">
-  <bannerLeft>
-    <name>Wurbelizer</name>
-    <src>images/wurbelizer.png</src>
-    <href>https://wurbelizer.org</href>
-    <title>${project.name}</title>
-  </bannerLeft>
-
-  <bannerRight>
-    <name>Krake Softwaretechnik</name>
-    <src>images/krake.png</src>
-    <href>https://krake.de</href>
-  </bannerRight>
+<site xmlns="http://maven.apache.org/SITE/2.0.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://maven.apache.org/SITE/2.0.0 https://maven.apache.org/xsd/site-2.0.0.xsd"
+      name="Wurbelizer">
 
   <skin>
     <groupId>org.apache.maven.skins</groupId>
     <artifactId>maven-fluido-skin</artifactId>
-    <version>1.12.0</version>
+    <version>${maven.fluido.skin.version}</version>
   </skin>
 
-  <body>
-    <links>
-      <item name="Wurbelizer" href="https://wurbelizer.org"/>
-    </links>
+  <bannerLeft name="Wurbelizer" href="https://wurbelizer.org">
+    <image src="images/logo-wurbelizer.png" alt="Wurbelizer"/>
+  </bannerLeft>
 
-    <menu ref="parent"/>
-    <menu ref="modules"/>
-    <menu ref="reports"/>
-    <menu name="Links">
-      <item name="Bitbucket" href="https://bitbucket.org/krake-oss/wurbelizer"/>
-      <item name="Tentackle" href="https://tentackle.org"/>
+  <body>
+    <!-- Inherited by every module; the module name is appended automatically. -->
+    <breadcrumbs>
+      <item name="Wurbelizer" href="https://wurbelizer.org"/>
+    </breadcrumbs>
+
+    <menu name="Wurbelizer" inherit="top">
+      <item name="Documentation" href="https://wurbelizer.org"/>
+      <item name="Source (Bitbucket)" href="https://bitbucket.org/krake-oss/wurbelizer/"/>
+      <item name="Krake Softwaretechnik" href="https://krake.de"/>
     </menu>
 
-    <footer><![CDATA[<a href="${url}">Wurbelizer</a> - Agility in Code Generation]]></footer>
+    <!-- Auto-generated navigation provided by the site plugin. -->
+    <menu ref="modules"/>
+    <menu ref="reports"/>
   </body>
-</project>
+
+  <custom>
+    <fluidoSkin>
+      <sourceLineNumbersEnabled>true</sourceLineNumbersEnabled>
+      <breadcrumbDivider>&#187;</breadcrumbDivider>
+      <skipGenerationDate>false</skipGenerationDate>
+    </fluidoSkin>
+  </custom>
+
+</site>

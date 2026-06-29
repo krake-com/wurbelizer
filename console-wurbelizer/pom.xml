@@ -12,7 +12,8 @@
   <packaging>jar</packaging>
   <name>Wurbelizer Console</name>
   <description>Run the Wurbelizer from the Console</description>
-  <url>https://wurbelizer.org</url>
+  <!-- url intentionally omitted: inherited from the parent as <parentUrl>/console-wurbelizer,
+       so the multi-module site relativizes parent/child links correctly. -->
 
   <properties>
     <rootBasedir>${project.parent.basedir}</rootBasedir>
