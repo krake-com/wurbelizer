@@ -1,125 +1,118 @@
+/*
+ * Brand styling for the Wurbelizer Maven site — mimics wurbelizer.org.
+ *
+ * Loaded by the Fluido (Bootstrap) skin after its own stylesheet, so these
+ * rules override the defaults.
+ *
+ * Palette (extracted from the original Divi site):
+ *   primary red   #de1d26   header / nav / accents
+ *   dark red      #9d141b   hover / shadow
+ *   link blue     #2ea3f2   body links
+ * Signature look: UPPERCASE red headings, square (0-radius) buttons, header shadow.
+ */
 
-html, body, td, th, a, h1, h2, h3, h4, h5, h6 {
-  font-family: arial,lucida sans,arial,helvetica,sans-serif;
+body {
+  font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  color: #bc3d2f;
-  background-color: transparent;
-  border: 0px solid white;
-  border-top: 1px solid #bc3d2f;
-  border-bottom: 1px solid #bc3d2f;
+pre,
+code,
+tt {
+  font-family: "Roboto Mono", Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
+/* ---- Top navigation bar: brand red, elevated like the original ---- */
+.navbar-inner {
+  background: #de1d26;
+  border: none;
+  box-shadow: 0 4px 20px -8px rgba(0, 0, 0, 0.35);
+}
+
+.navbar .nav > li > a,
+.navbar .brand {
+  color: #ffffff;
+  text-shadow: none;
+}
+
+.navbar .nav > li > a:hover,
+.navbar .nav > li > a:focus,
+.navbar .nav > .active > a,
+.navbar .nav > .active > a:hover {
+  color: #ffffff;
+  background-color: #9d141b;
+}
+
+.navbar .nav li.dropdown.open > .dropdown-toggle,
+.navbar .nav li.dropdown.active > .dropdown-toggle {
+  background-color: #9d141b;
+  color: #ffffff;
+}
+
+/* ---- Banner / logo breathing room ---- */
+#bannerLeft img,
+#banner img {
+  margin: 8px 0;
+}
+
+/* ---- Body links in the site's blue ---- */
 a,
-tr.a a,
-tr.b a,
-a.externalLink,
-a.externalLink:link,
-a.externalLink:visited {
-  color: #00305e;
+a:visited {
+  color: #2ea3f2;
 }
 
 a:hover,
-a.externalLink:active,
-a.externalLink:hover,
-tr.a a:hover,
-tr.b a:hover,
-tr.a a:active,
-tr.b a:active,
-#navcolumn li a:hover,
-#navcolumn li a:active {
-  color: #bc3d2f;
+a:focus {
+  color: #9d141b;
 }
 
-table.bodyTable th {
-  background-color: #00305e;
-  color: #fff;
+/* ---- Signature typography: uppercase, red headings ---- */
+#bodyColumn h1 {
+  text-transform: uppercase;
+  font-weight: 700;
 }
 
+#bodyColumn h2,
+#bodyColumn h3 {
+  text-transform: uppercase;
+  color: #de1d26;
+  font-weight: 700;
+}
+
+/* Section header underline accent. */
+#bodyColumn h2 {
+  border-bottom: 2px solid #de1d26;
+  padding-bottom: 0.2em;
+}
+
+/* ---- Breadcrumbs ---- */
 #breadcrumbs {
-  background-color: #00305e;
-  color: #fff;
-  border: 0px solid white;
+  background: #f7f7f7;
+  border-bottom: 1px solid #e5e5e5;
 }
 
 #breadcrumbs a {
-  color: #00305e;
-  font-size: 14px;
+  color: #de1d26;
 }
 
-#breadcrumbs,
-#breadcrumbs div {
-  height: 32px;
-  color: #fff;
-  display: block;
-  overflow: hidden;
-  vertical-align: middle;
-  font-size: 14px;
+/* ---- Square, uppercase, brand-red buttons like the site ---- */
+.btn-primary {
+  border-radius: 0;
+  text-transform: uppercase;
+  font-weight: 700;
+  background: #de1d26;
+  border-color: #9d141b;
+  text-shadow: none;
 }
 
-#breadcrumbs a:hover {
-  color: #bc3d2f;
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background: #9d141b;
+  border-color: #9d141b;
 }
 
-#bannerLeft {
-  float: left;
-}
-
-#bannerLeft,
-#bannerRight {
-  width: calc(50% - 1px);
-}
-
-#bannerLeft img:before,
-#bannerRight img:before {
-  content: ' ';
-  display: inline-block;
-  vertical-align: middle;
-  height: 100%;
-}
-
-#bannerRight img {
-  float: right;
-}
-
-#banner img {
-  margin: 10px;
-  display: inline-block;
-  vertical-align: middle;
-}
-
-#leftColumn {
-  background-color: transparent;
-  border: 0px solid white;
-}
-
-#navcolumn li.none {
-  font-size: 12px;
-}
-
-#navcolumn li.none strong,
-#navcolumn li.expanded strong {
-  color: #bc3d2f;
-  font-size: 12px;
-}
-
-#navcolumn h5 {
-  font-size: 12px;
-  color: #101010;
-  margin: 6px 0px;
-  padding: 2px 0px;
-  border-bottom: 1px solid #bc3d2f;
-}
-
-#navcolumn li a {
-  font-size: 12px;
-  color: #101010;
-}
-
-a.poweredBy {
-  margin-top: 10px;
-  border-top: 1px solid #bc3d2f;
-  display: block;
-  text-align: center;
+/* ---- Table header tint ---- */
+table.bodyTable th {
+  background-color: #de1d26;
+  color: #ffffff;
 }

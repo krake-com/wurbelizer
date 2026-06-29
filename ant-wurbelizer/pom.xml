@@ -12,7 +12,8 @@
   <packaging>jar</packaging>
   <name>Wurbelizer Ant Wrapper</name>
   <description>A Wrapper to Use the Wurbelizer with Apache Ant</description>
-  <url>https://wurbelizer.org</url>
+  <!-- url intentionally omitted: inherited from the parent as <parentUrl>/ant-wurbelizer,
+       so the multi-module site relativizes parent/child links correctly. -->
 
   <properties>
     <rootBasedir>${project.parent.basedir}</rootBasedir>
