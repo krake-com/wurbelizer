@@ -7,7 +7,7 @@ integrate, easy to learn — and yet flexible and powerful.
 
 This document covers the usage and integration. New here? Start with the
 [5-minute quickstart](./src/docs/quickstart.md), or visit the
-[Java site docs](https://wurbelizer.org/static-content/sitedocs/wurbelizer/latest/) 
+[Java site docs](https://wurbelizer.org/wurbelizer/) 
 as a reference.
 
 To navigate the documentation, see the
