@@ -19,8 +19,16 @@ The core pipeline:
 
 This repository ships a documentation set:
 
-- Project-wide docs live in `src/docs/`.
 - [`README.md`](README.md) — the public-facing overview.
+- Project-wide docs live in `src/docs/`, in this reading order:
+  - [`quickstart.md`](src/docs/quickstart.md) — 5-minute DTO-generating tutorial
+  - [`code-levels.md`](src/docs/code-levels.md) — the three code levels (wurblet / output / source)
+  - [`integration.md`](src/docs/integration.md) — build-tool integration, linking [`maven.md`](src/docs/maven.md), [`ant.md`](src/docs/ant.md), [`console.md`](src/docs/console.md)
+  - [`wurblet-syntax.md`](src/docs/wurblet-syntax.md) — `@`-based `.wrbl` syntax and wurbiler directives
+  - [`source-syntax.md`](src/docs/source-syntax.md) — anchors, here-documents and variables at the source level
+  - [`guard-types.md`](src/docs/guard-types.md) — the pluggable guarded-block patterns
+  - [`writing-wurblets.md`](src/docs/writing-wurblets.md) — the Wurbelizer API for building wurblets
+- [`toc.md`](src/docs/toc.md) is the reading-order index; [`index.md`](src/docs/index.md) is the alphabetical term index.
 
 When adding or changing a document, keep it in sync with `toc.md` and `index.md`.
 
@@ -121,12 +129,19 @@ Common directives: `@{package}@`, `@{import}@`, `@{extends}@`, `@{implements}@`,
 
 | Construct | Syntax | Purpose |
 |---|---|---|
-| Wurblet anchor | `@wurblet[(directive)] <tag> <WurbletClass> [args...]` | Bind generated code to a wurblet |
+| Wurblet anchor | `@wurblet[(wurbler-directive)] <tag> <WurbletClass> [args...]` | Bind generated code to a wurblet |
 | Here-document | `@> <filename>` … `@<` | Inline data file; `.filename` stays in heap |
 | Variable block | `@{` … `@}` inside a comment | Declare `key = value` variables |
 | Variable ref | `$var` or `${var}` | Used in args and variable values |
 
-Inline wurblets target `/**/` delimiters in adjacent code. Tag starting with `-` or `<` targets the preceding block; all others target the following block.
+Anchors live in Java comments (single-line or block); generated code can contain new anchors, so the wurbler re-parses until stable. Args are whitespace-separated (quote to include whitespace) and may span lines via a trailing `\`. Variables resolve from inline `@{ @}` blocks, `.wurb` property files, Maven/Ant properties and environment variables (recursively).
+
+Optional wurbler directives in the `(...)`:
+- `test:$var==value` / `!=` — conditional anchor; skips the wurblet (emits `// condition not met`) when unmet
+- `indent=N` — extra indentation; negative means *smart indent* (align to the anchor comment), the Java default
+- `fold=collapsed|expanded|none` — editor fold type for the guarded block (NetBeans only)
+
+Inline (unnamed) wurblets have a `<tag>` not starting with a letter and inject code between two empty block comments `/**/` in adjacent code. Tag starting with `-` or `<` targets the preceding block; all others (including `+`, `>`) target the following block.
 
 ## Testing
 
