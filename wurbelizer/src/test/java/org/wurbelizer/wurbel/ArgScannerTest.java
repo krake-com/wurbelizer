@@ -39,6 +39,50 @@ public class ArgScannerTest {
     Assert.assertNull(argScanner.next());
   }
 
+  @Test
+  public void testNullInput() {
+    Assert.assertNull(new ArgScanner(null, null).next());
+  }
+
+  @Test
+  public void testEmptyAndBlankInput() {
+    Assert.assertNull(new ArgScanner("", null).next());
+    Assert.assertNull(new ArgScanner("   \t  ", null).next());
+  }
+
+  @Test
+  public void testMultipleSimpleArgs() {
+    ArgScanner scanner = new ArgScanner("  one   two\tthree ", null);
+    Assert.assertEquals(scanner.next(), "one");
+    Assert.assertEquals(scanner.next(), "two");
+    Assert.assertEquals(scanner.next(), "three");
+    Assert.assertNull(scanner.next());
+  }
+
+  @Test
+  public void testSingleQuoteSuppressesTranslation() {
+    // single quotes: no variable translation takes place
+    ArgScanner scanner = new ArgScanner("'$alpha'", createProperties());
+    Assert.assertEquals(scanner.next(), "$alpha");
+    Assert.assertNull(scanner.next());
+  }
+
+  @Test
+  public void testDoubleQuoteTranslates() {
+    // double quotes: variables are translated
+    ArgScanner scanner = new ArgScanner("\"$alpha\"", createProperties());
+    Assert.assertEquals(scanner.next(), "this is alpha");
+    Assert.assertNull(scanner.next());
+  }
+
+  @Test
+  public void testBackslashEscapedWhitespaceKeepsSingleArg() {
+    // an escaped space does not separate arguments
+    ArgScanner scanner = new ArgScanner("a\\ b", null);
+    Assert.assertEquals(scanner.next(), "a b");
+    Assert.assertNull(scanner.next());
+  }
+
   private Properties createProperties() {
     Properties properties = new Properties();
     properties.setProperty("alpha", "this is alpha");
