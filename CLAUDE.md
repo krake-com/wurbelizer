@@ -123,7 +123,7 @@ Files start at output level. Level-switching markers:
 | `@(` … `)@` | Embed wurblet-level expression in output |
 | `@{directive ...}@` | Wurbiler directive (compile-time) |
 
-Common directives: `@{package}@`, `@{import}@`, `@{extends}@`, `@{implements}@`, `@{include}@`, `@{args}@`, `@{to <stream>}@`, `@{phase N}@`, `@{indent N|auto}@`, `@{comment ...}@`, `@{code ...}@`.
+Common directives: `@{package}@`, `@{import}@`, `@{extends}@`, `@{implements}@`, `@{include}@`, `@{args}@`, `@{to <stream>}@`, `@{phase N}@`, `@{indent N|auto}@`, `@{comment ...}@`, `@{code ...}@`, `@{config ...}@`.
 
 ## Source-Level Syntax (inside application source files)
 

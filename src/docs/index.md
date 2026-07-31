@@ -31,6 +31,7 @@ See the [Table of Contents](toc.md) for the documents in reading order.
 - **code switching (`@[ ]@`)** — [Wurblet Level Syntax: Code Switching](wurblet-syntax.md#code-switching)
 - **coffeebytes guard type** — [Guard Types](guard-types.md)
 - **comment directive** — [Wurblet Level Syntax: comment](wurblet-syntax.md#comment)
+- **config directive** — [Wurblet Level Syntax: config](wurblet-syntax.md#config)
 - **conditional anchor (`test`)** — [Source Level Syntax: Conditional Anchor](source-syntax.md#conditional-anchor)
 - **console integration** — [Console Integration](console.md)
 - **continuation line** — [Source Level Syntax](source-syntax.md), [Wurblet Level Syntax](wurblet-syntax.md)
