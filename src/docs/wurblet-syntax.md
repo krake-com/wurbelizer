@@ -199,6 +199,30 @@ an explicit phase.
  end of the wurblet's java code and can be used to override or implement wurblet methods.
  This is an alternative to subclassing.
 
+### config
+
+`@{config ...}@` sets the wurblet specific configuration. The text is stored in the
+compiled wurblet and is available at runtime via `getConfiguration()`, which returns
+null if the wurblet has no configuration.
+
+Unlike the other directives, the Wurbelizer does not interpret the configuration text
+at all. Its format and its meaning are entirely up to the wurblet, or more commonly to
+the parent class set by `@{extends}@`, which reads the configuration and configures the
+generation accordingly. This is the recommended way to parameterize a wurblet with
+settings that belong to the wurblet itself rather than to the source file it is
+applied to (the latter is what wurblet arguments and source-level variables are for).
+
+Multiple `@{config}@` directives are concatenated, separated by newlines, so a
+multiline configuration can be written as:
+```
+@{config model = org.example.model.Customer}@
+@{config nullable = false}@
+```
+and is retrieved by the wurblet as:
+```java
+String config = getConfiguration();    // "model = org.example.model.Customer\nnullable = false"
+```
+
 ## Further reading
 
 - [Source Level Syntax](source-syntax.md) — the anchors and here-documents that drive wurblets
