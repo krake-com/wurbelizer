@@ -13,7 +13,7 @@ source files as needed. For larger contexts it is better to use several speciali
 wurblets than a single one that does the whole job. Furthermore, it's perfectly possible to
 combine the wurbelizer with traditional template engines such as [Velocity](https://velocity.apache.org/)
 or [Freemarker](https://freemarker.apache.org/).
-For example, the [Tentackle Wizard](https://tentackle.org/static-content/sitedocs/tentackle/latest/tentackle-wizard-maven-plugin/plugin-info.html) first generates the source files which contain the
+For example, the [Tentackle Wizard](https://tentackle.org/tentackle/tentackle-wizard-maven-plugin/plugin-info.html) first generates the source files which contain the
 wurblet anchors and the wurbelizer later generates the implementation according to the
 model. See the [Tentackle tutorial](https://tentackle.org/tutorial/) for a sample project.
 
@@ -39,7 +39,7 @@ categorized into namespaces as follows:
 - `Wurbler.PROPSPACE_WURBLET` (`"wurblet"`): properties defined by the wurbler
 - `Wurbler.PROPSPACE_EXTRA` (`"extra"`): extra namespace usually provided by the
 build tool (maven, ant, ...). The `maven-wurbelizer-plugin` uses
-the [wurbletProperties](https://wurbelizer.org/static-content/sitedocs/wurbelizer/latest/wurbelizer-maven-plugin/wurbel-mojo.html#wurbletProperties).
+the [wurbletProperties](https://wurbelizer.org/wurbelizer/wurbelizer-maven-plugin/wurbel-mojo.html#wurbletProperties).
 The `org.wurbelizer.ant.wurbel.AntWurbler` will store all ant-properties here.
 
 #### Wurblet Namespace
@@ -95,6 +95,41 @@ with the build process.
 Wurblets should throw this exception if the error is severe enough that it doesn't
 make sense to execute any further wurblets, because they would fail as well.
 
+Tentackle's `Include` wurblet shows the everyday case — an error that is only an error
+depending on an option. It wraps I/O failures in a `WurbelException`, but when the
+caller passed `--missingok` and the cause is a missing file, it emits a comment instead
+and lets the build continue:
+
+```
+    catch (IOException ex) {
+      throw new WurbelException("including " + filename + " failed", ex);
+    }
+    catch (WurbelException ex)  {
+      if (missingOk && ex.getCause() instanceof FileNotFoundException) {
+]@
+        // no such file '@(filename)@' (ok)
+@[
+      }
+      else {
+        throw ex;
+      }
+    }
+```
+
+The distinction is used deliberately across the framework: a missing heap file for an
+entity that simply has no remote methods is normal, whereas a missing model file is a
+build error.
+
+`WurbelDiscardException` covers a subtler situation. A heap file collected by an earlier,
+failed wurblet may be incomplete; generating from it would silently produce wrong code.
+Heap files can therefore be marked as discarded (`HeapStream.discard()`), and a wurblet
+reading such a file throws `WurbelDiscardException` so that the existing source is left
+untouched and the real error — the one that broke the producer — is what gets reported.
+
+`WurbelTerminationException` is reserved for setup problems. Tentackle throws it, for
+example, when neither the `templateDir` nor the `projectRoot` wurblet property is set,
+because in that case no wurblet in the entire build could possibly succeed.
+
 ## Logging
 
 The wurbler provides access to the logger of the build tool (Maven, Ant, etc...) via
@@ -116,9 +151,75 @@ Example:
 
 A lot of real-world examples can be found in the Tentackle framework:
 
-[Tentackle wurblets](https://tentackle.org/static-content/sitedocs/tentackle/latest/tentackle-wurblets/apidocs/org/tentackle/wurblet/package-summary.html)
+[Tentackle wurblets](https://tentackle.org/tentackle/tentackle-wurblets/apidocs/org/tentackle/wurblet/package-summary.html)
 
-[Tentackle persistence wurblets](https://tentackle.org/static-content/sitedocs/tentackle/latest/tentackle-persistence-wurblets/apidocs/org/tentackle/persist/wurblet/package-summary.html)
+[Tentackle persistence wurblets](https://tentackle.org/tentackle/tentackle-persistence-wurblets/apidocs/org/tentackle/persist/wurblet/package-summary.html)
+
+Tentackle generates its whole persistence layer with the Wurbelizer and is thus a good
+place to see how the techniques described here play out at scale. Its wurblets are
+distributed over two modules — `tentackle-wurblets` for model-level, storage-independent
+code and `tentackle-persistence-wurblets` for SQL and remote-delegate code — and they
+range from a dozen lines to a couple of thousand.
+
+### A guided tour
+
+If you want to read real wurblets, this is a reasonable order, from the simplest
+technique to the most involved:
+
+| Wurblet | Lines | Illustrates |
+|---|---:|---|
+| `Inject` | 50 | an [inline wurblet](source-syntax.md#unnamed-anchor); scans the arguments, prints one value, no model at all |
+| `ColumnLengths` | 27 | the minimal model-driven wurblet: iterate over attributes, emit a constant each |
+| `AttributeNames` | 36 | the same, plus a boolean option (`--noif`) altering the emitted code |
+| `MethodCache` | 23 | escaping `@` in generated annotations (`\@Override`) |
+| `Include` | 65 | reading a file or heap file; error handling with an optional `--missingok` |
+| `Methods` | 180 | branching on many model options; generating javadoc along with the code |
+| `ModelComment` | 189 | `@{phase 2}@`; generating a *comment* rather than code |
+| `DbUpdateBy` | 111 | `@{config}@`, shared `.incl` fragments and three output streams at once |
+| `PdoRelations` | 2063 | how big a wurblet can get before you should reconsider the design |
+
+Note the proportions. The bulk of Tentackle's wurblets is small, because each one
+generates a single aspect; the large ones are the exception, not the model to follow.
+
+### The parent-class pattern
+
+The single most useful structural idea to take from Tentackle is that almost no logic
+lives in the `.wrbl` files. Each wurblet begins with
+
+```
+@{include $currentDir/header.incl}@
+```
+
+and that shared header sets the imports and, crucially, the base class —
+`ModelWurblet` or `DbModelWurblet`, both ordinary Java classes in the same module. They
+parse the model, resolve the entity for the current source file, evaluate wurblet
+arguments and offer the result as methods such as `getEntity()`, `getMethodArguments()`
+or `createStatementId()`.
+
+What remains in the `.wrbl` file is close to a pure template. The benefit is not only
+brevity: Java in a `.java` file can be unit-tested, debugged and refactored by the IDE,
+whereas the same code inside `@[ ... ]@` cannot be nearly as well. As a rule of thumb, if
+a wurblet contains a loop whose body is not output, that loop probably belongs in the
+base class.
+
+The same reasoning applies one level down, to `.incl` files: logic that several wurblets
+need but that *does* produce output — the SQL `WHERE`-clause generation in
+`genwhere.incl`, for example — is factored out as an
+[include](wurblet-syntax.md#include) instead of being copied.
+
+### Generating into several files
+
+`DbUpdateBy` and its siblings are worth studying for one more reason: a single anchor in
+one source file makes them emit code into three. They obtain two additional streams
+backed by heap files and select them with the [`@{to}@` directive](wurblet-syntax.md#to),
+while a later pass over the delegate sources includes what was collected. The mechanism
+is described end to end in
+[Cross-file generation with heap files](source-syntax.md#cross-file-generation-with-heap-files).
+
+This is the Wurbelizer's answer to a problem template generators usually solve by owning
+whole files: the generated method, its remote signature and its forwarding
+implementation are three views of one decision, so they are written by one wurblet — but
+each lands in the file where it belongs, next to hand-written code, in a guarded block.
 
 ---
 

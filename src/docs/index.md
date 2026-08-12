@@ -27,7 +27,8 @@ See the [Table of Contents](toc.md) for the documents in reading order.
 ## C
 
 - **code directive** — [Wurblet Level Syntax: code](wurblet-syntax.md#code)
-- **code levels** — [Code Levels](code-levels.md)
+- **code levels** — [Code Levels](code-levels.md),
+  [example](code-levels.md#the-three-levels-in-one-example)
 - **code switching (`@[ ]@`)** — [Wurblet Level Syntax: Code Switching](wurblet-syntax.md#code-switching)
 - **coffeebytes guard type** — [Guard Types](guard-types.md)
 - **comment directive** — [Wurblet Level Syntax: comment](wurblet-syntax.md#comment)
@@ -45,6 +46,8 @@ See the [Table of Contents](toc.md) for the documents in reading order.
 ## E
 
 - **editor fold (`fold=`)** — [Source Level Syntax: Editor Fold](source-syntax.md#editor-fold)
+- **empty block comment (`/**/`, `/*@*/`)** —
+  [Source Level Syntax: Unnamed Anchor](source-syntax.md#unnamed-anchor)
 - **error handling / exceptions** — [Writing Wurblets: Errorhandling](writing-wurblets.md#errorhandling)
 - **extends directive** — [Wurblet Level Syntax: extends](wurblet-syntax.md#extends)
 - **extra indentation (`indent=`)** — [Source Level Syntax: Extra Indentation](source-syntax.md#extra-indentation)
@@ -52,13 +55,19 @@ See the [Table of Contents](toc.md) for the documents in reading order.
 ## G
 
 - **guard type** — [Guard Types](guard-types.md)
-- **guarded block** — [Code Levels](code-levels.md), [Guard Types](guard-types.md)
+- **guarded block** — [Code Levels](code-levels.md), [Guard Types](guard-types.md),
+  [example](source-syntax.md#anchor-and-guarded-block)
+- **guided tour (Tentackle wurblets)** — [Writing Wurblets: A guided tour](writing-wurblets.md#a-guided-tour)
 
 ## H
 
-- **heap file (`.`-prefixed)** — [Source Level Syntax: Here Documents](source-syntax.md#here-documents)
+- **heap file (`.`-prefixed)** — [Source Level Syntax: Here Documents](source-syntax.md#here-documents),
+  [Cross-file generation](source-syntax.md#cross-file-generation-with-heap-files)
+- **HeapStream** — [Source Level Syntax: Cross-file generation](source-syntax.md#cross-file-generation-with-heap-files),
+  [Wurblet Level Syntax: to](wurblet-syntax.md#to)
 - **here document (`@> @<`)** — [Source Level Syntax: Here Documents](source-syntax.md#here-documents),
-  [Quickstart: source file](quickstart.md#the-source-file)
+  [Quickstart: source file](quickstart.md#the-source-file),
+  [model example](source-syntax.md#example-the-model-next-to-the-code)
 
 ## I
 
@@ -67,6 +76,9 @@ See the [Table of Contents](toc.md) for the documents in reading order.
 - **include directive** — [Wurblet Level Syntax: include](wurblet-syntax.md#include)
 - **indent directive** — [Wurblet Level Syntax: indent](wurblet-syntax.md#indent)
 - **inline wurblet** — [Source Level Syntax: Unnamed Anchor](source-syntax.md#unnamed-anchor)
+- **Inject wurblet (Tentackle)** — [Source Level Syntax: Unnamed Anchor](source-syntax.md#unnamed-anchor)
+- **`.incl` fragments** — [Wurblet Level Syntax: include](wurblet-syntax.md#include),
+  [Writing Wurblets: parent-class pattern](writing-wurblets.md#the-parent-class-pattern)
 
 ## L
 
@@ -75,9 +87,14 @@ See the [Table of Contents](toc.md) for the documents in reading order.
 
 ## M
 
-- **Maven integration** — [Maven Integration](maven.md)
+- **Maven integration** — [Maven Integration](maven.md),
+  [real-world configuration](maven.md#a-real-world-configuration)
 - **model** — [Quickstart: the model](quickstart.md#the-model),
-  [Source Level Syntax: Here Documents](source-syntax.md#here-documents)
+  [Source Level Syntax: Here Documents](source-syntax.md#here-documents),
+  [Code Levels: example](code-levels.md#the-three-levels-in-one-example)
+- **ModelWurblet / DbModelWurblet (Tentackle)** —
+  [Wurblet Level Syntax: extends](wurblet-syntax.md#extends),
+  [Writing Wurblets: parent-class pattern](writing-wurblets.md#the-parent-class-pattern)
 
 ## N
 
@@ -108,7 +125,9 @@ See the [Table of Contents](toc.md) for the documents in reading order.
 - **template (`.wrbl`)** — [Quickstart: the template](quickstart.md#the-template),
   [Wurblet Level Syntax](wurblet-syntax.md)
 - **Tentackle** — [README](../../README.md#used-in-the-wild-tentackle),
-  [Writing Wurblets](writing-wurblets.md#examples)
+  [Writing Wurblets](writing-wurblets.md#examples),
+  [guided tour](writing-wurblets.md#a-guided-tour),
+  [Maven configuration](maven.md#a-real-world-configuration)
 - **to directive** — [Wurblet Level Syntax: to](wurblet-syntax.md#to)
 
 ## U
@@ -133,7 +152,8 @@ See the [Table of Contents](toc.md) for the documents in reading order.
 - **wurbletPaths** — [Source Level Syntax](source-syntax.md#wurblet-anchor),
   [Wurblet Level Syntax: package](wurblet-syntax.md#package)
 - **`.wurb` property file** — [Ant Integration](ant.md#wurbel),
-  [Writing Wurblets: Wurbler Properties](writing-wurblets.md#wurbler-properties)
+  [Writing Wurblets: Wurbler Properties](writing-wurblets.md#wurbler-properties),
+  [example](source-syntax.md#example-variables-in-a-wurb-file)
 
 ---
 
