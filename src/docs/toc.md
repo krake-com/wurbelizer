@@ -28,11 +28,14 @@ a source file.
 The three code levels — wurblet, output and source — that distinguish the
 Wurbelizer from two-level generators.
 
+- [The three levels in one example](code-levels.md#the-three-levels-in-one-example)
+
 ### 2. [Build Tool Integration](integration.md)
 
 How to run the wurbiler and wurbler from common build tools.
 
 - [Maven Integration](maven.md)
+  - [A real-world configuration](maven.md#a-real-world-configuration)
 - [Ant Integration](ant.md)
   - [Wurbile](ant.md#wurbile)
   - [Wurbel](ant.md#wurbel)
@@ -45,6 +48,7 @@ The `@`-based extensions used inside `.wrbl` files.
 - [Level Switching](wurblet-syntax.md#level-switching)
   - [Code Switching](wurblet-syntax.md#code-switching)
   - [Value Extraction](wurblet-syntax.md#value-extraction)
+  - [A complete example](wurblet-syntax.md#a-complete-example)
 - [Wurbiler Directives](wurblet-syntax.md#wurbiler-directives)
   - [include](wurblet-syntax.md#include) ·
     [args](wurblet-syntax.md#args) ·
@@ -56,19 +60,24 @@ The `@`-based extensions used inside `.wrbl` files.
     [indent](wurblet-syntax.md#indent) ·
     [phase](wurblet-syntax.md#phase) ·
     [comment](wurblet-syntax.md#comment) ·
-    [code](wurblet-syntax.md#code)
+    [code](wurblet-syntax.md#code) ·
+    [config](wurblet-syntax.md#config)
 
 ### 4. [Source Level Syntax](source-syntax.md)
 
 The constructs the wurbler reads from application source comments.
 
 - [Wurblet Anchor](source-syntax.md#wurblet-anchor)
+  - [Anchor and Guarded Block](source-syntax.md#anchor-and-guarded-block)
   - [Unnamed Anchor](source-syntax.md#unnamed-anchor)
   - [Conditional Anchor](source-syntax.md#conditional-anchor)
   - [Extra Indentation](source-syntax.md#extra-indentation)
   - [Editor Fold](source-syntax.md#editor-fold)
 - [Here Documents](source-syntax.md#here-documents)
+  - [Example: the model next to the code](source-syntax.md#example-the-model-next-to-the-code)
+  - [Cross-file generation with heap files](source-syntax.md#cross-file-generation-with-heap-files)
 - [Variables](source-syntax.md#variables)
+  - [Example: variables in a `.wurb` file](source-syntax.md#example-variables-in-a-wurb-file)
 
 ### 5. [Guard Types](guard-types.md)
 
@@ -85,6 +94,9 @@ Design guidance and the Wurbelizer API for building your own wurblets.
 - [Errorhandling](writing-wurblets.md#errorhandling)
 - [Logging](writing-wurblets.md#logging)
 - [Examples](writing-wurblets.md#examples)
+  - [A guided tour](writing-wurblets.md#a-guided-tour)
+  - [The parent-class pattern](writing-wurblets.md#the-parent-class-pattern)
+  - [Generating into several files](writing-wurblets.md#generating-into-several-files)
 
 ---
 

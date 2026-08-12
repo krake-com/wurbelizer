@@ -12,6 +12,27 @@ a backslash. A line terminated by a backslash is concatenated with the
 following line (continuation line). The backslash itself is expressed by a
 double backslash.
 
+Escaping matters most when the *generated* code contains annotations, because
+`@` is significant at the wurblet level as well. A wurblet that generates an
+`@Override` must therefore write `\@Override`, as in this fragment of the
+Tentackle `MethodCache` wurblet:
+```
+  \@Override
+  public PdoMethodCache<@(pdoName)@> getPdoMethodCache() {
+    return METHOD_CACHE;
+  }
+```
+
+> **About the examples**
+>
+> Besides the small illustrative snippets, this document uses real wurblets from the
+> [Tentackle](https://tentackle.org) framework, which drives its whole persistence layer
+> with the Wurbelizer. The sources live in the modules
+> [`tentackle-wurblets`](https://tentackle.org/tentackle/tentackle-wurblets/apidocs/org/tentackle/wurblet/package-summary.html)
+> (model-level, storage-independent code) and
+> [`tentackle-persistence-wurblets`](https://tentackle.org/tentackle/tentackle-persistence-wurblets/apidocs/org/tentackle/persist/wurblet/package-summary.html)
+> (SQL and remote-delegate code).
+
 ## Level Switching
 
 The wurblet source starts at the output level. Thus, if no level switching
@@ -71,6 +92,56 @@ System.out.println("This is line 3");
 ```
 Any Java expression can be inserted into the generated output this way. 
 
+### A complete example
+
+Tentackle's `ColumnLengths` wurblet is small enough to show in full and uses
+nothing but the two level switches. It walks the attributes of an entity and emits a
+constant for every `String` column that has a maximum size:
+
+```
+@{include $currentDir/header.incl}@
+@{comment
+<strong>({\@code \@wurblet})</strong> Generate code to define the column lengths.
+...
+}@
+@[
+  private void wurbel() throws ModelException {
+    String lead = getOption("noif") == null ? "" : "public static final ";
+    for (Attribute attr: getEntity().getAttributes())  {
+      if ("String".equals(attr.getEffectiveDataType().getJavaType()) &&
+          attr.getSize() != null && attr.getSize() != 0 && !attr.getOptions().isNoConstant() && !attr.getOptions().isFromSuper())  {
+]@
+
+  /** maximum number of characters for '@(attr)@'. */
+  @(lead)@int CL_@(attr.getName().toUpperCase(Locale.ROOT))@ = @(attr.getSize())@;
+@[
+      }
+    }
+  }
+]@
+```
+
+Note how the whole method body lives at the wurblet level, while the three lines in the
+middle are output level: a fixed text with three extracted values, `@(attr)@`,
+`@(lead)@` and `@(attr.getSize())@`.
+
+Given a model that declares
+
+```
+ * String(30)     name            name              the number pool name [key]
+ * String(80)     realm           realm             pool realm, optional [MAPNULL]
+```
+
+the wurblet produces:
+
+```java
+  /** maximum number of characters for 'name'. */
+  int CL_NAME = 30;
+
+  /** maximum number of characters for 'realm'. */
+  int CL_REALM = 80;
+```
+
 ## Wurbiler Directives
 
 The wurbiler accepts directives at compile time. Directives are enveloped
@@ -93,6 +164,49 @@ Example:
 @{include $wurblets/wrbl/processargs.inc}@
 ```
 
+When the wurbiler is run from Maven, the variable `$currentDir` holds the directory of
+the `.wrbl` file being compiled, which makes includes relative to the wurblet itself.
+Tentackle uses this for two distinct purposes.
+
+**A common header.** Every wurblet in `tentackle-persistence-wurblets` starts with the
+same line:
+```
+@{include $currentDir/header.incl}@
+```
+and `header.incl` holds nothing but the directives shared by all of them:
+```
+@{package org.tentackle.persist.wurblet}@
+@{import java.io.*}@
+@{import java.util.*}@
+@{import org.tentackle.buildsupport.*}@
+@{import org.tentackle.common.*}@
+@{import org.tentackle.sql.*}@
+@{import org.tentackle.model.*}@
+@{import org.tentackle.wurblet.*}@
+@{import org.wurbelizer.wurbel.*}@
+@{import org.wurbelizer.wurblet.*}@
+@{extends DbModelWurblet}@
+@{args}@
+```
+The sibling module `tentackle-wurblets` has its own `header.incl` that extends
+`ModelWurblet` instead — the same idiom, a different base class.
+
+**Shared template fragments.** Includes are not limited to directives; they may contain
+wurblet *and* output level code. The wurblets that generate SQL statements
+(`DbSelectList`, `DbUpdateBy`, `DbDeleteBy`, ...) all need the same `WHERE`-clause
+logic, so it is factored out into `genwhere.incl` and pulled in where the clause belongs
+in the generated method:
+```
+    PreparedStatementWrapper st = getPreparedStatement(@(classVar)@@(statementId)@,
+      b -> {
+        StringBuilder sql = createSqlUpdate();
+@{include $currentDir/genupdate.incl}@
+        sql.append(Backend.SQL_WHEREALL);
+@{include $currentDir/genwhere.incl}@
+```
+Because inclusion happens at compile time, this is a pure text substitution: the
+included fragment becomes part of the wurblet's `wurbel()` method.
+
 ### args
 
 `@{args <arg1> ... <argN>}@` presets the wurblet arguments. 
@@ -105,6 +219,11 @@ any arguments switches back to the default, i.e. wurbler args.
 This is especially useful after including wurblet sources to make sure that arguments
 are processed.
 
+This is exactly why the Tentackle `header.incl` shown above ends with `@{args}@`: the
+last directive of the shared header resets the argument handling to the wurbler's
+arguments, so that every wurblet including it receives the arguments written into its
+`@wurblet` anchor, no matter what the included file did before.
+
 ### to
 
 A wurblet may generate code into more than one stream. The default stream, named
@@ -114,18 +233,56 @@ wurblet itself. `@{to <outputstream>}@` selects the stream that the generated co
 is written to. `@{to out}@` switches back to the default stream, which is equivalent
 to `@{to}@`.
 
-Example:
+The stream is an ordinary Java variable at the wurblet level — usually a `PrintStream`
+declared right before it is used — so opening and closing it is plain Java.
+
+Tentackle relies on this to generate three artifacts from a single anchor. When an entity
+is accessible remotely, a method must exist in three places: in the local implementation,
+as a signature in the RMI delegate interface, and as a forwarding method in the delegate
+implementation. The `DbUpdateBy` wurblet writes all three at once:
+
 ```
+  @(scope)@ int @(methodName)@(@(params)@) {
+@[
+    if (isRemote()) {
+      // create includes
+      RemoteIncludes genInc = new RemoteIncludes(this);
+      PrintStream implOut   = genInc.getImplementationStream();
+      PrintStream remoteOut = genInc.getInterfaceStream();
+]@
+    if (getSession().isRemote())  {
 @{to remoteOut}@
-    public TrackedList<@(type)@> @(methodName)@(DomainContext context, ...) throws RemoteException;
+  int @(methodName)@(@(params)@);
 @{to implOut}@
-    public TrackedList<@(type)@> @(methodName)@(DomainContext context, ...) throws RemoteException {
-        ...
-    }
+
+  \@Override
+  public int @(methodName)@(@(params)@) {
+@{to implOut}@
+    return dbObject.@(methodName)@(@(iparms)@);
+  }
 @{to}@
-    TrackedList<@(type)@> list = on(@<type)@.class)@(methodName)@(...);
-    ...
+      return getRemoteDelegate().@(methodName)@(@(iparms)@);
+    }
+    // else: local mode
+@[
+    } // end if remote
+]@
 ```
+
+Reading the streams in order:
+
+- the default stream (`out`) receives the method being generated into the current source
+  file, including the `if (getSession().isRemote())` branch that delegates the call
+- `remoteOut` receives the bare signature for the remote interface
+- `implOut` receives the forwarding implementation
+- `@{to}@` switches back to the default stream so the local branch continues
+
+The two extra streams are *not* files on disk. `RemoteIncludes` creates them as
+`HeapStream`s named after the delegate classes (see
+[Here Documents](source-syntax.md#here-documents)), and a later wurbel pass over the
+delegate sources pulls them in with an `Include` wurblet. The whole round trip is
+described in
+[Cross-file generation with heap files](source-syntax.md#cross-file-generation-with-heap-files).
 
 ### package
 
@@ -136,7 +293,20 @@ however, to assign a package to wurblets.
 Notice that the package name should be defined in the `<configuration>` of the
 maven wurbelizer plugin to load the wurblet without the need to specify its FQCN
 in the wurblet anchors.
-See [wurbletPaths](https://wurbelizer.org/static-content/sitedocs/wurbelizer/latest/wurbelizer-maven-plugin/wurbel-mojo.html#wurbletPaths).
+See [wurbletPaths](https://wurbelizer.org/wurbelizer/wurbelizer-maven-plugin/wurbel-mojo.html#wurbletPaths).
+
+Tentackle declares two wurblet packages,
+```
+@{package org.tentackle.wurblet}@
+```
+and
+```
+@{package org.tentackle.persist.wurblet}@
+```
+and lists both in the plugin configuration of the modules being wurbeled, so that
+anchors can simply say `Methods` or `DbSelectList` instead of the fully qualified name.
+See [Maven Integration](maven.md#a-real-world-configuration) for the complete
+configuration.
 
 ### import
 
@@ -154,6 +324,37 @@ Extending a parent class that in turn extends `org.wurbelizer.wurblet.AbstractWu
 is a common design pattern for wurblets. 
 The parent class usually implements all helper code, i.e. to access the model, while the
 wurblet contains only wurblet code.
+
+Tentackle is a good illustration of how far this pattern carries. It maintains a small
+hierarchy of base classes written as ordinary Java, not as wurblets:
+
+| Base class | Set by | Adds |
+|---|---|---|
+| `AbstractJavaWurblet` | the Wurbelizer | class name, super class name of the wurbeled source |
+| `ModelWurblet` | `@{extends ModelWurblet}@` | the parsed entity model: `getEntity()`, attributes, relations |
+| `DbModelWurblet` | `@{extends DbModelWurblet}@` | SQL specifics: statement IDs, backends, remote handling |
+
+A wurblet such as `AttributeNames` then consists of almost nothing but template code,
+because everything it needs is a method on its parent:
+
+```
+@{include $currentDir/header.incl}@
+@[
+  private void wurbel() {
+    String lead = getOption("noif") == null ? "" : "public static final ";
+    for (Relation rel: getEntity().getRelations()) {
+      String var = rel.getVariableName();
+]@
+
+  /** relation name for '@(rel)@'. */
+  @(lead)@String RN_@(var.toUpperCase(Locale.ROOT))@ = "@(var)@";
+@[
+    }
+    ...
+```
+
+Keeping the model access in Java and the templates in `.wrbl` files also means the
+helper code can be unit-tested and debugged with the ordinary tool chain.
 
 ### implements
 
@@ -189,9 +390,44 @@ an explicit phase.
 
 `@{phase N}@` sets the execution phase of the wurblet. Default is 1.
 
+Tentackle uses a later phase for wurblets that must observe what the other wurblets in
+the same file have done. `ModelComment` and `UniqueDomainKey` both start with
+```
+@{phase 2}@
+```
+`ModelComment` documents the relations of an entity as a comment block, so it has to run
+after the relations have been resolved, regardless of where its anchor happens to sit in
+the source file.
+
 ### comment
 
 `@{comment ..... }@` adds the text to the wurblet javadoc comment.
+
+Since the text becomes javadoc of the generated wurblet class, it is written in HTML and
+`@` must be escaped as `\@`. Tentackle documents every wurblet this way, which is what
+its published
+[wurblet API documentation](https://tentackle.org/tentackle/tentackle-wurblets/apidocs/org/tentackle/wurblet/package-summary.html)
+is generated from. The `Inject` wurblet, for example:
+
+```
+@{comment
+<strong>({\@code \@wurblet})</strong> Injects code from the argument list.
+<p>
+usage:<br>
+&#064;wurblet &lt;|&gt; Inject [--string] &lt;text&gt;
+<p>
+arguments:
+<ul>
+<li><em>--string:</em> enclose in double quotes.</li>
+<li><em>text:</em> the text to inject.</li>
+</ul>
+...
+}@
+```
+
+Documenting the accepted arguments right in the wurblet source is a habit worth copying:
+the anchor in the application source is the only place a user of the wurblet sees, and
+the javadoc is what tells them which options exist.
 
 ### code
 
@@ -222,6 +458,56 @@ and is retrieved by the wurblet as:
 ```java
 String config = getConfiguration();    // "model = org.example.model.Customer\nnullable = false"
 ```
+
+#### Example: switching the argument parser
+
+Tentackle's SQL wurblets share one base class, `DbModelWurblet`, but they need its
+argument parser to behave differently. `DbUpdateBy` and `PdoUpdateBy` take an update
+expression *and* a list of attributes to be updated, separated by a `|`, so for them the
+separator is meaningful:
+```
+@{include $currentDir/header.incl}@
+@{config groupArgs}@
+```
+The select wurblets, on the other hand, accept paths across entity boundaries in their
+expressions:
+```
+@{include $currentDir/header.incl}@
+@{config pathAllowed}@
+```
+and `RemoteMethod` may be applied to sources that have no entity in the model at all:
+```
+@{include $currentDir/header.incl}@
+@{config missingModelOk}@
+```
+
+The shared base class reads the configuration once, in `run()`, before any generation
+happens:
+
+```java
+  @Override
+  public void run() throws WurbelException {
+
+    String wurbletOptions = getConfiguration();
+    if (wurbletOptions != null) {
+      if (wurbletOptions.contains("groupArgs")) {
+        argumentGroupingEnabled = true;
+      }
+      else if (wurbletOptions.contains("pathAllowed")) {
+        pathAllowed = true;
+      }
+    }
+
+    super.run();
+    ...
+```
+
+This is the distinction the configuration is for: whether `|` groups arguments is a
+property of the *wurblet* — it is the same for every anchor that ever invokes
+`DbUpdateBy` — whereas which columns to update is a property of the *anchor* and is
+therefore passed as a wurblet argument. Note also that the option is written once in the
+`.wrbl` file rather than repeated in every anchor, and that it cannot be got wrong by
+the user of the wurblet.
 
 ## Further reading
 
