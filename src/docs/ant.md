@@ -98,7 +98,7 @@ An advanced example of the wurbler ant target may look like this:
         infoDir="${apt}" includes="*.java"
         wurbletpath="org.tentackle.wurblets:de.krake.myapp.wurblets"/>
     <wurbelize printstacktrace="true" printwurblet="false"
-        srcdir="${src}/de/krake/myapp/dbms/rmi" includes="*.java"
+        srcdir="${src}/de/krake/myapp/dbms/trip" includes="*.java"
         wurbletpath="org.tentackle.wurblets:de.krake.myapp.wurblets"/>
 </target>
 ```
