@@ -322,7 +322,7 @@ source files. Tentackle's remote delegates are the canonical case.
 
 When a persistence method is generated for an entity that is reachable remotely, three
 pieces of code are needed in three different files: the local implementation, a
-signature in the RMI delegate interface, and a forwarding method in the delegate
+signature in the TRIP delegate interface, and a forwarding method in the delegate
 implementation. The wurblet writes the latter two into heap files using the
 [`@{to}@` directive](wurblet-syntax.md#to):
 

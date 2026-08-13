@@ -238,7 +238,7 @@ declared right before it is used — so opening and closing it is plain Java.
 
 Tentackle relies on this to generate three artifacts from a single anchor. When an entity
 is accessible remotely, a method must exist in three places: in the local implementation,
-as a signature in the RMI delegate interface, and as a forwarding method in the delegate
+as a signature in the TRIP delegate interface, and as a forwarding method in the delegate
 implementation. The `DbUpdateBy` wurblet writes all three at once:
 
 ```
