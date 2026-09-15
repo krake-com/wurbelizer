@@ -81,9 +81,10 @@
 
     <ant.version>1.10.18</ant.version>
     <asm.version>9.10.1</asm.version>
+    <javax.inject.version>1</javax.inject.version>
     <maven.file.management.version>3.2.0</maven.file.management.version>
     <maven.plugin.annotations.version>3.16.0</maven.plugin.annotations.version>
-    <plexus.component.metadata.version>2.2.0</plexus.component.metadata.version>
+    <sisu.maven.plugin.version>1.1.0</sisu.maven.plugin.version>
     <slf4j.version>2.0.19</slf4j.version>
     <testng.version>7.12.0</testng.version>
     <wagon.ssh.version>3.5.3</wagon.ssh.version>
@@ -152,6 +153,12 @@
         <groupId>org.apache.maven.plugin-tools</groupId>
         <artifactId>maven-plugin-annotations</artifactId>
         <version>${maven.plugin.annotations.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.inject</groupId>
+        <artifactId>javax.inject</artifactId>
+        <version>${javax.inject.version}</version>
+        <scope>provided</scope>   <!-- provided by maven core at runtime -->
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -299,16 +306,9 @@
         </plugin>
 
         <plugin>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-component-metadata</artifactId>
-          <version>${plexus.component.metadata.version}</version>
-          <dependencies>
-            <dependency>
-              <groupId>org.ow2.asm</groupId>
-              <artifactId>asm</artifactId>
-              <version>${asm.version}</version>
-            </dependency>
-          </dependencies>
+          <groupId>org.eclipse.sisu</groupId>
+          <artifactId>sisu-maven-plugin</artifactId>
+          <version>${sisu.maven.plugin.version}</version>
         </plugin>
 
         <plugin>

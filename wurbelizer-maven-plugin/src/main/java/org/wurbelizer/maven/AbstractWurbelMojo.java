@@ -24,7 +24,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.shared.model.fileset.FileSet;
@@ -57,6 +56,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
+import javax.inject.Inject;
 
 /**
  * Base class for the wurbel mojos.<br>
@@ -191,7 +192,7 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
   /**
    * To create wurblet artifacts.
    */
-  @Component
+  @Inject
   private RepositorySystem repositorySystem;
 
   /**

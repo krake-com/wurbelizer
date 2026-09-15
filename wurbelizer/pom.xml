@@ -43,6 +43,9 @@
             <manifest>
               <mainClass>org.wurbelizer.misc.Version</mainClass>
             </manifest>
+            <manifestEntries>
+              <Automatic-Module-Name>org.wurbelizer</Automatic-Module-Name>
+            </manifestEntries>
           </archive>
         </configuration>
       </plugin>
