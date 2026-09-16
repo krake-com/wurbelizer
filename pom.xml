@@ -54,7 +54,7 @@
     <javac.version>25</javac.version>
     <javac.lint>all,-processing</javac.lint>
 
-    <maven.version>3.9.0</maven.version>
+    <maven.version>3.9.10</maven.version>
 
     <maven.clean.plugin.version>3.5.0</maven.clean.plugin.version>
     <maven.compiler.plugin.version>3.16.0</maven.compiler.plugin.version>

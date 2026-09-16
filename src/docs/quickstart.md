@@ -9,13 +9,13 @@ transfer object* (DTO) and let the wurbler weave it into a hand-written source f
 The complete, runnable sources are available at
 [github.com/harrharr/wurbelizer-tutorial](https://github.com/harrharr/wurbelizer-tutorial).
 
-> The tutorial is written against `wurbelizer.version` `25.6.5.0` (JDK 25, Maven 3.9.0).
+> The tutorial is written against `wurbelizer.version` `25.6.5.0` (JDK 25, Maven >= 3.9.10).
 > The runnable reference sources on GitHub still pin older versions; the steps are
 > identical — just the version numbers below differ.
 
 ## Prerequisites
 
-- JDK 25+ and Maven 3.9.0+ on your `PATH`. Check with `mvn --version`.
+- JDK 25+ and Maven 3.9.10+ on your `PATH`. Check with `mvn --version`.
 - Any modern Java IDE or plain command-line tools. (Eclipse cannot fold the generated
   blocks, but everything else works.)
 

@@ -36,7 +36,7 @@ Use American English spelling for all code comments and documentation (e.g. "beh
 
 ## Build Commands
 
-Requires Java 25+ and Maven 3.9.0+. The enforcer requires `file.encoding=UTF-8`:
+Requires Java 25+ and Maven 3.9.10+. The enforcer requires `file.encoding=UTF-8`:
 
 ```bash
 # Build all modules
