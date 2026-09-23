@@ -19,16 +19,24 @@
 
 package org.wurbelizer.maven;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.resolution.DependencyRequest;
+import org.eclipse.aether.resolution.DependencyResolutionException;
+import org.eclipse.aether.util.artifact.JavaScopes;
+import org.eclipse.aether.util.filter.DependencyFilterUtils;
 import org.slf4j.LoggerFactory;
 import org.wurbelizer.misc.Constants;
 import org.wurbelizer.misc.Logger;
@@ -50,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -190,7 +199,7 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
 
 
   /**
-   * To create wurblet artifacts.
+   * To resolve the wurblet artifacts.
    */
   @Inject
   private RepositorySystem repositorySystem;
@@ -637,32 +646,46 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
   private void updateClassLoader() throws MojoExecutionException {
 
     if (wurbletDependencies != null) {
-      Set<Artifact> wurbletArtifacts = new HashSet<>();
+      Set<Artifact> wurbletArtifacts = new LinkedHashSet<>();   // keeps the classpath order deterministic
+
+      RepositorySystemSession repoSession = session.getRepositorySession();
+      List<org.eclipse.aether.graph.Dependency> managedDependencies = new ArrayList<>();
+      if (project.getDependencyManagement() != null) {
+        for (Dependency managed : project.getDependencyManagement().getDependencies()) {
+          managedDependencies.add(RepositoryUtils.toDependency(managed, repoSession.getArtifactTypeRegistry()));
+        }
+      }
 
       for (Dependency dep : wurbletDependencies) {
 
-        Artifact artifact = repositorySystem.createArtifactWithClassifier(
-                dep.getGroupId(), dep.getArtifactId(), dep.getVersion(), dep.getType(), dep.getClassifier());
+        Artifact artifact = new DefaultArtifact(
+                dep.getGroupId(), dep.getArtifactId(), dep.getClassifier(), dep.getType(), dep.getVersion());
 
-        ArtifactResolutionRequest artifactRequest = new ArtifactResolutionRequest()
-                .setArtifact(artifact)
-                .setResolveTransitively(true)
-                .setLocalRepository(session.getLocalRepository())
-                .setRemoteRepositories(project.getRemoteArtifactRepositories())
-                .setForceUpdate(false)
-                .setManagedVersionMap(project.getManagedVersionMap());
+        CollectRequest collectRequest = new CollectRequest(
+                new org.eclipse.aether.graph.Dependency(artifact, JavaScopes.RUNTIME),
+                project.getRemoteProjectRepositories());
+        collectRequest.setManagedDependencies(managedDependencies);
 
-        Set<Artifact> resolvedArtifacts = repositorySystem.resolve(artifactRequest).getArtifacts();
+        DependencyRequest dependencyRequest = new DependencyRequest(
+                collectRequest, DependencyFilterUtils.classpathFilter(JavaScopes.RUNTIME));
 
-        if (resolvedArtifacts.isEmpty()) {
+        List<ArtifactResult> results;
+        try {
+          results = repositorySystem.resolveDependencies(repoSession, dependencyRequest).getArtifactResults();
+        }
+        catch (DependencyResolutionException ex) {
+          // partially resolved artifacts are still reported by the exception, but the wurblets must be complete
+          throw new MojoExecutionException("cannot resolve wurblet artifact " + artifact, ex);
+        }
+
+        if (results.isEmpty()) {
           throw new MojoExecutionException("cannot resolve wurblet artifact " + artifact);
         }
-        else {
-          wurbletArtifacts.addAll(resolvedArtifacts);
+        for (ArtifactResult result : results) {
+          Artifact resolvedArtifact = result.getArtifact();
+          wurbletArtifacts.add(resolvedArtifact);
           if (verbosityLevel.isDebug()) {
-            for (Artifact resolvedArtifact: resolvedArtifacts) {
-              getLog().debug("wurblet artifact " + resolvedArtifact + " added");
-            }
+            getLog().debug("wurblet artifact " + resolvedArtifact + " added");
           }
         }
       }
