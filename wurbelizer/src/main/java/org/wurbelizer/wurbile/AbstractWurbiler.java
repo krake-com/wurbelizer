@@ -247,7 +247,8 @@ public abstract class AbstractWurbiler implements Wurbiler {
             break;    // eof
           }
           char nc = (char) ic;
-          if (nc == '@')  {
+          if (nc == '@' || nc == ' ')  {
+            // escaped @ or blank: emit the char without the backslash
             if (inWurblet) {
               if (wurbletMode == WURBLET_BLOCK) {
                 out.write(nc);
@@ -260,7 +261,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
               sourceBuf.append(nc);
             }
           }
-          else if (nc != ' ') {
+          else {
             if (inWurblet) {
               if (wurbletMode == WURBLET_BLOCK) {
                 out.write(c);
