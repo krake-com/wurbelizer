@@ -10,6 +10,65 @@ Examples can be found here:
 - [Wurbelizer Tutorial](https://github.com/harrharr/wurbelizer-tutorial)
 - [Tentackle Tutorial](https://github.com/harrharr/tentackle-tutorial)
 
+## Goals and parameters
+
+The plugin provides three goals:
+
+| Goal          | Default phase          | Purpose                                                       |
+|---------------|------------------------|---------------------------------------------------------------|
+| `wurbile`     | `generate-sources`     | compiles the `.wrbl` sources to Java sources and `.ser` files |
+| `wurbel`      | `process-sources`      | runs the wurbler on the main sources                          |
+| `test-wurbel` | `process-test-sources` | runs the wurbler on the test sources                          |
+
+Parameters common to all goals:
+
+| Parameter   | Default                             | Description                                              |
+|-------------|-------------------------------------|----------------------------------------------------------|
+| `skip`      | `true` for `pom` packaging          | skips the execution                                      |
+| `verbosity` | `${wurbel.verbosity}`               | `default`, `info` or `debug`                             |
+| `charset`   | `${project.build.sourceEncoding}`   | the encoding of the source files                         |
+| `filesets`  | see below                           | the files to process, in the given order                 |
+
+Parameters of the `wurbile` goal:
+
+| Parameter                                  | Default                             | Description                                                |
+|--------------------------------------------|-------------------------------------|------------------------------------------------------------|
+| `wurbletSourceDir` (`wurbile.sourceDir`)   | `src/main/wurblets`                 | the `.wrbl` sources, if no `filesets` given (`**/*.wrbl`)  |
+| `wurbletTargetJavaDir` (`wurbile.javaDir`) | `target/generated-sources/wurblets` | the generated Java sources, added as a compile source root |
+| `wurbletTargetTextDir` (`wurbile.textDir`) | `target/classes`                    | the generated `.ser` files                                 |
+| `indent`                                   | `-1` (the wurbiler's default)       | the indentation of the generated Java source               |
+
+Parameters of the `wurbel` and `test-wurbel` goals:
+
+| Parameter                                                   | Description                                                                                                      |
+|-------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
+| `wurbletPaths` (required)                                   | the packages prepended to wurblet names that are not fully qualified                                             |
+| `wurbletProperties`                                         | extra properties for the wurblets, see below                                                                     |
+| `wurbletDependencies`                                       | the artifacts containing the wurblets, loaded in a separate classloader, see [Parallel builds](#parallel-builds) |
+| `sourceDir` (`wurbel.sourceDir`, `wurbel.testSourceDir`)    | the sources, if no `filesets` given (`**/*.java`)                                                                |
+| `analyzeDir` (`wurbel.analyzeDir`, `wurbel.testAnalyzeDir`) | `target/analyze` or `target/test-analyze`: extra information for the wurblets, see `Wurbler.getAnalyzeFile()`    |
+| `wurbelDir` (`wurbel.wurbelDir`)                            | `target/wurbel`: the directory for files created by the wurblets, available as `$wurbelDir`                      |
+| `dryRun`                                                    | only parses the sources, no wurblets are executed                                                                |
+| `includeAnchors`, `excludeAnchors`                          | lists of regular expressions matching the tags of the anchors to process or to skip                              |
+| `includeWurblets`, `excludeWurblets`                        | lists of regular expressions matching the wurblet names (as written in the anchors) to process or to skip        |
+| `firstPhase`, `lastPhase`                                   | restrict the [phases](source-syntax.md#processing-order-and-phases) to process (default: all, starting with 0)   |
+
+The include and exclude lists are applied together: an anchor is processed only if it
+matches all given include lists and none of the exclude lists. Skipped anchors keep
+their guarded blocks. Together with `firstPhase` and `lastPhase`, this is mainly useful
+for tracking down a problem in a single wurblet.
+
+The following extra properties are predefined and can be used in the values of the
+`wurbletProperties` as well as `$`-variables in the sources:
+
+| Property                                  | Value                                                                          |
+|-------------------------------------------|--------------------------------------------------------------------------------|
+| `project`                                 | the base directory of the current Maven module                                 |
+| `parentProject`, `parentParentProject`, … | the base directories of the parent modules                                     |
+| `projectRoot`                             | the base directory of the topmost parent module                                |
+| `wurbelDir`                               | the value of the `wurbelDir` parameter                                         |
+| `currentDir`, `currentFile`               | the directory and the name of the file being processed (also set by `wurbile`) |
+
 ## A real-world configuration
 
 The following is the plugin configuration of the `tentackle-persistence` module of the
@@ -105,7 +164,8 @@ Reading it section by section:
 - **`filesets`** determine *which* sources are wurbeled and, importantly, *in which
   order*. Here the entities are processed first and the remote delegates under `trip/`
   afterwards, because the delegates consume heap files that the entity wurblets produce.
-  See [Cross-file generation with heap files](source-syntax.md#cross-file-generation-with-heap-files).
+  See [Cross-file generation with heap files](source-syntax.md#cross-file-generation-with-heap-files)
+  and [Processing Order and Phases](source-syntax.md#processing-order-and-phases).
 
 Note that `**/*.wurb` is included alongside `**/*.java`. When a fileset matches a
 `.wurb` file, the plugin does not wurbel the property file itself but substitutes the

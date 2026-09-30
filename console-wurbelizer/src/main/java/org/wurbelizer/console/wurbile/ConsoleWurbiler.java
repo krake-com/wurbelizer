@@ -26,6 +26,7 @@ import org.wurbelizer.wurbile.Wurbiler;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 
 /**
  * Invokes the wurbiler from the console.
@@ -40,7 +41,7 @@ public class ConsoleWurbiler {
    */
   private static void usage() {
     System.out.println(
-      "usage: java org.wurbelizer.ConsoleWurbiler [--verbose=default|info|debug] [--indent=n] [--extends=<classpath>] [--package=<package>] <wurbelizable>.wrbl");
+      "usage: java org.wurbelizer.console.wurbile.ConsoleWurbiler [--verbosity=default|info|debug] [--indent=n] [--extends=<classpath>] [--package=<package>] <wurbelizable>.wrbl");
     System.exit(1);
   }
 
@@ -75,7 +76,7 @@ public class ConsoleWurbiler {
       }
       else if (arg.startsWith("--verbosity=")) {
         try {
-          verbosity = Verbosity.valueOf(arg.substring(12));
+          verbosity = Verbosity.valueOf(arg.substring(12).toUpperCase(Locale.ROOT));
         }
         catch (RuntimeException ex) {
           verbosity = Verbosity.DEFAULT;

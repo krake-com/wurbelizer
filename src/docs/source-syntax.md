@@ -52,6 +52,12 @@ Anchors that span more than one line must be concatenated by a trailing
 backslash at the end of the lines to be continued. Arguments are separated
 by whitespaces. If an argument contains whitespaces, it must be enclosed
 in double quotes. Such arguments may span more than one line as well.
+Variables within double quotes are substituted. Arguments may also be enclosed in
+single quotes, which suppresses variable substitution and allows double quotes
+inside, e.g. `--orderby='" ORDER BY " + CN_ID + " DESC"'`. A quote of the same kind
+within a quoted argument, and the backslash itself, are escaped with a backslash.
+Variables are substituted *after* the arguments have been separated, so a variable
+value may contain whitespace or quotes without further escaping.
 Arguments may contain $-signs denoting a variable. Variables may either
 be declared in a variable section, can be an ant property, a property from
 a wurb-file or an environment variable. The variable substitution process is
@@ -127,6 +133,20 @@ An entity in Tentackle typically carries a handful of such anchors, for example:
 
 The two `PdoSelectUnique` anchors show why the tag exists: the same wurblet is applied
 twice in the same file with different arguments, producing two different finder methods.
+
+### Lifecycle of a Guarded Block
+
+The guarded block belongs to its anchor, and the wurbler keeps both in sync:
+
+- The tag must be unique within the source file. A second anchor with the same tag is
+  reported as an error.
+- If an anchor is removed from the source, its guarded block is removed on the next
+  run as well. Anchors that are skipped, for example because they belong to another
+  [phase](#execution-phase) or are excluded by the build tool, keep their blocks.
+- If the wurblet fails, the guarded block receives the stack trace, enclosed in a
+  `/******** ... ********/` comment, so the error is visible right where the code is
+  missing. An inline wurblet (see below) inserts `{ <message> }` instead.
+  The wurbler stops processing a source file after the first pass with errors.
 
 ### Unnamed Anchor
 
@@ -239,6 +259,28 @@ the file wants to read — so that one anchor overrides the default and stays ex
 Notice that some IDEs automatically fold a guarded block 
 (also known as custom code folding region) by default. IntelliJ does so, for example.
 
+The default fold type for all anchors is set with the wurblet property `foldtype`
+(`collapsed`, `expanded` or `none`), see [Guard Types](guard-types.md).
+
+### Execution Phase
+
+The `phase` directive overrides the [phase](wurblet-syntax.md#phase) set by the
+wurblet's `@{phase}@` directive for a single anchor. Values less than 1 are treated as 1.
+
+Example:
+```
+// @wurblet(phase=2) summary Summary
+```
+
+This is useful if a wurblet must see what other wurblets produced, but only in some of
+the source files it is applied to. See
+[Processing Order and Phases](#processing-order-and-phases).
+
+Several wurbler directives can be combined, separated by whitespace:
+```
+// @wurblet(indent=2 fold=expanded) modelComment ModelComment
+```
+
 ## Here Documents
 
 Here-Documents are an elegant way to provide model information to the wurblets
@@ -266,6 +308,27 @@ maven (which usually is the case), the file is available during the
 whole wurbel lifecycle phase, to all wurblets in all files. This
 feature allows running wurblets in distinct phases, each phase creating some
 information for the next phase.
+
+### Here-Document Details
+
+- The text of each line is taken from the column of the `@>` onward, so the comment
+  lead (for example ` * `) is stripped as long as the lines are aligned with `@>`.
+- `\@` within the document is unescaped to `@`.
+- By default, the wurbler prepends an origin line to the document text, consisting of
+  `#@`, the source file name and the line number of the here-document, for example
+  `#@ModificationLog.java:12`. Wurblets reading the document should therefore ignore
+  lines starting with `#`. The option `--nosource` after the filename suppresses the
+  origin line:
+  ```
+  @> $model/modlog.map --nosource
+  ```
+- The origin line lets the wurbler detect that the same file on disk is written by
+  here-documents in two different source files, which is reported as an error.
+  The same applies to heap files.
+- Files on disk are only written if their contents change. If they do, the build tool
+  starts the current phase over, so that all wurblets see the updated files (see
+  [Processing Order and Phases](#processing-order-and-phases)). Heap files are cleared
+  at each restart.
 
 ### Example: the model next to the code
 
@@ -402,6 +465,56 @@ Notice the recursion in the example above: `mapping` is defined in terms of `$mo
 `$tablename`, where `$model` is not declared in the source at all but comes from the
 build tool — Tentackle sets it as a wurblet property in the POM.
 
+### Resolution Order
+
+Variables are substituted recursively until no more variables are found. A variable
+name ends at whitespace or at one of the characters `/ , ; : ( ) [ ] = ! ' "`.
+Substitution runs in two rounds:
+
+1. Java system properties, the extra properties provided by the build tool (see
+   [Wurbler Properties](writing-wurblets.md#wurbler-properties)) and the variables of
+   the source file, in this order. In this round, a dot is part of the variable name,
+   so that `$user.home` refers to the system property `user.home`.
+2. Environment variables and the variables of the source file. Now a dot ends the
+   variable name, so `$tablename.map` refers to `$tablename`.
+
+Variables that can't be resolved are left as is. A `$` preceded by a backslash
+(`\$`) is not substituted, and the backslash is removed.
+
+### Built-in Variables
+
+The wurbler provides the following variables for each source file:
+
+| Variable   | Value                                                                      |
+|------------|----------------------------------------------------------------------------|
+| `filename` | the pathname of the source file                                            |
+| `dirname`  | the directory of the source file                                           |
+| `wurbname` | the pathname of the `.wurb` file, if any                                   |
+
+The wurblets additionally see the tag and the wurblet name of the current anchor as
+`guardname` and `wurbletname` (see [Wurbler Properties](writing-wurblets.md#wurbler-properties)).
+
+For Java sources, the wurbler additionally extracts the following variables from the
+code:
+
+| Variable                     | Value                                                               |
+|------------------------------|---------------------------------------------------------------------|
+| `packagename`                | the package name                                                    |
+| `classname`                  | the name of the class, interface or record (without package)        |
+| `interfacename`              | the name of the interface, if the source is an interface            |
+| `recordname`                 | the name of the record, if the source is a record                   |
+| `definition`                 | the rest of the type declaration following the name, up to the `{`  |
+| `extends_`                   | the superclass of a class                                           |
+| `extends_0`, `extends_1`, …  | the extended interfaces of an interface                             |
+| `implements_0`, …            | the implemented interfaces                                          |
+| `annotation_0`, …            | the annotations of the type (single-line annotations only)          |
+| `modifiers_0`, …             | the modifiers `public`, `protected`, `private`, `abstract`, `final` |
+
+Only the first top-level type in the file is considered. For other kinds of source
+files, no variables are extracted, see [Source Types](guard-types.md#source-types).
+Wurblets extending `AbstractJavaWurblet` get the same information via methods such as
+`getClassName()`, see [Writing Wurblets](writing-wurblets.md#wurbelizer-api).
+
 ### Example: variables in a `.wurb` file
 
 The alternative to an inline `@{ @}` block is a property file with the extension `.wurb`,
@@ -420,9 +533,45 @@ annotation and `$classid` into `@ClassId`. Changing the table name is therefore 
 one-line edit that propagates through the annotations, the model file and every
 generated SQL statement on the next build.
 
+In a `.wurb` file, everything following a `#` is a comment. Besides variables, the
+`.wurb` file may also set the `guardtype` for this particular source file, overriding
+the global setting (see [Guard Types](guard-types.md)).
+
 Which of the two forms to prefer is mostly a matter of taste. An inline block keeps
 everything in one file; a `.wurb` file keeps the source free of build metadata and is
 easier to generate from a wizard or archetype.
+
+## Processing Order and Phases
+
+Wurbeling is organized in phases, which span all source files of a build-tool run
+(i.e. an execution of the Maven goal or the Ant task):
+
+1. **Phase 0** processes only the here-documents and variables of all source files, so
+   that every model file on disk is up to date before any wurblet runs. The Maven
+   plugin always starts with phase 0, the Ant task with phase 1.
+2. Then, all anchors whose wurblet [phase](wurblet-syntax.md#phase) is 1 are executed in
+   all source files, then those of phase 2, and so on. Only phases that actually occur
+   are processed. The Maven parameters `firstPhase` and `lastPhase` restrict the range.
+3. If a here-document on disk changes during a phase, the phase is started over for all
+   files.
+
+Within a phase, the source files are processed in the following order:
+
+- With Maven, the filesets are processed in the order of their declaration. Within a
+  fileset, the files are sorted alphabetically, and a file matched by several patterns
+  (for example both via its `.java` and its `.wurb` file) is processed only once. A file
+  matched by more than one fileset, however, is processed again. If a fileset produces errors, the remaining filesets are
+  skipped, because they may depend on it.
+- Within a source file, the wurbler runs the wurblets in the order of their anchors. If
+  a comment contains several anchors, they are executed from the last to the first, so
+  that the generated blocks appear below the comment in the order of the anchors. This
+  is repeated until the file no longer changes, because generated code may contain new
+  anchors, here-documents or variables.
+
+Thus, if a wurblet depends on the output of another wurblet in a *different* file,
+the order of the files matters (see
+[Cross-file generation with heap files](#cross-file-generation-with-heap-files)). If it
+depends on another wurblet in the *same* file, a higher phase is the better choice.
 
 ## Further reading
 

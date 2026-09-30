@@ -32,6 +32,7 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
@@ -83,6 +84,9 @@ public class ConsoleWurbler extends AbstractWurbler {
     int     wurbArgCount  = 0;
     boolean wurbletLoaded = false;
 
+    // work on a copy: consumed args are nulled, and the caller reuses the args for the next phase
+    args = args.clone();
+
     // parse command line args
     for (int argc=0; argc < args.length; argc++)  {
       String arg = args[argc];
@@ -95,7 +99,7 @@ public class ConsoleWurbler extends AbstractWurbler {
         args[argc] = null;    // consumed
       }
       else if (arg.startsWith("--analyzedir="))  {
-        analyzeDir = arg.substring(10);
+        analyzeDir = arg.substring(13);
         args[argc] = null;    // consumed
       }
       else if (!wurbletLoaded && !arg.startsWith("--")) {
@@ -106,11 +110,12 @@ public class ConsoleWurbler extends AbstractWurbler {
       }
       else if (arg.startsWith("--verbosity=")) {
         try {
-          this.verbosity = Verbosity.valueOf(arg.substring(12));
+          this.verbosity = Verbosity.valueOf(arg.substring(12).toUpperCase(Locale.ROOT));
         }
         catch (RuntimeException ex) {
           this.verbosity = Verbosity.DEFAULT;
         }
+        args[argc] = null;    // consumed
       }
       else  {
         wurbArgCount++;
@@ -181,7 +186,7 @@ public class ConsoleWurbler extends AbstractWurbler {
    */
   private static void usage() {
     System.out.println(
-      "usage: java org.wurbelizer.ConsoleWurbler [--|++out=<outputfile>] [--analyzedir=<dir>] [--verbosity=default|info|debug] <wurblet> [wurblet options and args...]");
+      "usage: java org.wurbelizer.console.wurbel.ConsoleWurbler [--|++out=<outputfile>] [--analyzedir=<dir>] [--verbosity=default|info|debug] [--glob=<regex>] <wurblet> [wurblet options and args...]");
     System.exit(1);
   }
 

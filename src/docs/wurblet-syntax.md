@@ -390,6 +390,12 @@ an explicit phase.
 
 `@{phase N}@` sets the execution phase of the wurblet. Default is 1.
 
+Phases span all source files of a build-tool run: all wurblets of phase 1 in all
+files are executed before any wurblet of phase 2. See
+[Processing Order and Phases](source-syntax.md#processing-order-and-phases).
+The phase can also be overridden for a single anchor with the
+[`phase` wurbler directive](source-syntax.md#execution-phase).
+
 Tentackle uses a later phase for wurblets that must observe what the other wurblets in
 the same file have done. `ModelComment` and `UniqueDomainKey` both start with
 ```
@@ -432,8 +438,18 @@ the javadoc is what tells them which options exist.
 ### code
 
 `@{code ...}@` adds the code to the class level code. This code is appended to the
- end of the wurblet's java code and can be used to override or implement wurblet methods.
- This is an alternative to subclassing.
+end of the wurblet's java code and can be used to override or implement wurblet methods.
+This is an alternative to subclassing.
+
+Example:
+```
+@{code
+  @Override
+  public String process(String generatedCode) {
+    return generatedCode.strip() + "\n";
+  }
+}@
+```
 
 ### config
 
