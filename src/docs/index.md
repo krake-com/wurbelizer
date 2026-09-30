@@ -77,6 +77,8 @@ See the [Table of Contents](toc.md) for the documents in reading order.
 - **indent directive** — [Wurblet Level Syntax: indent](wurblet-syntax.md#indent)
 - **inline wurblet** — [Source Level Syntax: Unnamed Anchor](source-syntax.md#unnamed-anchor)
 - **Inject wurblet (Tentackle)** — [Source Level Syntax: Unnamed Anchor](source-syntax.md#unnamed-anchor)
+- **isThreadSafe (wurblet)** — [Writing Wurblets: Thread safety](writing-wurblets.md#thread-safety),
+  [Maven Integration: Parallel builds](maven.md#parallel-builds)
 - **`.incl` fragments** — [Wurblet Level Syntax: include](wurblet-syntax.md#include),
   [Writing Wurblets: parent-class pattern](writing-wurblets.md#the-parent-class-pattern)
 
@@ -107,6 +109,8 @@ See the [Table of Contents](toc.md) for the documents in reading order.
 ## P
 
 - **package directive** — [Wurblet Level Syntax: package](wurblet-syntax.md#package)
+- **parallel builds (`mvn -T`)** — [Maven Integration: Parallel builds](maven.md#parallel-builds),
+  [Writing Wurblets: Thread safety](writing-wurblets.md#thread-safety)
 - **phase directive** — [Wurblet Level Syntax: phase](wurblet-syntax.md#phase)
 - **properties (wurbler)** — [Writing Wurblets: Wurbler Properties](writing-wurblets.md#wurbler-properties)
 
@@ -128,6 +132,8 @@ See the [Table of Contents](toc.md) for the documents in reading order.
   [Writing Wurblets](writing-wurblets.md#examples),
   [guided tour](writing-wurblets.md#a-guided-tour),
   [Maven configuration](maven.md#a-real-world-configuration)
+- **thread safety** — [Writing Wurblets: Thread safety](writing-wurblets.md#thread-safety),
+  [Maven Integration: Parallel builds](maven.md#parallel-builds)
 - **to directive** — [Wurblet Level Syntax: to](wurblet-syntax.md#to)
 
 ## U
@@ -142,6 +148,7 @@ See the [Table of Contents](toc.md) for the documents in reading order.
 
 ## W
 
+- **WurbelContext** — [Writing Wurblets: Thread safety](writing-wurblets.md#thread-safety)
 - **wurbel** — [Code Levels](code-levels.md), [README: terms](../../README.md#terms-and-definitions)
 - **wurbiler** — [Build Tool Integration](integration.md), [README: terms](../../README.md#terms-and-definitions)
 - **wurbiler directives** — [Wurblet Level Syntax: Wurbiler Directives](wurblet-syntax.md#wurbiler-directives)

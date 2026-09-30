@@ -16,17 +16,20 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 package org.wurbelizer.maven;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.AbstractMojoExecutionException;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.wurbelizer.misc.Settings;
 import org.wurbelizer.misc.Verbosity;
+import org.wurbelizer.wurbel.WurbelContext;
 import org.wurbelizer.wurbel.WurbelHelper;
 
 import java.io.File;
@@ -39,6 +42,9 @@ import java.util.Properties;
 
 /**
  * Base class of wurbelizer mojos.
+ * <p>
+ * Each execution runs within its own {@link WurbelContext}.
+ * Hence, concurrent executions in parallel builds don't interfere with each other.
  *
  * @author harald
  */
@@ -62,7 +68,7 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
 
   /**
    * The list of file sets to wurbile.<br>
-   * If set the source directory is ignored.
+   * If set, the source directory is ignored.
    */
   @Parameter
   protected List<FileSet> filesets;
@@ -79,7 +85,7 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
    * The charset used to read and write files.
    */
   @Parameter(defaultValue = "${project.build.sourceEncoding}")
-  protected String charset;   // don't use the name "encoding" as this is handled by maven
+  protected String charset;   // don't use the name "encoding" as maven handles this
 
   /**
    * Skips processing.<br>
@@ -99,6 +105,36 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
   protected List<String> resourceDirs;
 
 
+  /**
+   * Executes the mojo within the given wurbel context.
+   *
+   * @param context the wurbel context bound to the current thread
+   * @throws MojoExecutionException if an unexpected problem occurs
+   * @throws MojoFailureException if an expected problem occurs
+   */
+  protected abstract void doExecute(WurbelContext context) throws MojoExecutionException, MojoFailureException;
+
+
+  @Override
+  public final void execute() throws MojoExecutionException, MojoFailureException {
+    if (isSkipped()) {
+      return;
+    }
+    WurbelContext context = new WurbelContext();
+    try {
+      WurbelContext.call(context, () -> {
+        doExecute(context);
+        return null;
+      });
+    }
+    catch (MojoExecutionException | MojoFailureException ex) {
+      throw ex;
+    }
+    catch (AbstractMojoExecutionException ex) {
+      throw new MojoExecutionException(ex.getMessage(), ex);
+    }
+  }
+
 
   /**
    * Determines the charset.
@@ -108,7 +144,6 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
       Settings.setEncodingCharset(Charset.forName(charset));
     }
   }
-
 
   /**
    * sets the verbosity
@@ -127,7 +162,6 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
       verbosityLevel = getLog().isDebugEnabled() ? Verbosity.DEBUG : Verbosity.DEFAULT;
     }
   }
-
 
   /**
    * Gets the path relative to the basedir.<br>
@@ -161,7 +195,6 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
     return path;
   }
 
-
   /**
    * Finds all resource directories.
    */
@@ -175,9 +208,8 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
     }
   }
 
-
   /**
-   * Checks if given directory resides in resources.
+   * Checks if the given directory resides in resources.
    *
    * @param dirName the directory name
    * @return the resource dir, null if not a resource

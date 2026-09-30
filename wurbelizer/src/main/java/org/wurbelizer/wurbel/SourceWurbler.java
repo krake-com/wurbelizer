@@ -375,125 +375,141 @@ public class SourceWurbler extends AbstractWurbler {
                 ByteArrayOutputStream os = new ByteArrayOutputStream(); // holds the data
                 PrintStream ps = new PrintStream(os);
 
+                boolean locked = false;   // true if WURBLET_LOCK held
                 try {
+                  // serialize loading as well: thread-safety is only known after instantiation
+                  WURBLET_LOCK.lock();
+                  locked = true;
 
-                  if (!wurbletElement.isInline() && !guardedNames.add(currentGuardName)) {
-                    throw new WurbelException("guarded name '" + currentGuardName + "' not unique");
+                  try {
+
+                    if (!wurbletElement.isInline() && !guardedNames.add(currentGuardName)) {
+                      throw new WurbelException("guarded name '" + currentGuardName + "' not unique");
+                    }
+
+                    wurbProps.setProperty(WURBLET_GUARDNAME, currentGuardName);
+                    String wurbletName = wurbletElement.getWurbletName();
+                    wurbProps.setProperty(WURBLET_WURBLETNAME, wurbletName);
+
+                    if (verbosity.isDebug()) {
+                      logger.info("[" + loopCount + "]wurblet: " + currentGuardName + ", " + wurbletName);
+                    }
+
+                    // load the wurblet (may throw an Exception, but not a WurbelException)
+                    loadWurblet(wurbletName, wurbletPath, wurbProps);
+                    if (getWurblet().isThreadSafe()) {
+                      WURBLET_LOCK.unlock();    // may run concurrently with other wurblets
+                      locked = false;
+                    }
+
+                    if (wurbletPhase != null) {
+                      getWurblet().setPhase(wurbletPhase);
+                    }
+
+                    // get arguments if not fixed
+                    if (!isFixedArgs()) {
+                      setArgs(wurbletElement.getWurbletArgs());
+                    }
+                    setPrintStream(ps);
+
+                    // run the wurblet
+                    if (!invoke || !runWurblet(phase, collectedPhases)) {
+                      continue;
+                    }
+                    wurbletCount++;
                   }
-
-                  wurbProps.setProperty(WURBLET_GUARDNAME, currentGuardName);
-                  String wurbletName = wurbletElement.getWurbletName();
-                  wurbProps.setProperty(WURBLET_WURBLETNAME, wurbletName);
-
-                  if (verbosity.isDebug()) {
-                    logger.info("[" + loopCount + "]wurblet: " + currentGuardName + ", " + wurbletName);
-                  }
-
-                  // load the wurblet (may throw an Exception, but not a WurbelException)
-                  loadWurblet(wurbletName, wurbletPath, wurbProps);
-
-                  if (wurbletPhase != null) {
-                    getWurblet().setPhase(wurbletPhase);
-                  }
-
-                  // get arguments if not fixed
-                  if (!isFixedArgs()) {
-                    setArgs(wurbletElement.getWurbletArgs());
-                  }
-                  setPrintStream(ps);
-
-                  // run the wurblet
-                  if (!invoke || !runWurblet(phase, collectedPhases)) {
+                  catch (WurbelDiscardException dx) {
+                    // discard wurblet's output and treat as warning
+                    logger.warning(ExceptionHelper.concatenateMessages(dx));
                     continue;
                   }
-                  wurbletCount++;
-                }
-                catch (WurbelDiscardException dx) {
-                  // discard wurblet's output and treat as warning
-                  logger.warning(ExceptionHelper.concatenateMessages(dx));
-                  continue;
-                }
-                catch (WurbelException ex) {
-                  errors++;
-                  // log only exceptions that did not already show up (avoids cluttering output)
-                  String errMsg = ExceptionHelper.concatenateMessages(ex);
-                  if (!ex.isSourceInfoIncluded()) {
-                    errMsg = new File(filename).getName() +
-                             ":[" +
-                             doc.getLineNumber(wurbletElement.getWurbletBegin()) +
-                             "] " +
-                             errMsg;
-                  }
-                  boolean doLog = true;
-                  if (errorsSoFar != null) {
-                    doLog = !errorsSoFar.contains(errMsg);
+                  catch (WurbelException ex) {
+                    errors++;
+                    // log only exceptions that did not already show up (avoids cluttering output)
+                    String errMsg = ExceptionHelper.concatenateMessages(ex);
+                    if (!ex.isSourceInfoIncluded()) {
+                      errMsg = new File(filename).getName() +
+                               ":[" +
+                               doc.getLineNumber(wurbletElement.getWurbletBegin()) +
+                               "] " +
+                               errMsg;
+                    }
+                    boolean doLog = true;
+                    if (errorsSoFar != null) {
+                      doLog = !errorsSoFar.contains(errMsg);
+                      if (doLog) {
+                        errorsSoFar.add(errMsg);
+                      }
+                    }
                     if (doLog) {
-                      errorsSoFar.add(errMsg);
+                      logger.error(errMsg);
+                    }
+
+                    if (ex instanceof WurbelTerminationException || getWurblet() == null) {
+                      throw ex;
+                    }
+
+                    // place exceptions in comments in output
+                    if (wurbletElement.isInline()) {
+                      // print only a single line as newlines would break the insertion point
+                      ps.print(" { " + ex.getMessage() + " } ");
+                    }
+                    else {
+                      // stacktraces may contain file path names, which on Windows contain backslashes.
+                      // Those backslashes can be harmful in many ways, for example, if a
+                      // backslash is followed by the lower-case letter 'u', the compiler will treat this as
+                      // a Unicode character and compilation could fail due to an illegal Unicode sequence.
+                      // -> simply replace all backslashes with forward slashes!
+                      HeapFile stackTrace = new HeapFile("",null);
+                      ex.printStackTrace(stackTrace.getPrintStream());
+                      ps.println("/********");
+                      ps.println(stackTrace.getText().replace('\\', '/'));
+                      ps.println("********/");
                     }
                   }
-                  if (doLog) {
-                    logger.error(errMsg);
+                  // any other exception will abort (NPE, whatever)
+
+                  // build generated text
+                  String srcText = getWurblet().process(os.toString());
+
+                  int srcIndent = 0;
+                  if (indent >= 0) {
+                    // add fixed indent if option set
+                    srcIndent = indent;
+                  }
+                  else if (sourceType.isSmartIndent() && !wurbletElement.isInline()) {
+                    // smart indent: add extra spaces up to the start of the wurblet anchor's comment block
+                    SourceElement commentElement  = wurbletElement.getElement();
+                    if (commentElement.isComment()) {
+                      String lead = commentElement.getFirstLineLead();
+                      int leadLen = WurbelHelper.determineIndent(lead);
+                      if (leadLen == lead.length()) {   // if lead contains only spaces
+                        srcIndent = leadLen - WurbelHelper.determineIndent(srcText);
+                      }
+                    }
                   }
 
-                  if (ex instanceof WurbelTerminationException || getWurblet() == null) {
-                    throw ex;
+                  if (srcIndent > 0) {
+                    srcText = WurbelHelper.indent(srcText, srcIndent);
                   }
 
-                  // place exceptions in comments in output
+                  // replace and if no success delete
                   if (wurbletElement.isInline()) {
-                    // print only a single line as newlines would break the insertion point
-                    ps.print(" { " + ex.getMessage() + " } ");
+                    // inline wurblet: replace text between two consecutive /**/
+                    // within the next source element
+                    doc.replaceInline(srcText, elementIndex, wurbletElement);
                   }
                   else {
-                    // stacktraces may contain file path names, which on Windows contain backslashes.
-                    // Those backslashes can be harmful in many ways, for example, if a
-                    // backslash is followed by the lower-case letter 'u', the compiler will treat this as
-                    // a Unicode character and compilation could fail due to an illegal Unicode sequence.
-                    // -> simply replace all backslashes with forward slashes!
-                    HeapFile stackTrace = new HeapFile("",null);
-                    ex.printStackTrace(stackTrace.getPrintStream());
-                    ps.println("/********");
-                    ps.println(stackTrace.getText().replace('\\', '/'));
-                    ps.println("********/");
-                  }
-                }
-                // any other exception will abort (NPE, whatever)
-
-                // build generated text
-                String srcText = getWurblet().process(os.toString());
-
-                int srcIndent = 0;
-                if (indent >= 0) {
-                  // add fixed indent if option set
-                  srcIndent = indent;
-                }
-                else if (sourceType.isSmartIndent() && !wurbletElement.isInline()) {
-                  // smart indent: add extra spaces up to the start of the wurblet anchor's comment block
-                  SourceElement commentElement  = wurbletElement.getElement();
-                  if (commentElement.isComment()) {
-                    String lead = commentElement.getFirstLineLead();
-                    int leadLen = WurbelHelper.determineIndent(lead);
-                    if (leadLen == lead.length()) {   // if lead contains only spaces
-                      srcIndent = leadLen - WurbelHelper.determineIndent(srcText);
+                    // generate text into guarded section
+                    if (doc.replaceGuarded(guardType, foldType, wurbletElement.getName(), srcText, wurbletElement) == -1) {
+                      // insert the wurblet output
+                      doc.insertGuarded(guardType, foldType, wurbletElement.getName(), srcText, elementIndex + 1, wurbletElement);
                     }
                   }
                 }
-
-                if (srcIndent > 0) {
-                  srcText = WurbelHelper.indent(srcText, srcIndent);
-                }
-
-                // replace and if no success delete
-                if (wurbletElement.isInline()) {
-                  // inline wurblet: replace text between two consecutive /**/
-                  // within the next source element
-                  doc.replaceInline(srcText, elementIndex, wurbletElement);
-                }
-                else {
-                  // generate text into guarded section
-                  if (doc.replaceGuarded(guardType, foldType, wurbletElement.getName(), srcText, wurbletElement) == -1) {
-                    // insert the wurblet output
-                    doc.insertGuarded(guardType, foldType, wurbletElement.getName(), srcText, elementIndex + 1, wurbletElement);
+                finally {
+                  if (locked) {
+                    WURBLET_LOCK.unlock();
                   }
                 }
               }

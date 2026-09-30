@@ -18,25 +18,24 @@
 
 package org.wurbelizer.wurbel;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Factory and cache for {@link HeapFile}s.
+ * Factory and cache for {@link HeapFile}s.<br>
+ * The heapfiles are kept in the {@link WurbelContext#current() current} wurbel context.
  *
  * @author harald
  */
 public final class HeapFileFactory {
 
-  // all heapfiles
-  private static final Map<String,HeapFile> HEAP_FILES = new HashMap<>();
-
-
   /**
    * initializes the heapfiles.
    */
-  public static synchronized void initialize() {
-    HEAP_FILES.clear();
+  public static void initialize() {
+    Map<String,HeapFile> heapFiles = heapFiles();
+    synchronized (heapFiles) {
+      heapFiles.clear();
+    }
   }
 
   /**
@@ -48,13 +47,16 @@ public final class HeapFileFactory {
    *
    * @throws WurbelException if the file already exists
    */
-  public static synchronized HeapFile create(String heapName, String text) throws WurbelException {
-    if (HEAP_FILES.get(heapName) != null) {
-      throw new WurbelException("HeapFile '" + heapName + "' already exists");
+  public static HeapFile create(String heapName, String text) throws WurbelException {
+    Map<String,HeapFile> heapFiles = heapFiles();
+    synchronized (heapFiles) {
+      if (heapFiles.get(heapName) != null) {
+        throw new WurbelException("HeapFile '" + heapName + "' already exists");
+      }
+      HeapFile heapFile = new HeapFile(heapName, text);
+      heapFiles.put(heapName, heapFile);
+      return heapFile;
     }
-    HeapFile heapFile = new HeapFile(heapName, text);
-    HEAP_FILES.put(heapName, heapFile);
-    return heapFile;
   }
 
   /**
@@ -67,25 +69,28 @@ public final class HeapFileFactory {
    * @return the heapfile
    * @throws WurbelException if heapname is not unique
    */
-  public static synchronized HeapFile createOrOverwrite(String sourceName, String heapName, String text) throws WurbelException {
-    HeapFile heapFile = HEAP_FILES.get(heapName);
-    if (heapFile != null) {
-      if (heapFile.getSourceName() != null && sourceName != null &&
-          !heapFile.getSourceName().equals(sourceName)) {
-        throw new WurbelException("heapfile '" + heapName + "' created from more than one sources:\n" +
-                                   sourceName + " !=\n" + heapFile.getSourceName());
+  public static HeapFile createOrOverwrite(String sourceName, String heapName, String text) throws WurbelException {
+    Map<String,HeapFile> heapFiles = heapFiles();
+    synchronized (heapFiles) {
+      HeapFile heapFile = heapFiles.get(heapName);
+      if (heapFile != null) {
+        if (heapFile.getSourceName() != null && sourceName != null &&
+            !heapFile.getSourceName().equals(sourceName)) {
+          throw new WurbelException("heapfile '" + heapName + "' created from more than one sources:\n" +
+                                     sourceName + " !=\n" + heapFile.getSourceName());
+        }
+        heapFile.reset();
+        if (text != null) {
+          heapFile.getPrintStream().print(text);
+        }
       }
-      heapFile.reset();
-      if (text != null) {
-        heapFile.getPrintStream().print(text);
+      else  {
+        heapFile = new HeapFile(heapName, text);
+        heapFile.setSourceName(sourceName);
+        heapFiles.put(heapName, heapFile);
       }
+      return heapFile;
     }
-    else  {
-      heapFile = new HeapFile(heapName, text);
-      heapFile.setSourceName(sourceName);
-      HEAP_FILES.put(heapName, heapFile);
-    }
-    return heapFile;
   }
 
   /**
@@ -94,8 +99,11 @@ public final class HeapFileFactory {
    * @param heapName the name of the heapfile.
    * @return the heapfile, null if no such file.
    */
-  public static synchronized HeapFile get(String heapName) {
-    return HEAP_FILES.get(heapName);
+  public static HeapFile get(String heapName) {
+    Map<String,HeapFile> heapFiles = heapFiles();
+    synchronized (heapFiles) {
+      return heapFiles.get(heapName);
+    }
   }
 
 
@@ -105,8 +113,21 @@ public final class HeapFileFactory {
    * @param heapName the of heapfile
    * @return true if removed, false if no such file.
    */
-  public static synchronized boolean delete(String heapName) {
-    return HEAP_FILES.remove(heapName) != null;
+  public static boolean delete(String heapName) {
+    Map<String,HeapFile> heapFiles = heapFiles();
+    synchronized (heapFiles) {
+      return heapFiles.remove(heapName) != null;
+    }
+  }
+
+
+  /**
+   * Gets the heapfiles of the current wurbel context.
+   *
+   * @return the heapfiles
+   */
+  private static Map<String,HeapFile> heapFiles() {
+    return WurbelContext.current().heapFiles();
   }
 
 

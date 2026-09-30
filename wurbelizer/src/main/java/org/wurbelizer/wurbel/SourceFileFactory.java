@@ -18,19 +18,16 @@
 
 package org.wurbelizer.wurbel;
 
-import java.util.HashMap;
+import java.nio.file.Path;
 import java.util.Map;
 
 /**
- * A factory and cache for sourcefiles.
+ * A factory and cache for sourcefiles.<br>
+ * The sourcefiles are kept in the {@link WurbelContext#current() current} wurbel context.
  *
  * @author harald
  */
 public final class SourceFileFactory {
-
-  // all sourcefiles <filename>:<file>
-  private static final Map<String,SourceFile> FILE_MAP = new HashMap<>();
-
 
   /**
    * Opens the file and load into memory.<br>
@@ -41,29 +38,40 @@ public final class SourceFileFactory {
    *
    * @throws WurbelException if reading the file did fail
    */
-  public static synchronized SourceFile open(String filename) throws WurbelException {
-    SourceFile file = FILE_MAP.get(filename);
-    if (file == null) {
-      file = new SourceFile(filename);
+  public static SourceFile open(String filename) throws WurbelException {
+    String key = Path.of(filename).toAbsolutePath().normalize().toString();   // same file, regardless of how the name is given
+    Map<String,SourceFile> sourceFiles = sourceFiles();
+    synchronized (sourceFiles) {
+      SourceFile file = sourceFiles.get(key);
+      if (file == null) {
+        file = new SourceFile(filename);
+        sourceFiles.put(key, file);
+      }
+      return file;
     }
-    return file;
   }
 
 
   /**
    * Discard all files in list, if any.
    */
-  public static synchronized void initialize() {
-    FILE_MAP.clear();
+  public static void initialize() {
+    Map<String,SourceFile> sourceFiles = sourceFiles();
+    synchronized (sourceFiles) {
+      sourceFiles.clear();
+    }
   }
 
 
   /**
    * Rewinds all output streams (makes them empty again).
    */
-  public static synchronized void resetAll()  {
-    for (SourceFile file: FILE_MAP.values())  {
-      file.reset();
+  public static void resetAll()  {
+    Map<String,SourceFile> sourceFiles = sourceFiles();
+    synchronized (sourceFiles) {
+      for (SourceFile file: sourceFiles.values())  {
+        file.reset();
+      }
     }
   }
 
@@ -74,15 +82,28 @@ public final class SourceFileFactory {
    * @return the number of updated files
    * @throws WurbelException if closing a file failed
    */
-  public static synchronized int flushAll() throws WurbelException {
-    int updated = 0;
-    for (SourceFile file: FILE_MAP.values())  {
-      if (file.flush()) {
-        updated++;
+  public static int flushAll() throws WurbelException {
+    Map<String,SourceFile> sourceFiles = sourceFiles();
+    synchronized (sourceFiles) {
+      int updated = 0;
+      for (SourceFile file: sourceFiles.values())  {
+        if (file.flush()) {
+          updated++;
+        }
       }
+      sourceFiles.clear();
+      return updated;
     }
-    FILE_MAP.clear();
-    return updated;
+  }
+
+
+  /**
+   * Gets the sourcefiles of the current wurbel context.
+   *
+   * @return the sourcefiles
+   */
+  private static Map<String,SourceFile> sourceFiles() {
+    return WurbelContext.current().sourceFiles();
   }
 
 

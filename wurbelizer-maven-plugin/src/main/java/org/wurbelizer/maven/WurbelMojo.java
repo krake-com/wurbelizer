@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 package org.wurbelizer.maven;
 
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -36,6 +35,7 @@ import java.io.File;
 @Mojo(name = "wurbel",
       defaultPhase = LifecyclePhase.PROCESS_SOURCES,
       configurator = "set-classrealm",
+      threadSafe = true,
       requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
 public class WurbelMojo extends AbstractWurbelMojo {
 

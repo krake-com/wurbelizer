@@ -36,6 +36,7 @@ import java.io.File;
 @Mojo(name = "test-wurbel",
       defaultPhase = LifecyclePhase.PROCESS_TEST_SOURCES,
       configurator = "set-classrealm",
+      threadSafe = true,
       requiresDependencyResolution = ResolutionScope.TEST)
 public class TestWurbelMojo extends AbstractWurbelMojo {
 

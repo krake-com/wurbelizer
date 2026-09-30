@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 package org.wurbelizer.maven;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -30,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.wurbelizer.misc.Constants;
 import org.wurbelizer.misc.Logger;
 import org.wurbelizer.misc.Verbosity;
+import org.wurbelizer.wurbel.WurbelContext;
 import org.wurbelizer.wurbel.WurbelHelper;
 import org.wurbelizer.wurbile.SourceWurbiler;
 import org.wurbelizer.wurbile.WurbileException;
@@ -40,17 +40,17 @@ import java.io.IOException;
 
 /**
  * Wurbile Wurblets.<br>
- * The wurblet sources (wrbl-files) are translated to Java-sources
+ * The wurblet sources (wrbl-files) are translated to Java sources
  * and ser-files (serialized fixed text) and then compiled to Java class files.<br>
- * Those class files can later be instantiated as code generators by the Wurbler.<br>
- * See the wurbelizer:wurbel goal.
+ * The Wurbler can later instantiate those class files as code generators.<br>
+ * See the {@code wurbelizer:wurbel} goal.
  *
  * @author harald
  */
 @Mojo(name = "wurbile",
-      defaultPhase = LifecyclePhase.GENERATE_SOURCES)
+      defaultPhase = LifecyclePhase.GENERATE_SOURCES,
+      threadSafe = true)
 public class WurbileMojo extends AbstractWurbelizerMojo {
-
 
   /**
    * Directory holding the wurblet sources.
@@ -81,7 +81,6 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
   private Integer indent;
 
 
-
   /**
    * Total number of errors
    */
@@ -89,11 +88,7 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
 
 
   @Override
-  public void execute() throws MojoExecutionException, MojoFailureException {
-
-    if (isSkipped()) {
-      return;
-    }
+  protected void doExecute(WurbelContext context) throws MojoExecutionException, MojoFailureException {
 
     // validate configuration
     validate();
@@ -142,18 +137,16 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
     }
   }
 
-
-
   /**
    * Creates an instance of a wurbiler.
    *
    * @param wrblFile the input wurbelizer file
-   * @param outputJavaDir the output directory getting the Java-files
+   * @param outputJavaDir the output directory getting the Java files
    * @param outputTextDir the output directory getting the fixed text .ser-files.
    * @param logger the logger
    * @param verbosity the verbosity
    * @return the wurbiler
-   * @throws IOException if source file could not be loaded
+   * @throws IOException if the source file could not be loaded
    */
   protected Wurbiler createWurbiler(File wrblFile, File outputJavaDir, File outputTextDir, Logger logger, Verbosity verbosity)
          throws IOException {
@@ -195,7 +188,7 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
 
         File wurbletFile = new File(dirName + File.separator + fileName);
 
-        // set per file extra properties (e.g. for include processing)
+        // set per file extra properties (e.g., for include processing)
         WurbelHelper.getExtraProperties().setProperty("currentDir", wurbletFile.getParent());
         WurbelHelper.getExtraProperties().setProperty("currentFile", wurbletFile.getName());
 
@@ -239,7 +232,6 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
     getLog().info(getPathRelativeToBasedir(new File(dirName).getAbsolutePath()) + ": " +
                   wurbiledFilesCount + " files wurbiled, " + errorFilesCount + " errors");
   }
-
 
   /**
    * Checks mandatory params.<br>

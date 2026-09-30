@@ -54,6 +54,37 @@ the following properties:
 - `WURBLET_GUARDNAME` (`"guardname"`): the name of the guarded block.
 - `WURBLET_WURBLETNAME` (`"wurbletname"`): the name of the wurblet.
 
+### Thread safety
+
+Build tools may run several wurblers concurrently, for example the Maven plugin in a
+parallel build (see [Parallel builds](maven.md#parallel-builds)). Each run is bound to
+its own `org.wurbelizer.wurbel.WurbelContext`. The static accessors of the Wurbelizer API,
+such as `WurbelHelper.getExtraProperties()`, `HeapFileFactory`, `WurbelHelper.openReader()`
+and `Settings.getEncodingCharset()`, refer to the context of the current run.
+Keep the following in mind:
+
+- Wurblets are not considered thread-safe by default: `Wurblet.isThreadSafe()` returns `false`
+  in `AbstractWurblet`. Such wurblets are executed sequentially, i.e., no two of them run at
+  the same time within the same JVM, even if the build tool wurbels several modules in parallel.
+- A wurblet that doesn't share any mutable state with other wurblet instances (no static fields,
+  no non-thread-safe libraries) can opt in to run concurrently by overriding `isThreadSafe()`
+  in its superclass or in its `.wrbl` source:
+
+  ```
+  @[
+    @Override
+    public boolean isThreadSafe() {
+      return true;
+    }
+  ]@
+  ```
+
+- The context is bound to the current thread. Threads started by a wurblet don't see it,
+  unless they are forked via `java.util.concurrent.StructuredTaskScope`.
+- If you read resources from the wurblet's jar, open the `URLConnection` with
+  `setUseCaches(false)` instead of using `getResourceAsStream()`. The JVM shares cached
+  jar files among classloaders, and a concurrent run may close them.
+
 ## Skeleton extending AbstractJavaWurblet
 
 The following code skeleton is a good starting point for writing your own wurblet.

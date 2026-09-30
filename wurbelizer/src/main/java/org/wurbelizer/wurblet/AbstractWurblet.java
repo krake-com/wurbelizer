@@ -26,9 +26,9 @@ import java.io.PrintStream;
 /**
  * Provides basic functionality of a wurblet.
  * <p>
- * A wurblet is a code generator that is invoked from within a container,
+ * A wurblet is a code generator invoked from within a container,
  * the so-called wurbler. Wurblets generate code to one or more output streams.
- * The default output stream and the fixed source list is provided by the wurbler.
+ * The default output stream and the fixed source list are provided by the wurbler.
  * <p>
  * The general form of a wurblet anchor is:
  * <p>
@@ -82,10 +82,19 @@ public abstract class AbstractWurblet implements Wurblet {
     source = container.getSource();
   }
 
-
   @Override
   public void cleanup() throws WurbelException {
     // do nothing
+  }
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * The default is false. Override to return true if the wurblet is thread-safe.
+   */
+  @Override
+  public boolean isThreadSafe() {
+    return false;
   }
 
   @Override
@@ -126,7 +135,6 @@ public abstract class AbstractWurblet implements Wurblet {
     this.configuration = config;
   }
 
-
   /**
    * Gets the guardname
    * @return the guardname
@@ -139,7 +147,6 @@ public abstract class AbstractWurblet implements Wurblet {
     }
     return guardName;
   }
-
 
   @Override
   public String toString() {

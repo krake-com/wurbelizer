@@ -99,4 +99,17 @@ public interface Wurblet {
    */
   void setConfiguration(String config);
 
+  /**
+   * Returns whether this wurblet is thread-safe.<br>
+   * Build tools may wurbel several sources concurrently, for example the Maven plugin in parallel builds.
+   * Only thread-safe wurblets are executed concurrently. All others are executed sequentially,
+   * i.e. no two non-thread-safe wurblets run at the same time within the same JVM.
+   * <p>
+   * A wurblet is thread-safe if it doesn't share any mutable state with other wurblet instances,
+   * for example in static fields or in non-thread-safe libraries.
+   *
+   * @return true if thread-safe, false if must be executed sequentially
+   */
+  boolean isThreadSafe();
+
 }

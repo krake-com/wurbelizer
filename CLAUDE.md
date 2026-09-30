@@ -78,12 +78,12 @@ wurbelizer-parent/          (root POM, version 25.0-SNAPSHOT)
 
 ### Key Interfaces
 
-| Interface | Package | Role |
-|---|---|---|
-| `Wurbler` | `org.wurbelizer.wurbel` | Container that loads and runs a wurblet against a source file |
-| `Wurblet` | `org.wurbelizer.wurblet` | A code generator; implements `run()`, `process()`, `cleanup()` |
-| `Wurbiler` | `org.wurbelizer.wurbile` | Compiler that translates `.wrbl` source to Java + `.ser` |
-| `SourceRegion` | `org.wurbelizer.wurbel` | Guard-type strategy; registered via `META-INF/services` SPI |
+| Interface      | Package                  | Role                                                                                                                                                                       |
+|----------------|--------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Wurbler`      | `org.wurbelizer.wurbel`  | Container that loads and runs a wurblet against a source file                                                                                                              |
+| `Wurblet`      | `org.wurbelizer.wurblet` | A code generator; implements `run()`, `process()`, `cleanup()`; `isThreadSafe()` (default `false` in `AbstractWurblet`) — non-thread-safe wurblets are serialized JVM-wide |
+| `Wurbiler`     | `org.wurbelizer.wurbile` | Compiler that translates `.wrbl` source to Java + `.ser`                                                                                                                   |
+| `SourceRegion` | `org.wurbelizer.wurbel`  | Guard-type strategy; registered via `META-INF/services` SPI                                                                                                                |
 
 ### Key Classes
 
@@ -92,7 +92,8 @@ wurbelizer-parent/          (root POM, version 25.0-SNAPSHOT)
 - **`AbstractWurbiler`** — Base `Wurbiler` implementation. Translates `@[...]@` / `@(...)@` / `@{...}@` syntax from a `.wrbl` reader into a Java writer and a `List<String>` (fixed source).
 - **`HeapFile`** / **`HeapFileFactory`** — In-memory files for here-documents. Files whose name starts with `.` stay on the heap; others are written to disk. Heap files persist for the whole wurbel lifecycle phase across all source files.
 - **`AbstractWurblet`** / **`AbstractJavaWurblet`** — Base classes for wurblets; extend via `@{extends}@` directive in `.wrbl` source.
-- **`Settings`** — Global singleton for the file encoding charset (default UTF-8).
+- **`WurbelContext`** — Per-run state (encoding charset, extra properties, heap files, source files, wurblet classloader), bound via `ScopedValue`. The static accessors in `Settings`, `WurbelHelper`, `HeapFileFactory` and `SourceFileFactory` delegate to `WurbelContext.current()`; unbound callers (Ant, console, tests) share a global context. The Maven mojos bind a fresh context per execution and are `threadSafe`.
+- **`Settings`** — File encoding charset (default UTF-8), kept in the current `WurbelContext`.
 
 ### Guard Types (SPI)
 
@@ -105,11 +106,11 @@ Custom guard types implement `SourceRegion` and self-register.
 
 ### Maven Plugin Goals
 
-| Goal | Phase | Purpose |
-|---|---|---|
-| `wurbile` | `generate-sources` | Compile wurblet `.wrbl` sources → Java + `.ser` |
-| `wurbel` | `process-sources` | Run wurbler on main sources |
-| `test-wurbel` | `process-test-sources` | Run wurbler on test sources |
+| Goal          | Phase                  | Purpose                                         |
+|---------------|------------------------|-------------------------------------------------|
+| `wurbile`     | `generate-sources`     | Compile wurblet `.wrbl` sources → Java + `.ser` |
+| `wurbel`      | `process-sources`      | Run wurbler on main sources                     |
+| `test-wurbel` | `process-test-sources` | Run wurbler on test sources                     |
 
 The plugin uses a custom `ClassRealmConfigurator` (`set-classrealm`) so that wurblet classes compiled in earlier phases are visible at wurbel time. `WurbelMojo` and `TestWurbelMojo` both extend `AbstractWurbelMojo`; `WurbileMojo` extends `AbstractWurbelizerMojo`.
 
@@ -117,22 +118,22 @@ The plugin uses a custom `ClassRealmConfigurator` (`set-classrealm`) so that wur
 
 Files start at output level. Level-switching markers:
 
-| Marker | Meaning |
-|---|---|
-| `@[` … `]@` | Switch to wurblet (Java) level |
-| `@(` … `)@` | Embed wurblet-level expression in output |
-| `@{directive ...}@` | Wurbiler directive (compile-time) |
+| Marker              | Meaning                                  |
+|---------------------|------------------------------------------|
+| `@[` … `]@`         | Switch to wurblet (Java) level           |
+| `@(` … `)@`         | Embed wurblet-level expression in output |
+| `@{directive ...}@` | Wurbiler directive (compile-time)        |
 
 Common directives: `@{package}@`, `@{import}@`, `@{extends}@`, `@{implements}@`, `@{include}@`, `@{args}@`, `@{to <stream>}@`, `@{phase N}@`, `@{indent N|auto}@`, `@{comment ...}@`, `@{code ...}@`, `@{config ...}@`.
 
 ## Source-Level Syntax (inside application source files)
 
-| Construct | Syntax | Purpose |
-|---|---|---|
-| Wurblet anchor | `@wurblet[(wurbler-directive)] <tag> <WurbletClass> [args...]` | Bind generated code to a wurblet |
-| Here-document | `@> <filename>` … `@<` | Inline data file; `.filename` stays in heap |
-| Variable block | `@{` … `@}` inside a comment | Declare `key = value` variables |
-| Variable ref | `$var` or `${var}` | Used in args and variable values |
+| Construct      | Syntax                                                         | Purpose                                     |
+|----------------|----------------------------------------------------------------|---------------------------------------------|
+| Wurblet anchor | `@wurblet[(wurbler-directive)] <tag> <WurbletClass> [args...]` | Bind generated code to a wurblet            |
+| Here-document  | `@> <filename>` … `@<`                                         | Inline data file; `.filename` stays in heap |
+| Variable block | `@{` … `@}` inside a comment                                   | Declare `key = value` variables             |
+| Variable ref   | `$var` or `${var}`                                             | Used in args and variable values            |
 
 Anchors live in Java comments (single-line or block); generated code can contain new anchors, so the wurbler re-parses until stable. Args are whitespace-separated (quote to include whitespace) and may span lines via a trailing `\`. Variables resolve from inline `@{ @}` blocks, `.wurb` property files, Maven/Ant properties and environment variables (recursively).
 

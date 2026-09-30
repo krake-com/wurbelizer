@@ -113,6 +113,23 @@ This is what makes it possible to keep the variables in a resource directory ins
 next to the source, and a file already reached through another pattern is never
 processed twice.
 
+## Parallel builds
+
+All goals (`wurbile`, `wurbel` and `test-wurbel`) are thread-safe and can be used in
+parallel builds (`mvn -T ...`). Each execution runs in its own context, so the
+following are isolated per module:
+
+- the file encoding (`project.build.sourceEncoding`),
+- the extra properties, including `wurbletProperties`, `currentDir` and `currentFile`,
+- the heap files: modules may use the same heap-file names without clashing,
+- the classloader for the `wurbletDependencies`. Each execution gets its own child realm
+  of the plugin's classrealm, so different modules may even use different versions of
+  the same wurblet artifact.
+
+Wurblets are executed sequentially across all modules unless they declare themselves
+thread-safe by overriding `isThreadSafe()`, see [Thread safety](writing-wurblets.md#thread-safety).
+Only thread-safe wurblets run in parallel.
+
 ---
 
 **Navigation:** [← Previous: Build Tool Integration](integration.md) | [Contents](toc.md) · [Index](index.md) | [Next: Ant Integration →](ant.md)

@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 package org.wurbelizer.maven;
 
 import org.apache.maven.RepositoryUtils;
@@ -27,6 +26,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
+import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
@@ -44,12 +45,14 @@ import org.wurbelizer.misc.Verbosity;
 import org.wurbelizer.wurbel.HeapFileFactory;
 import org.wurbelizer.wurbel.SourceException;
 import org.wurbelizer.wurbel.SourceWurbler;
+import org.wurbelizer.wurbel.WurbelContext;
 import org.wurbelizer.wurbel.WurbelException;
 import org.wurbelizer.wurbel.WurbelHelper;
 import org.wurbelizer.wurbel.WurbelResult;
 import org.wurbelizer.wurbel.Wurbler;
 import org.wurbelizer.wurbel.WurbletExecutionFilter;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -63,10 +66,9 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
-import javax.inject.Inject;
 
 /**
  * Base class for the wurbel mojos.<br>
@@ -76,6 +78,18 @@ import javax.inject.Inject;
  * @author harald
  */
 public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
+
+  /**
+   * The packages of the wurbelizer core imported from the plugin's classrealm into the wurblet realms.
+   */
+  private static final String[] CORE_PACKAGES = {
+    "org.wurbelizer.misc", "org.wurbelizer.wurbel", "org.wurbelizer.wurbile", "org.wurbelizer.wurblet"
+  };
+
+  /**
+   * Counter to create unique realm IDs.
+   */
+  private static final AtomicLong REALM_COUNTER = new AtomicLong();
 
   /**
    * Gets the directory holding the sources to be wurbelized.
@@ -92,6 +106,7 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
    */
   public abstract File getAnalyzeDir();
 
+
   /**
    * Target directory for all files referenced by wurblets.
    */
@@ -99,7 +114,6 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
              property = "wurbel.wurbelDir",
              required = true)
   private File wurbelDir;
-
 
   /**
    * Classpaths for loading wurblets.<br>
@@ -130,7 +144,6 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
    */
   @Parameter
   private boolean dryRun;
-
 
   /**
    * Optional list of regular expressions describing the wurblet names used in the wurblet anchors.<br>
@@ -174,6 +187,7 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
   @Parameter
   private int lastPhase = Integer.MAX_VALUE;
 
+
   /**
    * Optional wurblet execution filter.
    */
@@ -187,17 +201,6 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
    */
   private ClassRealm classRealm;
 
-
-  /**
-   * Sets the classrealm.
-   *
-   * @param classRealm the realm
-   */
-  public void setClassRealm(ClassRealm classRealm) {
-    this.classRealm = classRealm;
-  }
-
-
   /**
    * To resolve the wurblet artifacts.
    */
@@ -210,12 +213,52 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
   private int totalErrors;
 
 
-  @Override
-  public void execute() throws MojoExecutionException, MojoFailureException {
+  /**
+   * Sets the classrealm.
+   *
+   * @param classRealm the realm
+   */
+  public void setClassRealm(ClassRealm classRealm) {
+    this.classRealm = classRealm;
+  }
 
-    if (isSkipped()) {
-      return;
-    }
+  /**
+   * Creates a {@link Wurbler}.
+   *
+   * @param filename the full pathname of the java-file
+   * @param wurbFilename optional wurblet properties file, null to check in same dir
+   * @param wurbletPath the list of package names to load wurblets from (if wurblet name is not absolute)
+   * @param analyzeDir the list of directories wurblets load extra information from (usually from apt-runs)
+   * @param phase the wurbel phase, 0 for heredocs, wurblets start at 1
+   * @param wurbletFilter optional wurblet execution filter
+   * @param dryRun true to just parse the source file, don't run any wurblets
+   * @param logger the logger (can also be used by the wurblets)
+   * @param verbosity the verbosity
+   * @param errorsSoFar a set of errors logged so far, null if no suppression of repeating errors
+   * @param collectedPhases the phases of all wurblets detected so far
+   * @return the wurbler
+   * @throws WurbelException if loading the wurb-file failed
+   */
+  public Wurbler createWurbler(String filename, String wurbFilename, String[] wurbletPath, String analyzeDir, int phase,
+                               WurbletExecutionFilter wurbletFilter, boolean dryRun,
+                               Logger logger, Verbosity verbosity, Set<String> errorsSoFar, Set<Integer> collectedPhases) throws WurbelException {
+    return new SourceWurbler(
+      filename,
+      wurbFilename,
+      wurbletPath,
+      analyzeDir,
+      phase,
+      wurbletFilter,
+      dryRun,
+      logger,
+      verbosity,
+      errorsSoFar,
+      collectedPhases);
+  }
+
+
+  @Override
+  protected void doExecute(WurbelContext context) throws MojoExecutionException, MojoFailureException {
 
     // validate configuration
     validate();
@@ -232,8 +275,140 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
     // setup resource directories for detecting wurb-files
     findResourceDirs();
 
-    // update the classloader with wurbletDependencies
-    updateClassLoader();
+    // create the classloader for the wurbletDependencies, if any
+    ClassRealm wurbletRealm = createWurbletRealm();
+    Thread thread = Thread.currentThread();
+    ClassLoader oldContextClassLoader = thread.getContextClassLoader();
+    try {
+      if (wurbletRealm != null) {
+        context.setWurbletClassLoader(wurbletRealm);
+        thread.setContextClassLoader(wurbletRealm);
+      }
+      wurbelize();
+    }
+    finally {
+      thread.setContextClassLoader(oldContextClassLoader);
+      if (wurbletRealm != null) {
+        context.setWurbletClassLoader(null);
+        try {
+          wurbletRealm.getWorld().disposeRealm(wurbletRealm.getId());
+        }
+        catch (NoSuchRealmException ex) {
+          getLog().warn("cannot dispose " + wurbletRealm.getId(), ex);
+        }
+      }
+    }
+  }
+
+  /**
+   * Creates the extra properties.
+   *
+   * @return the properties
+   */
+  @Override
+  protected Properties createExtraProperties() {
+
+    Properties props = super.createExtraProperties();
+    props.setProperty("wurbelDir", wurbelDir.getAbsolutePath());
+
+    if (wurbletProperties != null) {
+      Properties tmpProps = new Properties();
+      Enumeration<?> keys = wurbletProperties.keys();
+      while (keys.hasMoreElements())  {
+        Object key = keys.nextElement();
+        if (key instanceof String)  {
+          Object value = wurbletProperties.get(key);
+          if (value instanceof String)  {
+            tmpProps.setProperty((String) key, (String) value);
+          }
+        }
+      }
+      // next round: evaluate expressions
+      keys = tmpProps.keys();
+      while (keys.hasMoreElements())  {
+        Object key = keys.nextElement();
+        if (key instanceof String)  {
+          Object value = wurbletProperties.get(key);
+          if (value instanceof String)  {
+            String strValue = WurbelHelper.translateVariables((String) value, props);
+            props.setProperty((String) key, strValue);
+          }
+        }
+      }
+    }
+
+    return props;
+  }
+
+  /**
+   * Checks mandatory params.<br>
+   *
+   * @throws MojoExecutionException if validation fails.
+   */
+  protected void validate() throws MojoExecutionException {
+    if (getSourceDir() == null) {
+      throw new MojoExecutionException("missing wurbel.sourceDir");
+    }
+    if (getAnalyzeDir() == null) {
+      throw new MojoExecutionException("missing wurbel.analyzeDir");
+    }
+    if (wurbelDir == null) {
+      throw new MojoExecutionException("missing wurbel.wurbelDir");
+    }
+    if (wurbletPaths == null) {
+      throw new MojoExecutionException("missing wurbletPaths");
+    }
+    if (wurbletPaths.isEmpty()) {
+      throw new MojoExecutionException("wurbletPaths is empty");
+    }
+
+    try {
+      boolean createFilter = false;
+      List<Pattern> includeAnchorPatterns = new ArrayList<>();
+      if (includeAnchors != null) {
+        for (String anchor : includeAnchors) {
+          includeAnchorPatterns.add(Pattern.compile(anchor));
+          createFilter = true;
+        }
+      }
+      List<Pattern> includeWurbletPatterns = new ArrayList<>();
+      if (includeWurblets != null) {
+        for (String wurblet: includeWurblets) {
+          includeWurbletPatterns.add(Pattern.compile(wurblet));
+          createFilter = true;
+        }
+      }
+      List<Pattern> excludeAnchorPatterns = new ArrayList<>();
+      if (excludeAnchors != null) {
+        for (String anchor : excludeAnchors) {
+          excludeAnchorPatterns.add(Pattern.compile(anchor));
+          createFilter = true;
+        }
+      }
+      List<Pattern> excludeWurbletPatterns = new ArrayList<>();
+      if (excludeWurblets != null) {
+        for (String wurblet: excludeWurblets) {
+          excludeWurbletPatterns.add(Pattern.compile(wurblet));
+          createFilter = true;
+        }
+      }
+      wurbelFilter = createFilter ?
+                       new WurbelFilter(includeWurbletPatterns, includeAnchorPatterns,
+                                        excludeWurbletPatterns, excludeAnchorPatterns) : null;
+    }
+    catch (PatternSyntaxException px) {
+      throw new MojoExecutionException("cannot compile filter pattern  '" + px.getPattern() + "': " + px.getMessage(), px);
+    }
+  }
+
+
+  /**
+   * Wurbelizes the sources.
+   *
+   * @throws MojoExecutionException if an unexpected problem occurs
+   * @throws MojoFailureException if wurbel errors occurred
+   */
+  private void wurbelize() throws MojoExecutionException, MojoFailureException {
 
     // create any missing directories
     if (!wurbelDir.exists()) {
@@ -258,7 +433,6 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
     if (!getAnalyzeDir().isDirectory()) {
       throw new MojoExecutionException(getAnalyzeDir() + " is not a directory");
     }
-
 
     TreeSet<Integer> collectedPhases = new TreeSet<>();
     collectedPhases.add(0);     // usually not part of any wurblet definition
@@ -345,42 +519,6 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
       throw new MojoFailureException(totalErrors + " wurbel errors");
     }
   }
-
-
-  /**
-   * Creates a {@link Wurbler}.
-   *
-   * @param filename the full pathname of the java-file
-   * @param wurbFilename optional wurblet properties file, null to check in same dir
-   * @param wurbletPath the list of package names to load wurblets from (if wurblet name is not absolute)
-   * @param analyzeDir the list of directories wurblets load extra information from (usually from apt-runs)
-   * @param phase the wurbel phase, 0 for heredocs, wurblets start at 1
-   * @param wurbletFilter optional wurblet execution filter
-   * @param dryRun true to just parse the source file, don't run any wurblets
-   * @param logger the logger (can also be used by the wurblets)
-   * @param verbosity the verbosity
-   * @param errorsSoFar a set of errors logged so far, null if no suppression of repeating errors
-   * @param collectedPhases the phases of all wurblets detected so far
-   * @return the wurbler
-   * @throws WurbelException if loading the wurb-file failed
-   */
-  public Wurbler createWurbler(String filename, String wurbFilename, String[] wurbletPath, String analyzeDir, int phase,
-                               WurbletExecutionFilter wurbletFilter, boolean dryRun,
-                               Logger logger, Verbosity verbosity, Set<String> errorsSoFar, Set<Integer> collectedPhases) throws WurbelException {
-    return new SourceWurbler(
-            filename,
-            wurbFilename,
-            wurbletPath,
-            analyzeDir,
-            phase,
-            wurbletFilter,
-            dryRun,
-            logger,
-            verbosity,
-            errorsSoFar,
-            collectedPhases);
-  }
-
 
   /**
    * Wurbel all files in a fileset.
@@ -527,8 +665,6 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
     return hereDocsUpdated;
   }
 
-
-
   /**
    * Gets the wurblet paths.
    *
@@ -538,194 +674,128 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
     return wurbletPaths.toArray(new String[0]);
   }
 
-
-
   /**
-   * Creates the extra properties.
+   * Creates a classrealm for the wurbletDependencies.<br>
+   * The realm is a child of the plugin's classrealm and imports the wurbelizer core packages from it.
+   * Each execution gets its own realm, so that the wurbletDependencies of different executions
+   * or modules don't interfere with each other.
    *
-   * @return the properties
+   * @return the realm, null if no wurbletDependencies
+   * @throws MojoExecutionException if resolving the artifacts or creating the realm failed
    */
-  @Override
-  protected Properties createExtraProperties() {
+  private ClassRealm createWurbletRealm() throws MojoExecutionException {
 
-    Properties props = super.createExtraProperties();
-    props.setProperty("wurbelDir", wurbelDir.getAbsolutePath());
+    if (wurbletDependencies == null) {
+      return null;
+    }
 
-    if (wurbletProperties != null) {
-      Properties tmpProps = new Properties();
-      Enumeration<?> keys = wurbletProperties.keys();
-      while (keys.hasMoreElements())  {
-        Object key = keys.nextElement();
-        if (key instanceof String)  {
-          Object value = wurbletProperties.get(key);
-          if (value instanceof String)  {
-            tmpProps.setProperty((String) key, (String) value);
-          }
-        }
+    Set<Artifact> wurbletArtifacts = new LinkedHashSet<>();   // keeps the classpath order deterministic
+
+    RepositorySystemSession repoSession = session.getRepositorySession();
+    List<org.eclipse.aether.graph.Dependency> managedDependencies = new ArrayList<>();
+    if (project.getDependencyManagement() != null) {
+      for (Dependency managed : project.getDependencyManagement().getDependencies()) {
+        managedDependencies.add(RepositoryUtils.toDependency(managed, repoSession.getArtifactTypeRegistry()));
       }
-      // next round: evaluate expressions
-      keys = tmpProps.keys();
-      while (keys.hasMoreElements())  {
-        Object key = keys.nextElement();
-        if (key instanceof String)  {
-          Object value = wurbletProperties.get(key);
-          if (value instanceof String)  {
-            String strValue = WurbelHelper.translateVariables((String) value, props);
-            props.setProperty((String) key, strValue);
-          }
+    }
+
+    for (Dependency dep : wurbletDependencies) {
+
+      Artifact artifact = new DefaultArtifact(
+              dep.getGroupId(), dep.getArtifactId(), dep.getClassifier(), dep.getType(), dep.getVersion());
+
+      CollectRequest collectRequest = new CollectRequest(
+              new org.eclipse.aether.graph.Dependency(artifact, JavaScopes.RUNTIME),
+              project.getRemoteProjectRepositories());
+      collectRequest.setManagedDependencies(managedDependencies);
+
+      DependencyRequest dependencyRequest = new DependencyRequest(
+              collectRequest, DependencyFilterUtils.classpathFilter(JavaScopes.RUNTIME));
+
+      List<ArtifactResult> results;
+      try {
+        results = repositorySystem.resolveDependencies(repoSession, dependencyRequest).getArtifactResults();
+      }
+      catch (DependencyResolutionException ex) {
+        // partially resolved artifacts are still reported by the exception, but the wurblets must be complete
+        throw new MojoExecutionException("cannot resolve wurblet artifact " + artifact, ex);
+      }
+
+      if (results.isEmpty()) {
+        throw new MojoExecutionException("cannot resolve wurblet artifact " + artifact);
+      }
+      for (ArtifactResult result : results) {
+        Artifact resolvedArtifact = result.getArtifact();
+        if (isWurbelizerCore(resolvedArtifact)) {
+          continue;   // already provided by the plugin's classrealm
+        }
+        wurbletArtifacts.add(resolvedArtifact);
+        if (verbosityLevel.isDebug()) {
+          getLog().debug("wurblet artifact " + resolvedArtifact + " added");
         }
       }
     }
 
-    return props;
-  }
+    // determine the URLs of all the jars we just downloaded
+    List<URL> urls = new ArrayList<>();
+    StringBuilder missingDeps = null;
 
-
-  /**
-   * Checks mandatory params.<br>
-   *
-   * @throws MojoExecutionException if validation fails.
-   */
-  protected void validate() throws MojoExecutionException {
-    if (getSourceDir() == null) {
-      throw new MojoExecutionException("missing wurbel.sourceDir");
-    }
-    if (getAnalyzeDir() == null) {
-      throw new MojoExecutionException("missing wurbel.analyzeDir");
-    }
-    if (wurbelDir == null) {
-      throw new MojoExecutionException("missing wurbel.wurbelDir");
-    }
-    if (wurbletPaths == null) {
-      throw new MojoExecutionException("missing wurbletPaths");
-    }
-    if (wurbletPaths.isEmpty()) {
-        throw new MojoExecutionException("wurbletPaths is empty");
-    }
-
-    try {
-      boolean createFilter = false;
-      List<Pattern> includeAnchorPatterns = new ArrayList<>();
-      if (includeAnchors != null) {
-        for (String anchor : includeAnchors) {
-          includeAnchorPatterns.add(Pattern.compile(anchor));
-          createFilter = true;
+    for (Artifact artifact : wurbletArtifacts) {
+      try {
+        File file = artifact.getFile();
+        if (file != null) {
+          urls.add(file.toURI().toURL());
         }
-      }
-      List<Pattern> includeWurbletPatterns = new ArrayList<>();
-      if (includeWurblets != null) {
-        for (String wurblet: includeWurblets) {
-          includeWurbletPatterns.add(Pattern.compile(wurblet));
-          createFilter = true;
-        }
-      }
-      List<Pattern> excludeAnchorPatterns = new ArrayList<>();
-      if (excludeAnchors != null) {
-        for (String anchor : excludeAnchors) {
-          excludeAnchorPatterns.add(Pattern.compile(anchor));
-          createFilter = true;
-        }
-      }
-      List<Pattern> excludeWurbletPatterns = new ArrayList<>();
-      if (excludeWurblets != null) {
-        for (String wurblet: excludeWurblets) {
-          excludeWurbletPatterns.add(Pattern.compile(wurblet));
-          createFilter = true;
-        }
-      }
-      wurbelFilter = createFilter ?
-                     new WurbelFilter(includeWurbletPatterns, includeAnchorPatterns,
-                                      excludeWurbletPatterns, excludeAnchorPatterns) : null;
-    }
-    catch (PatternSyntaxException px) {
-      throw new MojoExecutionException("cannot compile filter pattern  '" + px.getPattern() + "': " + px.getMessage(), px);
-    }
-  }
-
-
-  private void updateClassLoader() throws MojoExecutionException {
-
-    if (wurbletDependencies != null) {
-      Set<Artifact> wurbletArtifacts = new LinkedHashSet<>();   // keeps the classpath order deterministic
-
-      RepositorySystemSession repoSession = session.getRepositorySession();
-      List<org.eclipse.aether.graph.Dependency> managedDependencies = new ArrayList<>();
-      if (project.getDependencyManagement() != null) {
-        for (Dependency managed : project.getDependencyManagement().getDependencies()) {
-          managedDependencies.add(RepositoryUtils.toDependency(managed, repoSession.getArtifactTypeRegistry()));
-        }
-      }
-
-      for (Dependency dep : wurbletDependencies) {
-
-        Artifact artifact = new DefaultArtifact(
-                dep.getGroupId(), dep.getArtifactId(), dep.getClassifier(), dep.getType(), dep.getVersion());
-
-        CollectRequest collectRequest = new CollectRequest(
-                new org.eclipse.aether.graph.Dependency(artifact, JavaScopes.RUNTIME),
-                project.getRemoteProjectRepositories());
-        collectRequest.setManagedDependencies(managedDependencies);
-
-        DependencyRequest dependencyRequest = new DependencyRequest(
-                collectRequest, DependencyFilterUtils.classpathFilter(JavaScopes.RUNTIME));
-
-        List<ArtifactResult> results;
-        try {
-          results = repositorySystem.resolveDependencies(repoSession, dependencyRequest).getArtifactResults();
-        }
-        catch (DependencyResolutionException ex) {
-          // partially resolved artifacts are still reported by the exception, but the wurblets must be complete
-          throw new MojoExecutionException("cannot resolve wurblet artifact " + artifact, ex);
-        }
-
-        if (results.isEmpty()) {
-          throw new MojoExecutionException("cannot resolve wurblet artifact " + artifact);
-        }
-        for (ArtifactResult result : results) {
-          Artifact resolvedArtifact = result.getArtifact();
-          wurbletArtifacts.add(resolvedArtifact);
-          if (verbosityLevel.isDebug()) {
-            getLog().debug("wurblet artifact " + resolvedArtifact + " added");
-          }
-        }
-      }
-
-      // add all the jars we just downloaded to the new child realm
-      StringBuilder missingDeps = null;
-
-      for (Artifact artifact : wurbletArtifacts) {
-        try {
-          File file = artifact.getFile();
-          if (file != null) {
-            URL url = file.toURI().toURL();
-            classRealm.addURL(url);
-            if (verbosityLevel.isDebug()) {
-              getLog().info("added to classpath: " + url);
-            }
+        else {
+          // artifact not resolved
+          if (missingDeps == null) {
+            missingDeps = new StringBuilder();
           }
           else {
-            // artifact not resolved
-            if (missingDeps == null) {
-              missingDeps = new StringBuilder();
-            }
-            else {
-              missingDeps.append(", ");
-            }
-            missingDeps.append(artifact);
+            missingDeps.append(", ");
           }
-        }
-        catch (MalformedURLException ex) {
-          throw new MojoExecutionException("cannot determine URL for " + artifact.getFile(), ex);
+          missingDeps.append(artifact);
         }
       }
-
-      if (missingDeps != null) {
-        throw new MojoExecutionException("some wurblet dependencies could not be resolved: " + missingDeps);
+      catch (MalformedURLException ex) {
+        throw new MojoExecutionException("cannot determine URL for " + artifact.getFile(), ex);
       }
-
-      // make the child realm the ContextClassLoader
-      Thread.currentThread().setContextClassLoader(classRealm);
     }
+
+    if (missingDeps != null) {
+      throw new MojoExecutionException("some wurblet dependencies could not be resolved: " + missingDeps);
+    }
+
+    // create the child realm
+    String realmId = "wurbelizer:" + project.getId() + ":" + REALM_COUNTER.incrementAndGet();
+    ClassRealm wurbletRealm;
+    try {
+      wurbletRealm = classRealm.getWorld().newRealm(realmId, classRealm);
+    }
+    catch (DuplicateRealmException ex) {
+      throw new MojoExecutionException("cannot create wurblet realm " + realmId, ex);
+    }
+    for (String corePackage : CORE_PACKAGES) {
+      wurbletRealm.importFrom(classRealm, corePackage);
+    }
+    for (URL url : urls) {
+      wurbletRealm.addURL(url);
+      if (verbosityLevel.isDebug()) {
+        getLog().info("added to classpath: " + url);
+      }
+    }
+
+    return wurbletRealm;
+  }
+
+  /**
+   * Returns whether the artifact is the wurbelizer core library.
+   *
+   * @param artifact the artifact
+   * @return true if wurbelizer core
+   */
+  private boolean isWurbelizerCore(Artifact artifact) {
+    return "org.wurbelizer".equals(artifact.getGroupId()) && "wurbelizer".equals(artifact.getArtifactId());
   }
 
 }
