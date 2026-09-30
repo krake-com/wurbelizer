@@ -90,6 +90,7 @@ Reading it section by section:
 - **`wurbletDependencies`** pulls in the artifact containing the compiled wurblets. The
   wurblets themselves are built in a separate module with the `wurbile` goal, so that
   they are available as an ordinary Maven dependency to every module that uses them.
+  Each execution also loads them in its own classloader, see [Parallel builds](#parallel-builds).
 - **`wurbletPaths`** lists the packages the wurbler prepends to a wurblet name found in
   an anchor. Because both Tentackle wurblet packages are listed, an anchor may simply
   read `// @wurblet methods MethodsImpl` instead of naming the fully qualified class.
@@ -129,6 +130,13 @@ following are isolated per module:
 Wurblets are executed sequentially across all modules unless they declare themselves
 thread-safe by overriding `isThreadSafe()`, see [Thread safety](writing-wurblets.md#thread-safety).
 Only thread-safe wurblets run in parallel.
+
+This per-execution isolation applies only to wurblets declared as `wurbletDependencies`. If
+the wurblets are added to the plugin's own `<dependencies>` instead, they are loaded by the
+plugin's classrealm, which all executions of the build share, together with any static state.
+Wurblets that rely on the isolation must check which classloader loaded them, see
+[Thread safety](writing-wurblets.md#thread-safety). The Tentackle wurblets, for example, run
+in parallel only if they are declared as `wurbletDependencies`, as in the configuration above.
 
 ---
 

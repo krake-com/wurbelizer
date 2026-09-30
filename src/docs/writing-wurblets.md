@@ -66,8 +66,8 @@ Keep the following in mind:
 - Wurblets are not considered thread-safe by default: `Wurblet.isThreadSafe()` returns `false`
   in `AbstractWurblet`. Such wurblets are executed sequentially, i.e., no two of them run at
   the same time within the same JVM, even if the build tool wurbels several modules in parallel.
-- A wurblet that doesn't share any mutable state with other wurblet instances (no static fields,
-  no non-thread-safe libraries) can opt in to run concurrently by overriding `isThreadSafe()`
+- A wurblet that doesn't share any mutable state with other wurblet instances (no mutable static
+  fields, no non-thread-safe libraries) can opt in to run concurrently by overriding `isThreadSafe()`
   in its superclass or in its `.wrbl` source:
 
   ```
@@ -79,11 +79,47 @@ Keep the following in mind:
   ]@
   ```
 
+- Static fields and singletons (models, caches, factories) are shared only among the classes
+  of the same classloader. The Maven plugin loads the `wurbletDependencies` in a separate class
+  realm for each execution, and an execution processes its sources one after another on one
+  thread. So a wurblet with such state is still thread-safe, as long as its class was actually
+  loaded by the realm of the current run:
+
+  ```
+  @[
+    @Override
+    public boolean isThreadSafe() {
+      ClassLoader loader = WurbelContext.current().getWurbletClassLoader();
+      return loader != null && getClass().getClassLoader() == loader;
+    }
+  ]@
+  ```
+
+  `getWurbletClassLoader()` returns `null` if the run has no realm of its own, for example with
+  Ant or the console, or if the wurblets are plugin `<dependencies>` instead of
+  `wurbletDependencies`. In that case all runs share the same classes, and the wurblet falls back
+  to sequential execution. The Tentackle wurblets use this approach: see
+  `org.tentackle.wurblet.WurbletThreadSafety`, which is used by `ModelWurblet`, `DTOWurblet`
+  and `IncludeWurblet`.
 - The context is bound to the current thread. Threads started by a wurblet don't see it,
   unless they are forked via `java.util.concurrent.StructuredTaskScope`.
-- If you read resources from the wurblet's jar, open the `URLConnection` with
-  `setUseCaches(false)` instead of using `getResourceAsStream()`. The JVM shares cached
-  jar files among classloaders, and a concurrent run may close them.
+- The JVM shares cached jar files among all classloaders. When a run disposes its realm, the
+  shared jar file may be closed, and a concurrent read in another realm fails with
+  "zip file closed". This affects all code that runs during wurbeling and reads resources from
+  jars via `URL.openStream()` or `getResourceAsStream()`, including libraries used by the
+  wurblet, such as service finders or model loaders. Open the `URLConnection` with
+  `setUseCaches(false)` instead, as `java.util.ServiceLoader` does:
+
+  ```
+  URLConnection connection = url.openConnection();
+  connection.setUseCaches(false);
+  try (InputStream in = connection.getInputStream()) {
+    ...
+  }
+  ```
+
+  This applies even to wurblets that run sequentially, because realms are disposed outside
+  the lock that serializes them.
 
 ## Skeleton extending AbstractJavaWurblet
 

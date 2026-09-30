@@ -26,6 +26,8 @@ See the [Table of Contents](toc.md) for the documents in reading order.
 
 ## C
 
+- **class realm (wurblet classloader)** — [Maven Integration: Parallel builds](maven.md#parallel-builds),
+  [Writing Wurblets: Thread safety](writing-wurblets.md#thread-safety)
 - **code directive** — [Wurblet Level Syntax: code](wurblet-syntax.md#code)
 - **code levels** — [Code Levels](code-levels.md),
   [example](code-levels.md#the-three-levels-in-one-example)
@@ -82,6 +84,10 @@ See the [Table of Contents](toc.md) for the documents in reading order.
 - **`.incl` fragments** — [Wurblet Level Syntax: include](wurblet-syntax.md#include),
   [Writing Wurblets: parent-class pattern](writing-wurblets.md#the-parent-class-pattern)
 
+## J
+
+- **jar URL cache (`setUseCaches(false)`)** — [Writing Wurblets: Thread safety](writing-wurblets.md#thread-safety)
+
 ## L
 
 - **level switching** — [Wurblet Level Syntax: Level Switching](wurblet-syntax.md#level-switching)
@@ -131,7 +137,8 @@ See the [Table of Contents](toc.md) for the documents in reading order.
 - **Tentackle** — [README](../../README.md#used-in-the-wild-tentackle),
   [Writing Wurblets](writing-wurblets.md#examples),
   [guided tour](writing-wurblets.md#a-guided-tour),
-  [Maven configuration](maven.md#a-real-world-configuration)
+  [Maven configuration](maven.md#a-real-world-configuration),
+  [parallel builds](maven.md#parallel-builds)
 - **thread safety** — [Writing Wurblets: Thread safety](writing-wurblets.md#thread-safety),
   [Maven Integration: Parallel builds](maven.md#parallel-builds)
 - **to directive** — [Wurblet Level Syntax: to](wurblet-syntax.md#to)
@@ -156,6 +163,8 @@ See the [Table of Contents](toc.md) for the documents in reading order.
 - **wurblet** — [Writing Wurblets](writing-wurblets.md), [README: terms](../../README.md#terms-and-definitions)
 - **wurblet anchor (`@wurblet`)** — [Source Level Syntax: Wurblet Anchor](source-syntax.md#wurblet-anchor)
 - **wurblet level** — [Code Levels](code-levels.md), [Wurblet Level Syntax](wurblet-syntax.md)
+- **wurbletDependencies (Maven)** — [Maven Integration: real-world configuration](maven.md#a-real-world-configuration),
+  [Parallel builds](maven.md#parallel-builds)
 - **wurbletPaths** — [Source Level Syntax](source-syntax.md#wurblet-anchor),
   [Wurblet Level Syntax: package](wurblet-syntax.md#package)
 - **`.wurb` property file** — [Ant Integration](ant.md#wurbel),
