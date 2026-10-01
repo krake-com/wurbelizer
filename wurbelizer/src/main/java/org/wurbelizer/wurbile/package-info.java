@@ -19,7 +19,7 @@
 /**
  * The wurbiler.
  * <p>
- * The wurblet compiler translates wurblet source files to Java- and text files holding
- * fixed strings and compiles them to class files, that can be used by the wurbler.
+ * The wurblet compiler translates wurblet source files to Java source files and files holding
+ * the serialized fixed strings. Once compiled to class files by the build tool, they can be used by the wurbler.
  */
 package org.wurbelizer.wurbile;

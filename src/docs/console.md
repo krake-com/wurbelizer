@@ -12,7 +12,8 @@ java org.wurbelizer.console.wurbile.ConsoleWurbiler [--verbosity=default|info|de
 ```
 
 Compiles a single `.wrbl` file. The generated Java source and the `.ser` file are
-written to the directory of the `.wrbl` file and must be compiled separately.
+written below the directory of the `.wrbl` file, in the directory of the wurblet's package,
+and must be compiled separately.
 `--extends` and `--package` set the defaults for wurblets without an
 [`@{extends}@`](wurblet-syntax.md#extends) or [`@{package}@`](wurblet-syntax.md#package)
 directive. The exit code is 2 if the wurblet contains errors and 1 on other failures.
@@ -29,8 +30,8 @@ Unlike the Ant and Maven integrations, the console wurbler does not process sour
 files. It runs a single wurblet, given by its fully qualified class name, with the
 arguments from the command line and prints the generated code to standard output, or to
 the file given by `--out` (`++out` appends to the file). `--analyzedir` sets the
-directory for [`getAnalyzeFile()`](writing-wurblets.md#the-container). The wurblet runs once in each of
-its phases; errors are printed as a comment to standard error.
+directory for [`getAnalyzeFile()`](writing-wurblets.md#the-container). The wurblet runs once, in its
+[phase](wurblet-syntax.md#phase); errors are printed as a comment to standard error.
 
 With `--glob`, the wurblet is invoked once for each file in a directory whose name
 matches the regular expression, for example `--glob="model/.*\.map$"`. An argument

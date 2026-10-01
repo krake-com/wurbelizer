@@ -22,12 +22,12 @@ The plugin provides three goals:
 
 Parameters common to all goals:
 
-| Parameter   | Default                             | Description                                              |
-|-------------|-------------------------------------|----------------------------------------------------------|
-| `skip`      | `true` for `pom` packaging          | skips the execution                                      |
-| `verbosity` | `${wurbel.verbosity}`               | `default`, `info` or `debug`                             |
-| `charset`   | `${project.build.sourceEncoding}`   | the encoding of the source files                         |
-| `filesets`  | see below                           | the files to process, in the given order                 |
+| Parameter   | Default                           | Description                                               |
+|-------------|-----------------------------------|-----------------------------------------------------------|
+| `skip`      | `true` for `pom` packaging        | skips the execution                                       |
+| `verbosity` | `${wurbel.verbosity}`             | `default`, `info` or `debug`; if unset, `debug` with `-X` |
+| `charset`   | `${project.build.sourceEncoding}` | the encoding of the source files                          |
+| `filesets`  | see below                         | the files to process, in the given order                  |
 
 Parameters of the `wurbile` goal:
 

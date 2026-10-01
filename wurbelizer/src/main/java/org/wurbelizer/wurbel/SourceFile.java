@@ -33,7 +33,7 @@ import java.io.Reader;
 import java.io.Writer;
 
 /**
- * In-memory file to check for changes before flush/flush.
+ * In-memory file to check for changes before it is written.
  * <p>
  * SourceFiles are cached by the {@link SourceFileFactory} for the duration
  * of a single wurbel run (meant to be attached to a single SourceDocument).<br>
@@ -65,7 +65,7 @@ public class SourceFile {
     char[] chars = new char[BUFSIZE];
     int numRead;
     try (Reader in = new InputStreamReader(new FileInputStream(filename), Settings.getEncodingCharset())) {
-      // read the source file according to the systems encoding
+      // read the source file according to the configured encoding
       while((numRead = in.read(chars)) > -1) {
         orgBuf.append(String.valueOf(chars, 0, numRead));
       }

@@ -44,13 +44,13 @@ import java.util.regex.Pattern;
  * Because ANT does not provide a foreach "out of the box", the main-method supports
  * file lists as follows:
  * <pre>
- * java org.wurbelizer.console.ConsoleWurbler --glob="blahdir/.*\.map$" &#64;
+ * java org.wurbelizer.console.wurbel.ConsoleWurbler --glob="blahdir/.*\.map$" &lt;wurblet&gt; &#64;
  * </pre>
- * The &#64; will be replaced by the filename and the wurblet is invoked for each such file.
- * Note that it's not a real globbing, but uses regex.
+ * The &#64; will be replaced by the filename, and the wurblet is invoked for each such file.
+ * Note that it's not a real globbing but uses regex.
  * This is not the most generic solution, but it does the job for wurblets like CreateTableSql.
  * <p>
- * Note that this wurbler runs each wurblet only once!
+ * Note that this wurbler runs the wurblet only once, in its phase!
  *
  * @author harald
  */
@@ -58,7 +58,7 @@ public class ConsoleWurbler extends AbstractWurbler {
 
   private final int phase;                      // wurblet execution phase
   private final Set<Integer> collectedPhases;   // the phases of all wurblets detected so far
-  private String analyzeDir;                    // wurblet extra analyze dir
+  private String analyzeDir;                    // directory with extra wurblet information
   private final Logger logger;                  // the default logger
   private Verbosity verbosity;                  // tell what's going on
 
@@ -180,7 +180,6 @@ public class ConsoleWurbler extends AbstractWurbler {
     }
   }
 
-
   /**
    * Prints the usage.
    */
@@ -189,7 +188,6 @@ public class ConsoleWurbler extends AbstractWurbler {
       "usage: java org.wurbelizer.console.wurbel.ConsoleWurbler [--|++out=<outputfile>] [--analyzedir=<dir>] [--verbosity=default|info|debug] [--glob=<regex>] <wurblet> [wurblet options and args...]");
     System.exit(1);
   }
-
 
   /**
    * single run
@@ -213,7 +211,6 @@ public class ConsoleWurbler extends AbstractWurbler {
       System.err.println("*/");
     }
   }
-
 
   /**
    * globbing run

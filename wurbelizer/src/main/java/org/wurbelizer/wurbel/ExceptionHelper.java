@@ -20,7 +20,7 @@ package org.wurbelizer.wurbel;
 
 /**
  * Helper methods dealing with exceptions.<br>
- * Partly copied from Tentackle project.
+ * Partly copied from the Tentackle project.
  *
  * @author harald
  */

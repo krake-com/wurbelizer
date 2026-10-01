@@ -22,7 +22,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * Class holding the  wurblet data.<br>
+ * Class holding the wurblet data.<br>
  * An instance of this class is serialized per wurblet.
  */
 public class WurbletData implements Serializable {
@@ -65,9 +65,8 @@ public class WurbletData implements Serializable {
     return this.args;
   }
 
-
   /**
-   * Sets the wurblet arguments (e.g. by the @{args} wurblet command).
+   * Sets the wurblet arguments (e.g. by the {@code @{args}@} wurbiler directive).
    *
    * @param args fixed args, null = get from container
    */
@@ -83,7 +82,6 @@ public class WurbletData implements Serializable {
   public String[] getSource() {
     return this.source;
   }
-
 
   /**
    * Set the fixed source.

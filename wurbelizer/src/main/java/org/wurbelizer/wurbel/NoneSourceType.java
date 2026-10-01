@@ -21,7 +21,9 @@ package org.wurbelizer.wurbel;
 import java.util.Properties;
 
 /**
- * The generic source type for files without extension.
+ * The generic default source type.<br>
+ * Used for files without an extension and for all extensions without a dedicated source type.
+ * Extracts no properties and uses no smart indent.
  *
  * @author harald
  */

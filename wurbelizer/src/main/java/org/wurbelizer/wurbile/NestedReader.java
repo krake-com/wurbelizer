@@ -63,10 +63,11 @@ public class NestedReader {
     reader = Files.newBufferedReader(file.toPath(), Settings.getEncodingCharset());
   }
 
+
   /**
    * Reads the next character.
    *
-   * @return the character, -1 if end of reader
+   * @return the character, -1 if EOF
    * @throws IOException if reading failed
    */
   public int read() throws IOException {
@@ -82,7 +83,7 @@ public class NestedReader {
     line = reader.readLine();
     if (line == null) {
       if (file != null) {
-        reader.close(); // close include readers
+        reader.close();
       }
       return -1;    // end of file
     }
@@ -111,9 +112,9 @@ public class NestedReader {
   }
 
   /**
-   * Returns whether reader is included.
+   * Returns whether the reader is included.
    *
-   * @return true if including file reader
+   * @return true if including the file reader
    */
   public boolean isIncluded() {
     return file != null;

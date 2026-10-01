@@ -34,11 +34,12 @@ public class HeapStream {
 
 
   /**
-   * Create a stream on the heap
+   * Creates a stream on the heap.<br>
+   * Creates the heapfile or appends to it if it already exists.
    *
    * @param container the wurblet container
-   * @param heapName the name of the code stream
-   * @throws WurbelException if stream could not be created
+   * @param heapName the name of the heapfile (without the leading dot)
+   * @throws WurbelException if the stream could not be created
    */
   @SuppressWarnings("this-escape")
   public HeapStream(Wurbler container, String heapName) throws WurbelException {
@@ -69,19 +70,17 @@ public class HeapStream {
     return heapFile.isDiscarded();
   }
 
-
   /**
    * Gets the stream.
    *
-   * @return get the remote stream
+   * @return the stream
    */
   public PrintStream getStream()  {
     return codeStream;
   }
 
-
   /**
-   * Appends a text to the stream (without newline).
+   * Appends a text to the stream.
    *
    * @param text the text to append
    */
@@ -96,7 +95,7 @@ public class HeapStream {
    * @param heapName the name of the heapfile
    * @return the heapfile
    *
-   * @throws WurbelException if heapfile could not be reverted of created
+   * @throws WurbelException if heapfile could not be reverted or created
    */
   protected HeapFile createOrGetHeapFile(String heapName) throws WurbelException {
     HeapFile file = HeapFileFactory.get(heapName);

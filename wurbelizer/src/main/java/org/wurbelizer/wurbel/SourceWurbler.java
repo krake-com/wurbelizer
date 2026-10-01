@@ -39,10 +39,10 @@ import java.util.StringTokenizer;
 
 /**
  * A wurblet container.<br>
- * Reads a source file, scans for &#64;wurblets and sub elements and applies them
+ * Reads a source file, scans for &#64;wurblets and sub elements, and applies them
  * as long as there is no more change to the source code.
- * The {@code SourceWurbler} usually is invoked from within the {@code AntWurbler}.
- * but may also be invoked from the command line (for testing purposes).
+ * The {@code SourceWurbler} is invoked by the build tool integrations, i.e. the Maven mojos
+ * and the {@code AntWurbler} task, once per source file and phase.
  *
  * @author harald
  */
@@ -70,14 +70,13 @@ public class SourceWurbler extends AbstractWurbler {
   private int loopCount;                                // loop counter
 
 
-
   /**
    * Creates a {@code SourceWurbler}.
    *
-   * @param filename the full pathname of the java-file
-   * @param wurbFilename optional wurblet properties file, null to check in same dir
+   * @param filename the pathname of the source file
+   * @param wurbFilename optional wurblet properties file, null to check in the same dir
    * @param wurbletPath the list of package names to load wurblets from (if wurblet name is not absolute)
-   * @param analyzeDir the list of directories wurblets load extra information from (usually from apt-runs)
+   * @param analyzeDir the directory wurblets load extra information from (usually from apt-runs)
    * @param phase the wurbel phase, 0 for heredocs, wurblets start at 1
    * @param wurbletFilter optional wurblet execution filter
    * @param dryRun true to just parse the source file, don't run any wurblets
@@ -114,9 +113,10 @@ public class SourceWurbler extends AbstractWurbler {
 
     // determine source type
     String fileExtension = null;    // default type
-    int ndx = filename.lastIndexOf('.');
+    String name = file.getName();
+    int ndx = name.lastIndexOf('.');
     if (ndx >= 0) {
-      fileExtension = filename.substring(ndx).toLowerCase(Locale.ROOT);    // e.g. ".java"
+      fileExtension = name.substring(ndx).toLowerCase(Locale.ROOT);    // e.g. ".java"
     }
     sourceType = SourceType.get(fileExtension);
 
@@ -186,24 +186,20 @@ public class SourceWurbler extends AbstractWurbler {
     return verbosity;
   }
 
-
   @Override
   public Logger getLogger() {
     return logger;
   }
-
 
   @Override
   public int getInvocationCount() {
     return loopCount;
   }
 
-
   @Override
   public File getAnalyzeFile(String name) {
     return new File(analyzeDir, name);
   }
-
 
   @Override
   public WurbelResult wurbel() throws WurbelException, SourceException {
@@ -214,7 +210,7 @@ public class SourceWurbler extends AbstractWurbler {
       logger.info("--- " + filename + " ---");
     }
 
-    // read the source file according to the systems encoding
+    // read the source file according to the configured encoding
     SourceFile sourceFile = SourceFileFactory.open(filename);
     String text = sourceFile.getOrgText();
     wurbProps.setProperty(WURBLET_FILECONTENTS, text);
@@ -231,7 +227,7 @@ public class SourceWurbler extends AbstractWurbler {
       // setup and scan document
       SourceDocument doc = new SourceDocument(text, filename, wurbProps, logger, verbosity);
 
-      // extract some additional properties if this is a java file
+      // extract additional properties according to the source type (e.g. classname for Java)
       for (;;) {
         boolean foundProps = false;
         Properties sourceProps = sourceType.extractProperties(doc);
@@ -311,7 +307,7 @@ public class SourceWurbler extends AbstractWurbler {
                   }
                 }
                 hereDocFile.getStream().print(hereText);
-                // heredoc originally present in source created (i.e. not a new heredoc created by a wurblet)
+                // heredoc originally present in the source created (i.e. not a new heredoc created by a wurblet)
                 if (verbosity.isDebug()) {
                   logger.info("heredoc '" + hereName + "' updated");
                 }
@@ -366,6 +362,7 @@ public class SourceWurbler extends AbstractWurbler {
                     if (wurbletPhase < 1) {
                       wurbletPhase = 1;
                     }
+                    collectedPhases.add(wurbletPhase);   // add phase if not yet done
                     if (wurbletPhase != phase) {
                       invoke = false;   // skip this wurblet
                     }
@@ -395,7 +392,7 @@ public class SourceWurbler extends AbstractWurbler {
                       logger.info("[" + loopCount + "]wurblet: " + currentGuardName + ", " + wurbletName);
                     }
 
-                    // load the wurblet (may throw an Exception, but not a WurbelException)
+                    // load the wurblet
                     loadWurblet(wurbletName, wurbletPath, wurbProps);
                     if (getWurblet().isThreadSafe()) {
                       WURBLET_LOCK.unlock();    // may run concurrently with other wurblets
@@ -458,7 +455,7 @@ public class SourceWurbler extends AbstractWurbler {
                       // stacktraces may contain file path names, which on Windows contain backslashes.
                       // Those backslashes can be harmful in many ways, for example, if a
                       // backslash is followed by the lower-case letter 'u', the compiler will treat this as
-                      // a Unicode character and compilation could fail due to an illegal Unicode sequence.
+                      // a Unicode character, and compilation could fail due to an illegal Unicode sequence.
                       // -> simply replace all backslashes with forward slashes!
                       HeapFile stackTrace = new HeapFile("",null);
                       ex.printStackTrace(stackTrace.getPrintStream());
@@ -469,7 +466,7 @@ public class SourceWurbler extends AbstractWurbler {
                   }
                   // any other exception will abort (NPE, whatever)
 
-                  // build generated text
+                  // build the generated text
                   String srcText = getWurblet().process(os.toString());
 
                   int srcIndent = 0;
@@ -493,7 +490,7 @@ public class SourceWurbler extends AbstractWurbler {
                     srcText = WurbelHelper.indent(srcText, srcIndent);
                   }
 
-                  // replace and if no success delete
+                  // replace and if no success, delete
                   if (wurbletElement.isInline()) {
                     // inline wurblet: replace text between two consecutive /**/
                     // within the next source element
@@ -580,13 +577,11 @@ public class SourceWurbler extends AbstractWurbler {
   }
 
 
-
-
   /**
    * Checks for equality of a string-pair given by 'expr1 == expr2' or 'expr1 != expr2'.
    *
    * @param condStr the condition
-   * @return true if condition is met, false if not
+   * @return true if the condition is met, false if not
    */
   private boolean simpleCondition(String condStr) {
     boolean invert = false;
@@ -616,7 +611,6 @@ public class SourceWurbler extends AbstractWurbler {
     return invert;    // condition is not met
   }
 
-
   /**
    * Sets the guardtype from a string.
    *
@@ -626,7 +620,6 @@ public class SourceWurbler extends AbstractWurbler {
     // overwrite guardtype from wurbfile
     guardType = SourceRegion.get(value);
   }
-
 
   /**
    * Sets the foldtype from a string.
@@ -639,7 +632,6 @@ public class SourceWurbler extends AbstractWurbler {
       }
     }
   }
-
 
   /**
    * Processes a property line.

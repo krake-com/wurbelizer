@@ -25,7 +25,7 @@ The wurbile target then looks like this:
     <mkdir dir="${wbuild}"/>
     <wurbile srcdir="${wrbl}" destdir="${wbuild}" includes="**/*.wrbl" />
     <!-- compile wurbiled wurblets -->
-    <javac debug="on" source="11" deprecation="true"
+    <javac debug="on" release="25" deprecation="true"
         destdir="${wbuild}" includes="**" >
         <src path="${wsrc}"/>
         <src path="${wbuild}"/>
@@ -43,6 +43,10 @@ extension `.wrbl`).
 (for example parent classes, interfaces, and so on).
 - `${wbuild}`: directory where the wurbiled sources and compiled classes
 are placed.
+
+The `destdir` attribute sets the directory for the generated Java sources and `.ser` files.
+The package directory of each wurblet (see [`@{package}@`](wurblet-syntax.md#package)) is
+appended. Without `destdir`, the files are written below the directory of each `.wrbl` file.
 
 The `wurb-cp` classpath defines all archives necessary to compile
 the wurbiled wurblets. An optional step may create a jar archive of all
@@ -139,8 +143,9 @@ usually to exchange information between wurblets. For example,
 a JDK "apt" (annotation processing) run may produce information that other
 wurblets rely on (as is the case in Tentackle). Wurblets access files in this
 directory via `Wurbler.getAnalyzeFile(name)`.
-- `runonce` determines whether wurbelizing a file is allowed more than
-once within an ant build (bool, default `true`).
+- `runonce` determines whether a file is wurbelized only once within an ant build
+(bool, default `true`). A file is skipped by later task executions, but it is still processed
+in all phases and restarts of the execution that processes it first.
 - `dryrun` only parses the source files without running any wurblets
 (bool, default `false`).
 - `verbosity` sets the verbosity: `default`, `info` or `debug` (default `default`).
@@ -148,7 +153,7 @@ With `info`, the names of the modified files are logged; with `debug`, every
 processed wurblet is logged together with its filename, which is useful for
 verifying the order in which wurblets are invoked.
 - `failonerror` determines whether to stop the ant build on error (bool,
-default `true`).
+default `true`). A `WurbelTerminationException` thrown by a wurblet stops the task immediately.
 - `proceed` is the inverse of `failonerror` (bool, default `false`).
 
 Again, all options from org.apache.tools.ant.taskdefs.MatchingTask
@@ -156,7 +161,8 @@ apply as well.
 
 All Ant properties are passed to the wurblets as extra properties (see
 [Wurbler Properties](writing-wurblets.md#wurbler-properties)) and can be used as
-`$`-variables in the sources. Unlike the Maven plugin, the Ant task starts
+`$`-variables in the sources. Wurblets may access them via the namespace `"extra"` or its
+synonym `"ant"`. Unlike the Maven plugin, the Ant task starts
 directly with phase 1: here-documents are written during the regular passes
 (see [Processing Order and Phases](source-syntax.md#processing-order-and-phases)).
 

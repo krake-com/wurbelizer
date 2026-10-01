@@ -23,7 +23,8 @@ import org.apache.maven.model.Dependency;
 import java.io.Serial;
 
 /**
- * Resource the wurblets depend on.
+ * An artifact containing wurblets.<br>
+ * Used for the {@code wurbletDependencies} of the wurbel mojos.
  *
  * @author harald
  */

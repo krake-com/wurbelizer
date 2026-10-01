@@ -30,7 +30,7 @@ import java.util.Map;
 public final class SourceFileFactory {
 
   /**
-   * Opens the file and load into memory.<br>
+   * Opens the file and loads it into memory.<br>
    * If the file already has been loaded, it will be reused.
    *
    * @param filename the filename
@@ -51,9 +51,8 @@ public final class SourceFileFactory {
     }
   }
 
-
   /**
-   * Discard all files in list, if any.
+   * Discards all cached files, if any.
    */
   public static void initialize() {
     Map<String,SourceFile> sourceFiles = sourceFiles();
@@ -61,7 +60,6 @@ public final class SourceFileFactory {
       sourceFiles.clear();
     }
   }
-
 
   /**
    * Rewinds all output streams (makes them empty again).
@@ -75,9 +73,8 @@ public final class SourceFileFactory {
     }
   }
 
-
   /**
-   * Flushes all files and clears the vector.
+   * Flushes all files and clears the cache.
    *
    * @return the number of updated files
    * @throws WurbelException if closing a file failed

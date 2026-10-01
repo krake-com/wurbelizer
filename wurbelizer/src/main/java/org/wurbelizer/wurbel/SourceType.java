@@ -35,7 +35,7 @@ public interface SourceType {
   String getFileExtension();
 
   /**
-   * Extract properties for given file.
+   * Extract properties for the given file.
    *
    * @param document the source document
    * @return the properties, never null
@@ -43,7 +43,9 @@ public interface SourceType {
   Properties extractProperties(SourceDocument document);
 
   /**
-   * Returns whether this is the default source type.
+   * Returns whether this is the default source type.<br>
+   * The default type is used for files without an extension and for files whose
+   * extension has no dedicated source type.
    *
    * @return true if default
    */
@@ -62,6 +64,7 @@ public interface SourceType {
     return false;
   }
 
+
   /**
    * Gets all registered source types.
    *
@@ -72,29 +75,25 @@ public interface SourceType {
   }
 
   /**
-   * Gets the source type of given extension.
+   * Gets the source type of the given extension.<br>
+   * If there is no source type registered for the extension, the default type is returned.
    *
-   * @param extension the file extension, null if default type
+   * @param extension the file extension including the dot, null if the file has no extension
    * @return the source type
-   * @throws WurbelException if no matching source type configured
+   * @throws WurbelException if no matching source type and no default type is configured
    */
   static SourceType get(String extension) throws WurbelException {
-    SourceType type;
-    if (extension == null) {
-      type = WurbelHelper.getDefaultSourceType();
-    }
-    else {
+    SourceType type = null;
+    if (extension != null) {
       type = WurbelHelper.getSourceTypeMap().get(extension);
     }
     if (type == null) {
+      // no extension or no dedicated source type for this extension
+      type = WurbelHelper.getDefaultSourceType();
+    }
+    if (type == null) {
       StringBuilder buf = new StringBuilder();
-      if (extension == null) {
-        buf.append("no default source type");
-      }
-      else {
-        buf.append("no source type '").append(extension).append("'");
-      }
-      buf.append(" configured. Available are: ");
+      buf.append("no source type '").append(extension).append("' and no default source type configured. Available are: ");
       boolean comma = false;
       for (SourceType sourceType: getAll()) {
         if (comma) {

@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 package org.wurbelizer.ant.wurbile;
 
 import org.apache.tools.ant.BuildException;
@@ -38,21 +37,22 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-
 /**
  * Ant Task to invoke the SourceWurbiler.<br>
  * This task will recursively scan the sourcedir looking
  * for *.wrbl-files to wurbile.<p>
  *
+ * The generated Java sources and .ser files are written to the {@code destdir}, or to the directory
+ * of the .wrbl file if not set. The package directories of the wurblets are appended.<p>
+ *
  * Integrate into ant with:
  * <pre>
- *   &lt;taskdef name="wurbile" classname="org.wurbelizer.AntWurbiler"/&gt;
+ *   &lt;taskdef name="wurbile" classname="org.wurbelizer.ant.wurbile.AntWurbiler"/&gt;
  * </pre>
  * Make sure that wurbelizer.jar is in the classpath of ant.
  *
  * @author harald
  */
-
 public class AntWurbiler extends MatchingTask {
 
   private static final String FAIL_MSG = "wurbilation failed";
@@ -71,10 +71,9 @@ public class AntWurbiler extends MatchingTask {
   private Path src;                 // source path (for wrbl-files)
   private File destDir;             // destination directory
   private Verbosity verbosity;      // tell what's going on
-  private int indent;               // source indent, -1 = default = 4
+  private int indent;               // source indent, -1 = wurbiler's default (autoindent)
   private String parentClass;       // implementing parent class (default = AbstractWurblet)
   private String packageName;       // package name, null = none
-
 
 
   /**
@@ -102,7 +101,6 @@ public class AntWurbiler extends MatchingTask {
     }
   }
 
-
   /**
    * Gets the verbosity.
    * @return the verbosity
@@ -111,28 +109,23 @@ public class AntWurbiler extends MatchingTask {
     return verbosity.toString().toLowerCase(Locale.ROOT);
   }
 
-
   /**
    * Gets the initial source indent.
-   * Defaults to 4.
    *
-   * @return the source ident.
+   * @return the source indent, -1 = wurbiler's default (autoindent)
    */
   public int getIndent() {
     return indent;
   }
 
-
   /**
-   * Sets the initial source ident (leading spaces for compiled wurblet source)
-   * Default is 4.
+   * Sets the initial source indent (leading spaces for the generated wurblet java source).
    *
-   * @param indent the source indent, -1 = default (4)
+   * @param indent the source indent, -1 = wurbiler's default (autoindent)
    */
   public void setIndent(int indent) {
     this.indent = indent;
   }
-
 
   /**
    * Gets the parent class.
@@ -143,7 +136,6 @@ public class AntWurbiler extends MatchingTask {
     return parentClass;
   }
 
-
   /**
    * Sets the parent class.
    *
@@ -152,7 +144,6 @@ public class AntWurbiler extends MatchingTask {
   public void setParentClass(String parentClass) {
     this.parentClass = parentClass;
   }
-
 
   /**
    * Gets the packageName.
@@ -163,7 +154,6 @@ public class AntWurbiler extends MatchingTask {
     return packageName;
   }
 
-
   /**
    * Sets the package name.
    *
@@ -172,7 +162,6 @@ public class AntWurbiler extends MatchingTask {
   public void setPackageName(String packageName) {
     this.packageName = packageName;
   }
-
 
   /**
    * Creates a path for source compilation.
@@ -186,20 +175,8 @@ public class AntWurbiler extends MatchingTask {
     return src.createPath();
   }
 
-
   /**
-   * Recreates a path for source compilation.
-   *
-   * @return a nested src element.
-   */
-  protected Path recreateSrc() {
-    src = null;
-    return createSrc();
-  }
-
-
-  /**
-   * Sets the source directories to find the source Java files.
+   * Sets the source directories to find the wurblet sources (.wrbl files).
    *
    * @param srcDir the source directories as a path
    */
@@ -211,9 +188,8 @@ public class AntWurbiler extends MatchingTask {
     }
   }
 
-
   /**
-   * Gets the source dirs to find the source java files.
+   * Gets the source dirs to find the wurblet sources (.wrbl files).
    *
    * @return the source directories as a path
    */
@@ -221,21 +197,18 @@ public class AntWurbiler extends MatchingTask {
     return src;
   }
 
-
   /**
-   * Sets the destination directory into which the Java source
-   * files should be compiled.
+   * Sets the destination directory for the generated Java sources and .ser files.<br>
+   * If not set, the directory of each .wrbl file is used.
    *
-   * @param destDir the destination director
+   * @param destDir the destination directory
    */
   public void setDestdir(File destDir) {
     this.destDir = destDir;
   }
 
-
   /**
-   * Gets the destination directory into which the java source files
-   * should be compiled.
+   * Gets the destination directory for the generated Java sources and .ser files.
    *
    * @return the destination directory
    */
@@ -243,28 +216,25 @@ public class AntWurbiler extends MatchingTask {
     return destDir;
   }
 
-
   /**
-   * Indicates whether the build will continue
-   * even if there are compilation errors; defaults to true.
+   * Indicates whether the build will stop
+   * if there are wurbile errors; defaults to true.
    *
-   * @param fail if true halt the build on failure
+   * @param fail if true, halt the build on failure
    */
   public void setFailOnError(boolean fail) {
     failOnError = fail;
   }
 
-
   /**
    * Sets whether to proceed on error.
-   * This is the inverse of Failonerror.
+   * This is the inverse of failonerror.
    *
    * @param proceed true to proceed on error
    */
   public void setProceed(boolean proceed) {
     failOnError = !proceed;
   }
-
 
   /**
    * Gets the failonerror flag.
@@ -274,7 +244,6 @@ public class AntWurbiler extends MatchingTask {
   public boolean getFailOnError() {
     return failOnError;
   }
-
 
   /**
    * Executes the task.
@@ -287,7 +256,7 @@ public class AntWurbiler extends MatchingTask {
     checkParameters();
     resetFileLists();
 
-    // scan source directories directory to build up wurbelize list
+    // scan source directories to build up the wurbile list
     String[] list = src.list();
     for (String list1 : list) {
       File srcDir = getProject().resolveFile(list1);
@@ -304,6 +273,25 @@ public class AntWurbiler extends MatchingTask {
     wurbile();
   }
 
+  /**
+   * Gets the list of files to be compiled.
+   *
+   * @return the array of files, never null
+   */
+  public File[] getFileList() {
+    return wurbleList;
+  }
+
+
+  /**
+   * Recreates a path for source compilation.
+   *
+   * @return a nested src element.
+   */
+  protected Path recreateSrc() {
+    src = null;
+    return createSrc();
+  }
 
   /**
    * Clears the list of files to be compiled and copied.
@@ -312,9 +300,8 @@ public class AntWurbiler extends MatchingTask {
     wurbleList = new File[0];
   }
 
-
   /**
-   * Scans the directory looking for source files to be wurbelized.
+   * Scans the directory looking for wurblet sources to be wurbiled.
    *
    * @param srcDir the source directory
    * @param files the array of filenames
@@ -340,17 +327,6 @@ public class AntWurbiler extends MatchingTask {
     }
   }
 
-
-  /**
-   * Gets the list of files to be compiled.
-   *
-   * @return the array of files, never null
-   */
-  public File[] getFileList() {
-    return wurbleList;
-  }
-
-
   /**
    * Checks that all required attributes have been set and nothing
    * silly has been entered.
@@ -365,7 +341,6 @@ public class AntWurbiler extends MatchingTask {
       throw new BuildException("srcdir attribute must be set!", getLocation());
     }
   }
-
 
   /**
    * Compiles the wurblets.
@@ -410,7 +385,7 @@ public class AntWurbiler extends MatchingTask {
 
         if (errors == 0) {
           if (verbosity.isInfo() && !verbosity.isDebug()) {
-            // file has been modified without errors
+            // file has been compiled without errors
             log(file.getName());
           }
         }

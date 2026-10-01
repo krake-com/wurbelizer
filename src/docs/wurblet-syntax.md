@@ -7,21 +7,8 @@ to the wurblet source code:
 1. switching between wurblet- and output-level
 2. wurbiler directives
 
-Special significance of a character can be turned off by preceding it with
-a backslash. A line terminated by a backslash is concatenated with the
-following line (continuation line). The backslash itself is expressed by a
-double backslash.
-
-Escaping matters most when the *generated* code contains annotations, because
-`@` is significant at the wurblet level as well. A wurblet that generates an
-`@Override` must therefore write `\@Override`, as in this fragment of the
-Tentackle `MethodCache` wurblet:
-```
-  \@Override
-  public PdoMethodCache<@(pdoName)@> getPdoMethodCache() {
-    return METHOD_CACHE;
-  }
-```
+The special significance of `@` can be turned off by preceding it with a backslash,
+see [Escaping](#escaping).
 
 > **About the examples**
 >
@@ -92,6 +79,37 @@ System.out.println("This is line 3");
 ```
 Any Java expression can be inserted into the generated output this way. 
 
+Within the wurblet level, the markers `@[`, `@(` and `@{` are not interpreted, but copied
+together with their closing counterparts. This allows nesting, i.e. a wurblet may generate
+the source of another wurblet.
+
+### Escaping
+
+The backslash is the escape character of the wurbiler, on all levels:
+
+- `\@` produces a plain `@`, which is neither a level switch nor a directive.
+- `\ ` (backslash blank) produces a plain blank.
+- Any other backslash is copied unchanged, together with the character following it. So
+  `\n` in a Java string literal keeps working, and `\\` stays a double backslash.
+  Unlike the [source level](source-syntax.md), there are no continuation lines: a trailing
+  backslash is copied as well.
+
+A closing marker can be escaped by escaping its `@`, e.g. `]\@` produces a literal `]@`.
+
+Escaping matters most when the *generated* code contains annotations, because
+`@` is significant at the wurblet level as well. A wurblet that generates an
+`@Override` should therefore write `\@Override`, as in this fragment of the
+Tentackle `MethodCache` wurblet:
+```
+  \@Override
+  public PdoMethodCache<@(pdoName)@> getPdoMethodCache() {
+    return METHOD_CACHE;
+  }
+```
+An unescaped `@` that is not followed by `[`, `(` or `{` is copied as well, but the wurbiler
+logs a warning. This also applies to annotations at the wurblet level: write `\@Override`
+for a method declared within `@[ ... ]@` to avoid the warning.
+
 ### A complete example
 
 Tentackle's `ColumnLengths` wurblet is small enough to show in full and uses
@@ -145,11 +163,13 @@ the wurblet produces:
 ## Wurbiler Directives
 
 The wurbiler accepts directives at compile time. Directives are enveloped
-by a leading @{ and a closing }@ and are allowed on the wurblet and the
-output level. They take the form:
+by a leading `@{` and a closing `}@`. They are recognized at the output level, i.e. outside of
+`@[ ... ]@` blocks (inside, they are copied, see [Level Switching](#level-switching)).
+They take the form:
 ```
 @{<directive> <arg1> <arg2> ... <argN>}@
 ```
+Directive names are case-insensitive. An unknown directive is an error.
 The following directives are supported:
 
 ### include
@@ -157,6 +177,8 @@ The following directives are supported:
 `@{include <filename>}@` includes the source file given by `<filename>`. 
 Includes may be nested to any depth, and the wurbiler detects circular includes.
 The filename may contain $-variables, which are replaced at compile time.
+A relative filename is resolved against the working directory of the build tool, not
+against the including file.
 
 Example:
 
@@ -209,7 +231,8 @@ included fragment becomes part of the wurblet's `wurbel()` method.
 
 ### args
 
-`@{args <arg1> ... <argN>}@` presets the wurblet arguments. 
+`@{args <arg1> ... <argN>}@` presets the wurblet arguments. The arguments are separated by
+whitespace and are not quoted or variable-substituted.
 
 The wurblet retrieves its arguments by `getContainer().getArgs()` at the wurblet
 level. By default, the arguments are provided by the wurbler which usually
@@ -288,7 +311,9 @@ described in
 
 `@{package <packagename>}@` sets the package name of the wurblet. 
 By default wurblets are not created into a particular package. It is good practice,
-however, to assign a package to wurblets.
+however, to assign a package to wurblets. A wurblet can have only one package: a second
+`@{package}@` directive with a different name is an error.
+The generated Java source and `.ser` file are placed in the corresponding package directory.
 
 Notice that the package name should be defined in the `<configuration>` of the
 maven wurbelizer plugin to load the wurblet without the need to specify its FQCN
@@ -320,6 +345,7 @@ Example:
 ### extends
 
 `@{extends <parentclass>}@` sets the parent class the wurblet extends.
+Like `@{package}@`, it may be given only once (repeating the same class is allowed).
 Extending a parent class that in turn extends `org.wurbelizer.wurblet.AbstractWurblet` 
 is a common design pattern for wurblets. 
 The parent class usually implements all helper code, i.e. to access the model, while the
@@ -360,7 +386,8 @@ helper code can be unit-tested and debugged with the ordinary tool chain.
 
 `@{implements <interface1> ... <interfaceN>}@` adds interfaces the
 wurblet will implement. Multiple `@{implements}@` directives are
-concatenated. 
+concatenated. The interfaces are listed in alphabetical order, and implementing the same
+interface twice is an error.
 
 Example:
 ```
@@ -375,9 +402,10 @@ will result in
 ### indent
 
 By default, the wurbiler does its best to produce readable and debuggable
-code. However, the indentation can be changed manually to improve readability.
+Java code for the wurblet. However, the indentation can be changed manually to improve readability.
+This applies to the generated Java source of the wurblet, not to the code the wurblet generates.
 
-`@{indent <columns>}@` will set the indentation fixed to <columns>. 
+`@{indent <columns>}@` will set the indentation fixed to `<columns>`. 
 
 To switch back to the automatic indentation (which is the default), use `@{indent auto}@`.
 
@@ -444,7 +472,7 @@ This is an alternative to subclassing.
 Example:
 ```
 @{code
-  @Override
+  \@Override
   public String process(String generatedCode) {
     return generatedCode.strip() + "\n";
   }

@@ -126,6 +126,8 @@ Files start at output level. Level-switching markers:
 | `@(` … `)@`         | Embed wurblet-level expression in output |
 | `@{directive ...}@` | Wurbiler directive (compile-time)        |
 
+Escapes: `\@` → `@`, `\ ` → blank; other backslashes are copied verbatim (no continuation lines at wurblet level). Directives are only recognized outside `@[ ]@`.
+
 Common directives: `@{package}@`, `@{import}@`, `@{extends}@`, `@{implements}@`, `@{include}@`, `@{args}@`, `@{to <stream>}@`, `@{phase N}@`, `@{indent N|auto}@`, `@{comment ...}@`, `@{code ...}@`, `@{config ...}@`.
 
 ## Source-Level Syntax (inside application source files)
@@ -140,11 +142,12 @@ Common directives: `@{package}@`, `@{import}@`, `@{extends}@`, `@{implements}@`,
 Anchors live in Java comments (single-line or block); generated code can contain new anchors, so the wurbler re-parses until stable. Args are whitespace-separated (quote to include whitespace) and may span lines via a trailing `\`. Variables resolve from inline `@{ @}` blocks, `.wurb` property files, Maven/Ant properties and environment variables (recursively).
 
 Optional wurbler directives in the `(...)`:
-- `test:$var==value` / `!=` — conditional anchor; skips the wurblet (emits `// condition not met`) when unmet
+- `test:$var==value` / `!=` — conditional anchor; when unmet, the wurblet is skipped and an existing guarded block is kept
 - `indent=N` — extra indentation; negative means *smart indent* (align to the anchor comment), the Java default
 - `fold=collapsed|expanded|none` — editor fold type for the guarded block (NetBeans only)
+- `phase=N` — overrides the wurblet's `@{phase}@` for this anchor
 
-Inline (unnamed) wurblets have a `<tag>` not starting with a letter and inject code between two empty block comments `/**/` in adjacent code. Tag starting with `-` or `<` targets the preceding block; all others (including `+`, `>`) target the following block.
+Inline (unnamed) wurblets have a `<tag>` starting with `-`, `<`, `+` or `>` and inject code between two empty block comments `/**/` (or `/*@*/`) in adjacent code. `-`/`<` targets the preceding block, `+`/`>` the following block. Any other tag is a regular named anchor.
 
 ## Testing
 

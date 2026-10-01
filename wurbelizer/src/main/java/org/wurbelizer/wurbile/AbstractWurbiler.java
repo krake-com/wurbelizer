@@ -47,9 +47,10 @@ import java.util.TreeSet;
  * stored in serialized form in a separate file and will be deserialized by the wurbler
  * when running the wurblet.<p>
  *
- * By default, the input stream starts at the source-level.
- * The backslash is recognized as wurblet-level is entered via {@code '@['} and left via {@code ']@'}.
- * Wurblet-levels again may contain other wurblet-levels, i.e. they may be nested
+ * The input stream starts at the output level.
+ * The wurblet level is entered via {@code '@['} and left via {@code ']@'}.
+ * Within the wurblet level, <code>'@['</code>, <code>'@('</code> and <code>'@&#123;'</code> are not interpreted but copied
+ * together with their closing counterparts, i.e. they may be nested,
  * resulting in a wurblet generating a wurblet which in turn generates java source
  * or even another wurblet.<p>
  *
@@ -58,10 +59,13 @@ import java.util.TreeSet;
  * This may be even used in a string (e.g.: {@code "This is line @(line)@\n");}).<p>
  *
  * The backslash {@code '\'} is recognized as an escape char.
- * If followed by a {@code '@'}, the backslash will be consumed and the @ passed to the source.
- * Other pairs of escapes will be passed unprocessed (e.g. {@code '\n'} or whatever).<p>
+ * If followed by a {@code '@'} or a blank, the backslash will be consumed and the {@code @} or blank passed on.
+ * Any other backslash is passed unprocessed together with the following character
+ * (e.g. {@code '\n'} or {@code '\\'}). An {@code '@'} not followed by <code>'['</code>, <code>'('</code> or <code>'&#123;'</code>
+ * is passed unprocessed as well, but a warning is logged.<p>
  *
- * Commands may also be embedded at the source-level via {@code @{command par1 par2 ... parN}@}.
+ * Commands (directives) may be embedded at the output level via {@code @{command par1 par2 ... parN}@}.
+ * Command names are case-insensitive. Unknown commands are errors.
  * The following commands are supported:<p>
  *
  * {@code @{include <pathname>}@}: includes a file in the current input stream.
@@ -72,30 +76,32 @@ import java.util.TreeSet;
  *
  * {@code @{import <classpath>}@}: adds to the extra imports.<p>
  *
- * {@code @{extends <parentclass>}@}  sets the parent-class (default is AbstractWurblet).<p>
+ * {@code @{extends <parentclass>}@}: sets the parent-class (default is AbstractWurblet).<p>
  *
- * {@code @{implements <if1> ... <ifN>}@}  implements interfaces.<p>
+ * {@code @{implements <if1> ... <ifN>}@}: implements interfaces.<p>
  *
- * {@code @{indent <spaces>}@}: sets the fixed source indentation.
- * "auto" enables autoindent., i.e. {@code @{indent auto}@}.
- * Autoindent is the default.<p>
+ * {@code @{indent <spaces>}@}: sets the fixed indentation of the generated java source.
+ * {@code @{indent auto}@} enables autoindent, which is the default.<p>
  *
- * {@code @{args <arg1> <arg2> ...}@}: presets the wurblet arguments (default is from container, i.e. wurbler)
- * notice that {@code @{args}@} without any arguments enables container args again.
- * This is especially useful for @{including} serveral wurblets in a single source-file.
- * Thus, if the wurblet needs args, it's a good practice to include an @{args}-line
- * in the wurblet-code.<p>
+ * {@code @{args <arg1> <arg2> ...}@}: presets the wurblet arguments (default is from container, i.e. wurbler).
+ * Notice that {@code @{args}@} without any arguments enables container args again.
+ * This is especially useful if several wurblets include a common source file.
+ * Thus, if the wurblet needs args, it's a good practice to add an {@code @{args}@} directive
+ * to the wurblet-code.<p>
  *
  * {@code @{phase N}@}: sets the execution phase of the wurblet. Default is 1.<p>
  *
  * {@code @{to <outputstream>}@}: sets the output stream (this is the stream the wurblet
  * will write the generated code to, not the output writer of the compiled wurblet!).
- * {@code @{to out}} resets to the default stream, which is equivalent to {@code @{to}}.<p>
+ * {@code @{to out}@} resets to the default stream, which is equivalent to {@code @{to}@}.<p>
  *
- * {@code @{comment ..... }@}: adds the text to the wurblet comment<p>
+ * {@code @{comment ..... }@}: adds the text to the wurblet comment.<p>
  *
  * {@code @{code ...}@}: adds the code to the class level code. This code is appended to the
- * end of the wurblet's java code and can be used to override or implement wurblet methods.
+ * end of the wurblet's java code and can be used to override or implement wurblet methods.<p>
+ *
+ * {@code @{config ...}@}: adds the text to the wurblet specific configuration,
+ * available at runtime via {@code getConfiguration()}.
  *
  * @author harald
  */
@@ -121,9 +127,8 @@ public abstract class AbstractWurbiler implements Wurbiler {
   private static final String CMD_CODE        = "code";
 
 
-
   private String        packageName;        // package name from @{package}@ command
-  private Set<String>   imports;            // all imports form @{import}@ commands
+  private Set<String>   imports;            // all imports from @{import}@ commands
   private String        parentClass;        // extends parentclass from @{extends}@ command, null = default
   private Set<String>   interfaces;         // collection of @{implements}@, null = default
   private String[]      args;               // wurblet arguments from @{args ...}@ command, null = default,
@@ -143,7 +148,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
   private boolean       inAutoIndent;       // true = in leading space string processing
   private boolean       lastWasOpenBlock;   // true = last line ends with '{' (used in autoindent processing)
   private int           autoIndent;         // if >= 0, indent is determined automatically
-  private int           indent;             // length of indent generated code for writing source-strings
+  private int           indent;             // length of indent-generated code for writing source-strings
   private String        indentStr;          // indent string (blanks)
 
   private StringBuilder sourceBuf;          // buffer for current source string
@@ -152,7 +157,6 @@ public abstract class AbstractWurbiler implements Wurbiler {
   private Logger        logger;             // logger for errors and warnings
   private Verbosity     verbosity;          // the verbosity
   private int           wurbletMode;        // current or previous wurblet mode: one of WURBLET_...
-
 
 
   /**
@@ -180,7 +184,6 @@ public abstract class AbstractWurbiler implements Wurbiler {
   }
 
 
-
   /**
    * Gets the output writer.
    *
@@ -199,9 +202,8 @@ public abstract class AbstractWurbiler implements Wurbiler {
     return in.getReader();
   }
 
-
   /**
-   * Compiles the wurbelizable.
+   * Compiles the wurblet source.
    *
    * @return the number of errors, 0 = no errors (warnings are not counted)
    * @throws WurbileException if the compiled output could not be created
@@ -304,7 +306,12 @@ public abstract class AbstractWurbiler implements Wurbiler {
               // some unknown sequence, simply keep it
               logWarning("unknown @-sequence at " + srcLocation());
               if (inWurblet) {
-                out.write(c);
+                if (wurbletMode == WURBLET_BLOCK) {
+                  out.write(c);
+                }
+                else {
+                  wurbletBuf.append(c);
+                }
               }
               else {
                 sourceBuf.append(c);
@@ -313,7 +320,12 @@ public abstract class AbstractWurbiler implements Wurbiler {
                 break;    // end of file
               }
               if (inWurblet) {
-                out.write(nc);
+                if (wurbletMode == WURBLET_BLOCK) {
+                  out.write(nc);
+                }
+                else {
+                  wurbletBuf.append(nc);
+                }
               }
               else {
                 sourceBuf.append(nc);
@@ -398,7 +410,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
                           cmdOk = handleCode(wurbletBuf.toString());
                           break;
                         case CMD_CONFIG:
-                          // add wurblet comment
+                          // add wurblet configuration
                           cmdOk = handleConfig(wurbletBuf.toString());
                           break;
                         default:
@@ -448,7 +460,7 @@ public abstract class AbstractWurbiler implements Wurbiler {
           else {
             if (inWurblet) {
               if (wurbletMode == WURBLET_BLOCK) {
-                // simpy write wurblet-code to out
+                // simply write wurblet-code to out
                 if (blockStart) {
                   blockStart = false;
                   if (c != '\n')  {
@@ -523,8 +535,6 @@ public abstract class AbstractWurbiler implements Wurbiler {
     }
   }
 
-
-
   /**
    * Gets the list of fixed source-strings.
    *
@@ -535,17 +545,15 @@ public abstract class AbstractWurbiler implements Wurbiler {
     return sourceList;
   }
 
-
   /**
    * Presets the source list.
    *
-   * @param sourceList the source list, null if compile() should initialize it
+   * @param sourceList the source list; null if compile() should initialize it
    */
   @Override
   public void setSourceList(List<String> sourceList) {
     this.sourceList = sourceList;
   }
-
 
   /**
    * Gets the source indentation.
@@ -556,7 +564,6 @@ public abstract class AbstractWurbiler implements Wurbiler {
   public int getIndent() {
     return indent;
   }
-
 
   /**
    * Sets the indentation for code generating the source.
@@ -577,7 +584,6 @@ public abstract class AbstractWurbiler implements Wurbiler {
       indentStr = buf.toString();
     }
   }
-
 
   /**
    * Sets the autoindent feature.
@@ -600,17 +606,15 @@ public abstract class AbstractWurbiler implements Wurbiler {
     return autoIndent >= 0;
   }
 
-
   /**
    * Sets the name of the output stream in the generated source.
    *
-   * @param outName the name of the output stream, null sets to the default value "out".
+   * @param outName the name of the output stream; null sets to the default value "out"
    */
   @Override
   public void setOutName(String outName)  {
     this.outName = outName == null ? OUTNAME : outName;
   }
-
 
   /**
    * Sets outname to the default.
@@ -619,7 +623,6 @@ public abstract class AbstractWurbiler implements Wurbiler {
   public void setOutName() {
     setOutName(null);
   }
-
 
   /**
    * Gets the outname.
@@ -631,7 +634,6 @@ public abstract class AbstractWurbiler implements Wurbiler {
     return outName;
   }
 
-
   /**
    * Gets the logger for warnings and errors.
    *
@@ -641,7 +643,6 @@ public abstract class AbstractWurbiler implements Wurbiler {
   public Logger getLogger() {
     return logger;
   }
-
 
   /**
    * Sets the logger for warnings and errors.
@@ -653,7 +654,6 @@ public abstract class AbstractWurbiler implements Wurbiler {
     this.logger = logger;
   }
 
-
   /**
    * Gets the verbosity.
    * @return the verbosity
@@ -663,7 +663,6 @@ public abstract class AbstractWurbiler implements Wurbiler {
     return verbosity;
   }
 
-
   /**
    * Sets the verbosity.
    * @param verbosity the verbosity
@@ -672,7 +671,6 @@ public abstract class AbstractWurbiler implements Wurbiler {
   public void setVerbosity(Verbosity verbosity) {
     this.verbosity = verbosity;
   }
-
 
   /**
    * Logs an error message.
@@ -686,7 +684,6 @@ public abstract class AbstractWurbiler implements Wurbiler {
     errors++;
   }
 
-
   /**
    * Logs a warning.
    *
@@ -698,19 +695,16 @@ public abstract class AbstractWurbiler implements Wurbiler {
     }
   }
 
-
   /**
    * Logs a verbose message.
    *
-   * @param msg the warning message
+   * @param msg the info message
    */
   public void logInfo(String msg) {
     if (logger != null) {
       logger.info(msg + " in " + in);
     }
   }
-
-
 
   /**
    * Gets the package name.
@@ -722,7 +716,6 @@ public abstract class AbstractWurbiler implements Wurbiler {
     return packageName;
   }
 
-
   /**
    * Sets the package-name.
    *
@@ -732,7 +725,6 @@ public abstract class AbstractWurbiler implements Wurbiler {
   public void setPackageName(String packageName)  {
     this.packageName = packageName;
   }
-
 
   /**
    * Gets the name of the parent class.
@@ -744,7 +736,6 @@ public abstract class AbstractWurbiler implements Wurbiler {
     return parentClass;
   }
 
-
   /**
    * Sets the parent class.
    *
@@ -755,12 +746,11 @@ public abstract class AbstractWurbiler implements Wurbiler {
     this.parentClass = parentClass;
   }
 
-
   /**
    * Adds an interface.
    *
    * @param iface the name of the interface
-   * @return true if added, false if already in list of interfaces.
+   * @return true if added, false if already in the list of interfaces
    */
   public boolean addInterface(String iface)  {
     if (interfaces == null) {
@@ -777,7 +767,6 @@ public abstract class AbstractWurbiler implements Wurbiler {
   public Collection<String> getInterfaces() {
     return interfaces;
   }
-
 
   @Override
   public String[] getImports() {
@@ -843,7 +832,6 @@ public abstract class AbstractWurbiler implements Wurbiler {
   }
 
 
-
   /**
    * Extracts or appends a multiline text.
    *
@@ -874,11 +862,10 @@ public abstract class AbstractWurbiler implements Wurbiler {
     return buf;
   }
 
-
-    /**
+  /**
    * Handles the include-command.
    *
-   * @param stok the tokenizer pointing to first arg
+   * @param stok the tokenizer pointing to the first arg
    * @return true if ok, false if some error
    */
   private boolean handleInclude(StringTokenizer stok) {
@@ -910,11 +897,10 @@ public abstract class AbstractWurbiler implements Wurbiler {
     return true;
   }
 
-
   /**
    * Handles the package-command.
    *
-   * @param stok the tokenizer pointing to first arg
+   * @param stok the tokenizer pointing to the first arg
    * @return true if ok, false if some error
    */
   private boolean handlePackage(StringTokenizer stok) {
@@ -934,11 +920,10 @@ public abstract class AbstractWurbiler implements Wurbiler {
     return true;
   }
 
-
   /**
    * Handles the extends-command.
    *
-   * @param stok the tokenizer pointing to first arg
+   * @param stok the tokenizer pointing to the first arg
    * @return true if ok, false if some error
    */
   private boolean handleExtends(StringTokenizer stok) {
@@ -958,11 +943,10 @@ public abstract class AbstractWurbiler implements Wurbiler {
     return true;
   }
 
-
   /**
    * Handles the implements-command.
    *
-   * @param stok the tokenizer pointing to first arg
+   * @param stok the tokenizer pointing to the first arg
    * @return true if ok, false if some error
    */
   private boolean handleImplements(StringTokenizer stok) {
@@ -979,11 +963,10 @@ public abstract class AbstractWurbiler implements Wurbiler {
     return true;
   }
 
-
   /**
    * Handles the import-command.
    *
-   * @param stok the tokenizer pointing to first arg
+   * @param stok the tokenizer pointing to the first arg
    */
   private void handleImport(StringTokenizer stok) {
     if (stok.hasMoreTokens()) {
@@ -995,15 +978,14 @@ public abstract class AbstractWurbiler implements Wurbiler {
     }
   }
 
-
   /**
    * Handles the args-command.
    *
-   * @param stok the tokenizer pointing to first arg
+   * @param stok the tokenizer pointing to the first arg
    */
   private void handleArgs(StringTokenizer stok) {
     List<String> argList = new ArrayList<>();
-    if (stok.hasMoreTokens()) {
+    while (stok.hasMoreTokens()) {
       String arg = stok.nextToken();
       argList.add(arg);
       if (verbosity.isDebug()) {
@@ -1022,7 +1004,6 @@ public abstract class AbstractWurbiler implements Wurbiler {
       args = null;
     }
   }
-
 
   /**
    * Handles the comment command.
@@ -1057,11 +1038,10 @@ public abstract class AbstractWurbiler implements Wurbiler {
     return configuration != null;
   }
 
-
   /**
    * Handles the indent-command.
    *
-   * @param stok the tokenizer pointing to first arg
+   * @param stok the tokenizer pointing to the first arg
    */
   private void handleIndent(StringTokenizer stok) {
     if (stok.hasMoreTokens()) {
@@ -1079,11 +1059,10 @@ public abstract class AbstractWurbiler implements Wurbiler {
     }
   }
 
-
   /**
    * Handles the phase-command.
    *
-   * @param stok the tokenizer pointing to first arg
+   * @param stok the tokenizer pointing to the first arg
    */
   private void handlePhase(StringTokenizer stok) {
     if (stok.hasMoreTokens()) {
@@ -1101,11 +1080,10 @@ public abstract class AbstractWurbiler implements Wurbiler {
     }
   }
 
-
   /**
    * Handles the to-command.
    *
-   * @param stok the tokenizer pointing to first arg
+   * @param stok the tokenizer pointing to the first arg
    */
   private void handleOutName(StringTokenizer stok) {
     String path = stok.hasMoreTokens() ? stok.nextToken() : null;
@@ -1115,10 +1093,9 @@ public abstract class AbstractWurbiler implements Wurbiler {
     }
   }
 
-
   /**
    * Reads next char from input.
-   * Could be from some inluded file or the main stream.
+   * Could be from some included file or the main stream.
    */
   private int read() throws IOException {
     int c = in.read();
@@ -1136,14 +1113,12 @@ public abstract class AbstractWurbiler implements Wurbiler {
     return c;
   }
 
-
-
   /**
    * Flushes the source buffer.
    */
   private void flushSource() throws IOException {
     if (!sourceBuf.isEmpty()) {
-      // cut first newline, if any (comes from @[ ... newline)
+      // cut the first newline, if any (comes from @[ ... newline)
       if ((wurbletMode == WURBLET_BLOCK || wurbletMode == WURBLET_COMMAND) &&
           sourceBuf.charAt(0) == '\n')  {
         sourceBuf.deleteCharAt(0);
@@ -1161,16 +1136,14 @@ public abstract class AbstractWurbiler implements Wurbiler {
     sourceLoc = srcLocation();
   }
 
-
   /**
-   * Gets the current location in input source.
+   * Gets the current location in the input source.
    *
    * @return the current source-location
    */
   private String srcLocation()  {
     return in.getLineNo() + ":" + in.getLinePos();
   }
-
 
   /**
    * Gets a formatted source string of max length and no control-chars.

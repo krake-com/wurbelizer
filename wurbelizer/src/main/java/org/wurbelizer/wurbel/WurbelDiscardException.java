@@ -22,10 +22,10 @@ import java.io.Serial;
 
 /**
  * Same as {@link WurbelException} but instructs the wurbler to discard the generated source.<br>
- * The error is counted as a warning and is treated as if there was no wurblet at all.<br>
+ * The error is logged as a warning and is not counted as an error. The existing guarded block,
+ * if any, is left unchanged.<br>
  * Useful if a wurblet fails, but it's smarter to leave the existing code unchanged and continue
- * with the build process. Requires some management to count those warnings and terminate the
- * build process in a subsequent phase.
+ * with the build process, for example, because the real cause has already been reported as an error elsewhere.
  *
  * @author harald
  * @see WurbelException

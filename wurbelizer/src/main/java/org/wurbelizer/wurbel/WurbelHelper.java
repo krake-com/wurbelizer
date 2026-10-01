@@ -50,7 +50,6 @@ public final class WurbelHelper {
 
       super();
 
-      // since 1.5 getenv() is back again :-))
       for (Map.Entry<String,String> entry: System.getenv().entrySet()) {
         setProperty(entry.getKey(), entry.getValue());
       }
@@ -182,7 +181,7 @@ public final class WurbelHelper {
     } while (replaced);
 
     if (lastLoop) {
-      // translate \$ to $ (this allows \$ to suppress variable substituion)
+      // translate \$ to $ (this allows \$ to suppress variable substitution)
       int len = buf.length() - 1;
       for (int i=0; i < len; i++) {
         if (buf.charAt(i) == '\\' && buf.charAt(i+1) == '$') {
@@ -212,7 +211,7 @@ public final class WurbelHelper {
   }
 
   /**
-   * Translates variables in arguments, first properties, second environmen. Using StringBuilder.
+   * Translates variables in arguments, first properties, second environment. Using StringBuilder.
    *
    * @param buf argument buffer to be translated/parsed in place
    * @param otherProps != null to use given properties for translation as well
@@ -277,7 +276,7 @@ public final class WurbelHelper {
 
   /**
    * Perform indentation on generated source code.
-   * Implements the indent=... wurbler argumemt
+   * Implements the indent=... wurbler argument
    *
    * @param source is the original string (of lines)
    * @param indent is the number of spaces to insert at the start of each line

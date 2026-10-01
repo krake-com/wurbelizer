@@ -62,7 +62,7 @@ public abstract class AbstractWurbler implements Wurbler {
 
   /**
    * Creates a wurbler.<br>
-   * The output of the wurblet output by default goes to stdout.
+   * By default, the wurblet's output goes to stdout.
    */
   @SuppressWarnings("this-escape")
   public AbstractWurbler()  {
@@ -73,15 +73,17 @@ public abstract class AbstractWurbler implements Wurbler {
 
 
   /**
-   * Loads the wurblet from persistant storage.<br>
-   * The wurblet's classname may be either absolute or relative. If relative,
-   * a classpath must be provided. If the wurblet class could be loaded and
-   * the wurblet instance created, the serialized fixed source will be loaded
-   * from a file with the same name as the wurblet-class but the extension replaced
-   * by {@code .ser}.
+   * Loads the wurblet.<br>
+   * The wurblet's classname may be either fully qualified or relative. If relative,
+   * the package names of the classPath are prepended in the given order, before the plain name is tried.
+   * The class is loaded by the {@link WurbelContext#getWurbletClassLoader() wurblet classloader}
+   * of the current context, if set.
+   * If the wurblet class could be loaded and the wurblet instance created, the serialized fixed source
+   * will be loaded from a resource with the same name as the wurblet-class but the extension
+   * {@code .ser}.
    *
-   * @param className the pathname of the java-class.
-   * @param classPath an optional list of prefixes to load the className from
+   * @param className the name of the wurblet class
+   * @param classPath an optional list of package names to load the className from
    * @param otherProps extra properties for this wurblet only, null = none
    *
    * @throws WurbelException if loading the wurblet failed

@@ -53,6 +53,7 @@ The `@`-based extensions used inside `.wrbl` files.
 - [Level Switching](wurblet-syntax.md#level-switching)
   - [Code Switching](wurblet-syntax.md#code-switching)
   - [Value Extraction](wurblet-syntax.md#value-extraction)
+  - [Escaping](wurblet-syntax.md#escaping)
   - [A complete example](wurblet-syntax.md#a-complete-example)
 - [Wurbiler Directives](wurblet-syntax.md#wurbiler-directives)
   - [include](wurblet-syntax.md#include) ·

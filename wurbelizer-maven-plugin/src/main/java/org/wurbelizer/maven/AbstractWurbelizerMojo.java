@@ -67,7 +67,7 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
   protected MavenSession session;
 
   /**
-   * The list of file sets to wurbile.<br>
+   * The list of file sets to wurbile or wurbel.<br>
    * If set, the source directory is ignored.
    */
   @Parameter
@@ -76,7 +76,7 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
   /**
    * The verbosity.<br>
    * One of "default", "info" or "debug".
-   * Debus is also turned on (if not set explicitly) by Maven's global debug flag (see command line switch <code>-X</code>).
+   * Debug is also turned on (if not set explicitly) by Maven's global debug flag (see command line switch <code>-X</code>).
    */
   @Parameter(defaultValue = "${wurbel.verbosity}")
   protected String verbosity;
@@ -225,7 +225,6 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
     return null;
   }
 
-
   /**
    * Creates the extra properties.
    *
@@ -252,7 +251,6 @@ public abstract class AbstractWurbelizerMojo extends AbstractMojo {
     props.setProperty("projectRoot", projectRootPath);
     return props;
   }
-
 
   /**
    * Make extra properties available.

@@ -32,7 +32,7 @@ import java.io.PrintStream;
  * <p>
  * The general form of a wurblet anchor is:
  * <p>
- * {@code @wurblet <tag> <name> [options/arguments]}
+ * {@code @wurblet[(wurbler-directives)] <tag> <name> [options/arguments]}
  * <p>
  * It must be part of a line- or block-comment.
  * <p>
@@ -136,7 +136,7 @@ public abstract class AbstractWurblet implements Wurblet {
   }
 
   /**
-   * Gets the guardname
+   * Gets the guardname, i.e. the tag of the anchor that invoked this wurblet.
    * @return the guardname
    * @throws WurbelException if guardname could not be determined
    */

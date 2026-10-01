@@ -29,14 +29,13 @@ import java.util.List;
 public interface Wurbiler {
 
   /**
-   * Compiles the wurbelizable.
+   * Compiles the wurblet source.
    *
    * @return number of errors, 0 = no errors (warnings are not counted)
    *
-   * @throws WurbileException if compilation failed due to i/o error
+   * @throws WurbileException if compilation failed due to I/O-error
    */
   int compile() throws WurbileException;
-
 
   /**
    * Gets the list of invariant wurblet strings of the output level.
@@ -48,25 +47,23 @@ public interface Wurbiler {
   /**
    * Presets the list of invariant wurblet strings of the output level.
    *
-   * @param sourceList the source list, null if compile() should initialize it
+   * @param sourceList the source list; null if compile() should initialize it
    */
   void setSourceList(List<String> sourceList);
 
-
   /**
-   * Gets the source indentation.
+   * Gets the indentation of the generated java source.
    *
    * @return the current indentation
    */
   int getIndent();
 
   /**
-   * Sets the indentation for code generating the source.
+   * Sets the indentation of the generated java source.
    *
    * @param indent the new indentation
    */
   void setIndent(int indent);
-
 
   /**
    * Sets the autoindent feature.
@@ -82,7 +79,6 @@ public interface Wurbiler {
    */
   boolean isAutoIndent();
 
-
   /**
    * Sets the name of the output stream in the generated source.
    *
@@ -91,7 +87,7 @@ public interface Wurbiler {
   void setOutName(String outName);
 
   /**
-   * Sets name of the output stream to the default value (out).
+   * Sets the name of the output stream to the default value (out).
    */
   void setOutName();
 
@@ -101,7 +97,6 @@ public interface Wurbiler {
    * @return the name of the output stream
    */
   String getOutName();
-
 
   /**
    * Gets the logger for warnings and errors.
@@ -117,7 +112,6 @@ public interface Wurbiler {
    */
   void setLogger(Logger logger);
 
-
   /**
    * Gets the verbosity.
    * @return the verbosity
@@ -129,7 +123,6 @@ public interface Wurbiler {
    * @param verbosity the verbosity
    */
   void setVerbosity(Verbosity verbosity);
-
 
   /**
    * Gets the package name.
@@ -145,7 +138,6 @@ public interface Wurbiler {
    */
   void setPackageName(String packageName);
 
-
   /**
    * Gets the parent class.
    *
@@ -160,7 +152,6 @@ public interface Wurbiler {
    */
   void setParentClass(String parentClass);
 
-
   /**
    * Gets the list of imports.
    *
@@ -171,10 +162,9 @@ public interface Wurbiler {
   /**
    * Sets the imports.
    *
-   * @param imports is the array of imports, null to clear
+   * @param imports the array of imports, null to clear
    */
   void setImports(String[] imports);
-
 
   /**
    * Gets the preset wurblet args.
@@ -187,12 +177,11 @@ public interface Wurbiler {
    * Preset wurblet args.
    * The default (null) means that the args
    * are determined at runtime by the wurbler,
-   * i.e. command-line, &#64;wurblet-directive.
+   * i.e. from the &#64;wurblet anchor or the command line.
    *
    * @param args the wurblet args
    */
   void setArgs(String[] args);
-
 
   /**
    * Gets the wurblet comment.
@@ -208,7 +197,6 @@ public interface Wurbiler {
    */
   void setComment(String comment);
 
-
   /**
    * Gets the extra code.
    *
@@ -223,7 +211,6 @@ public interface Wurbiler {
    */
   void setExtraCode(String code);
 
-
   /**
    * Gets the wurblet specific configuration.
    *
@@ -237,7 +224,6 @@ public interface Wurbiler {
    * @param config the config, null if none
    */
   void setConfiguration(String config);
-
 
   /**
    * Gets the execution phase of the compiled wurblet.

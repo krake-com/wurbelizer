@@ -38,6 +38,7 @@ where:
 - `@wurblet`: starts an anchor
 - `(wurbler-directive1 ... N)`: optional directives to the wurbler
 - `<tag>`: is a tag uniquely identifying the anchor within the source file
+  (tags of [unnamed anchors](#unnamed-anchor) need not be unique)
 - `<wurblet>`: the class name of the wurblet. This is either a fully
 qualified class name or a basename to which the wurbler prepends
 the package names provided by 
@@ -147,19 +148,25 @@ The guarded block belongs to its anchor, and the wurbler keeps both in sync:
   `/******** ... ********/` comment, so the error is visible right where the code is
   missing. An inline wurblet (see below) inserts `{ <message> }` instead.
   The wurbler stops processing a source file after the first pass with errors.
+- If the wurblet throws a `WurbelDiscardException` (see
+  [Errorhandling](writing-wurblets.md#errorhandling)), the guarded block is left unchanged.
 
 ### Unnamed Anchor
 
-If the `<tag>` in the wurblet anchor does not start with a letter, 
-it is considered as an unnamed wurblet anchor. Unnamed anchors are useful for
-so-called inline wurblets, which are commonly used to inject a small piece
+If the `<tag>` in the wurblet anchor starts with one of the characters `-`, `<`, `+` or `>`,
+it is considered as an unnamed wurblet anchor. Unnamed anchors are used for
+so-called inline wurblets, which inject a small piece
 of code into the code block directly preceding or following the anchor. The
 code is injected between two consecutive empty block comments `/**/`. The
 first character of the tag determines whether the preceding or following code
-block is targeted by the wurblet.
+block is targeted by the wurblet:
 
-- The characters `-` or `<` refer to the preceding block
-- all others, including `+` or `>` refer to the following block
+- `-` or `<` refer to the preceding block
+- `+` or `>` refer to the following block
+
+Any other tag, even one that doesn't start with a letter, denotes a regular, named anchor with a
+guarded block. Unlike named anchors, the tags of unnamed anchors need not be unique, so the
+same tag, such as `<`, can be used for all inline wurblets of a file.
 
 Instead of `/**/`, the empty block comment may also be written as `/*@*/`. Both forms
 are equivalent and are treated as code rather than as a comment. `/*@*/` is the better
@@ -215,8 +222,17 @@ Example:
 ```
 
 Will invoke the wurblet `Didoedeldu` if the variable `$planb` equals the string `yes`. 
-Otherwise the comment `// condition not met` will be generated. 
+Otherwise, the wurblet is skipped: an existing guarded block is left unchanged, and no
+block is created if there is none yet.
 Currently, only the operators `==` and `!=` are supported.
+
+Notice the following:
+
+- Wurbler directives are separated by whitespace, so the condition must not contain blanks,
+  unless it is enclosed in double quotes, e.g. `@wurblet("test:$planb == yes")`.
+- The operands are compared literally after variable substitution. A variable that can't be
+  resolved is compared as is, e.g. `$planb`.
+- The wurblet is loaded even if the condition is not met, so it must exist.
 
 ### Extra Indentation
 

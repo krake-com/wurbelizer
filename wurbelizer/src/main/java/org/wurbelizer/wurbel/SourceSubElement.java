@@ -19,7 +19,7 @@
 package org.wurbelizer.wurbel;
 
 /**
- * Single- or block-comment-{@link SourceElement}s may contain {@code SubElement}s.<br>
+ * Comment- and guarded {@link SourceElement}s may contain {@code SubElement}s.<br>
  * Currently, the following SubElements are defined:
  * <ul>
  * <li>{@code SourceWurbletSubElement}: a wurblet anchor</li>
@@ -33,7 +33,7 @@ package org.wurbelizer.wurbel;
 public abstract class SourceSubElement {
 
   private final SourceElement element;      // the element containing the sub-element
-  private final String text;                // contents of here-document
+  private final String text;                // contents of the sub element
   private String name;                      // name of the sub element
 
 
@@ -71,7 +71,6 @@ public abstract class SourceSubElement {
     return element;
   }
 
-
   /**
    * Gets the name.
    *
@@ -80,7 +79,6 @@ public abstract class SourceSubElement {
   public String getName() {
     return name;
   }
-
 
   /**
    * Sets the name
@@ -91,7 +89,6 @@ public abstract class SourceSubElement {
     this.name = name;
   }
 
-
   /**
    * Gets the contents.
    *
@@ -100,7 +97,6 @@ public abstract class SourceSubElement {
   public String getText() {
     return text;
   }
-
 
   /**
    * String representation of the sub-element

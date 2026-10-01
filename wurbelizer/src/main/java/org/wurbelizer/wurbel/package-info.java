@@ -20,6 +20,6 @@
  * The wurbler.
  * <p>
  * The wurbler is a container that parses source files for &#64;wurblet anchors,
- * loads the wurblets and applies generated code to the sources.
+ * loads the wurblets, and applies generated code to the sources.
  */
 package org.wurbelizer.wurbel;

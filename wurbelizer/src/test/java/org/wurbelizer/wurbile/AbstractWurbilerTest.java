@@ -19,6 +19,7 @@
 package org.wurbelizer.wurbile;
 
 import org.testng.annotations.Test;
+import org.wurbelizer.misc.Verbosity;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
@@ -27,6 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -46,10 +49,16 @@ public class AbstractWurbilerTest {
   private static Result compile(String wrbl) throws Exception {
     StringWriter out = new StringWriter();
     List<String> source = new ArrayList<>();
-    AbstractWurbiler wurbiler = new AbstractWurbiler(
-        new BufferedReader(new StringReader(wrbl)), "test", out, source) {};
+    AbstractWurbiler wurbiler = createWurbiler(wrbl, out, source);
     assertEquals(wurbiler.compile(), 0);
     return new Result(out.toString(), source);
+  }
+
+  private static AbstractWurbiler createWurbiler(String wrbl, StringWriter out, List<String> source) {
+    AbstractWurbiler wurbiler = new AbstractWurbiler(
+        new BufferedReader(new StringReader(wrbl)), "test", out, source) {};
+    wurbiler.setVerbosity(Verbosity.DEFAULT);
+    return wurbiler;
   }
 
   @Test
@@ -70,5 +79,34 @@ public class AbstractWurbilerTest {
   @Test
   public void testEscapedAt() throws Exception {
     assertEquals(compile("\\@Override").source, List.of("@Override\n"));
+  }
+
+  @Test
+  public void testArgsDirectiveKeepsAllArguments() throws Exception {
+    AbstractWurbiler wurbiler = createWurbiler("@{args a b c}@", new StringWriter(), new ArrayList<>());
+    assertEquals(wurbiler.compile(), 0);
+    assertEquals(wurbiler.getArgs(), new String[] { "a", "b", "c" });
+  }
+
+  @Test
+  public void testEmptyArgsDirectiveResetsArguments() throws Exception {
+    AbstractWurbiler wurbiler = createWurbiler("@{args a b}@@{args}@", new StringWriter(), new ArrayList<>());
+    assertEquals(wurbiler.compile(), 0);
+    assertNull(wurbiler.getArgs());
+  }
+
+  @Test
+  public void testUnescapedAtInDirectiveStaysInDirective() throws Exception {
+    StringWriter out = new StringWriter();
+    AbstractWurbiler wurbiler = createWurbiler(
+        "@{code\n  @Override\n  public String toString() { return \"x\"; }\n}@", out, new ArrayList<>());
+    assertEquals(wurbiler.compile(), 0);
+    assertTrue(wurbiler.getExtraCode().contains("@Override"), wurbiler.getExtraCode());
+    assertFalse(out.toString().contains("@O"), out.toString());
+  }
+
+  @Test
+  public void testUnescapedAtInExpressionStaysInExpression() throws Exception {
+    assertTrue(compile("@(\"@x\")@").java.contains(".print(\"@x\");"));
   }
 }

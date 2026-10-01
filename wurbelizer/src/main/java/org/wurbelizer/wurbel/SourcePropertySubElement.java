@@ -41,7 +41,7 @@ public class SourcePropertySubElement extends SourceSubElement {
 
 
   /**
-   * Scan for properties and append them to given property list.
+   * Scan for properties and append them to the given property list.
    *
    * @param props the properties to add the contents of this sub element to
    */

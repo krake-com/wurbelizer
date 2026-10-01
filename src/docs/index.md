@@ -16,6 +16,8 @@ See the [Table of Contents](toc.md) for the documents in reading order.
   [Maven: Goals and parameters](maven.md#goals-and-parameters), [Ant: Wurbel](ant.md#wurbel)
 - **anchor** — *see* wurblet anchor
 - **Ant integration** — [Ant Integration](ant.md)
+- **ant namespace (`"ant"`)** — [Writing Wurblets: Wurbler Properties](writing-wurblets.md#wurbler-properties),
+  [Ant: Wurbel](ant.md#wurbel)
 - **args directive** — [Wurblet Level Syntax: args](wurblet-syntax.md#args)
 - **arguments (wurblet)** — [Source Level Syntax: Wurblet Anchor](source-syntax.md#wurblet-anchor),
   [args directive](wurblet-syntax.md#args)
@@ -53,6 +55,7 @@ See the [Table of Contents](toc.md) for the documents in reading order.
 - **directives (wurbler)** — [Source Level Syntax: Wurblet Anchor](source-syntax.md#wurblet-anchor)
 - **discard (heap file)** — [Writing Wurblets: Errorhandling](writing-wurblets.md#errorhandling),
   [Heap Files API](writing-wurblets.md#heap-files-api)
+- **destdir (Ant)** — [Ant: Wurbile](ant.md#wurbile)
 - **DTO tutorial** — [Quickstart](quickstart.md)
 - **dry run (`dryRun`)** — [Maven: Goals and parameters](maven.md#goals-and-parameters), [Ant: Wurbel](ant.md#wurbel)
 
@@ -62,6 +65,7 @@ See the [Table of Contents](toc.md) for the documents in reading order.
 - **empty block comment (`/**/`, `/*@*/`)** —
   [Source Level Syntax: Unnamed Anchor](source-syntax.md#unnamed-anchor)
 - **error handling / exceptions** — [Writing Wurblets: Errorhandling](writing-wurblets.md#errorhandling)
+- **escaping (`\@`, `\ `)** — [Wurblet Level Syntax: Escaping](wurblet-syntax.md#escaping)
 - **extends directive** — [Wurblet Level Syntax: extends](wurblet-syntax.md#extends)
 - **extra indentation (`indent=`)** — [Source Level Syntax: Extra Indentation](source-syntax.md#extra-indentation)
 - **extra properties** — [Writing Wurblets: Wurbler Properties](writing-wurblets.md#wurbler-properties),
@@ -106,6 +110,7 @@ See the [Table of Contents](toc.md) for the documents in reading order.
   [Maven: Goals and parameters](maven.md#goals-and-parameters)
 - **indent directive** — [Wurblet Level Syntax: indent](wurblet-syntax.md#indent)
 - **inline wurblet** — [Source Level Syntax: Unnamed Anchor](source-syntax.md#unnamed-anchor)
+- **inline tags (`-`, `<`, `+`, `>`)** — [Source Level Syntax: Unnamed Anchor](source-syntax.md#unnamed-anchor)
 - **Inject wurblet (Tentackle)** — [Source Level Syntax: Unnamed Anchor](source-syntax.md#unnamed-anchor)
 - **isThreadSafe (wurblet)** — [Writing Wurblets: Thread safety](writing-wurblets.md#thread-safety),
   [Maven Integration: Parallel builds](maven.md#parallel-builds)
@@ -166,6 +171,7 @@ See the [Table of Contents](toc.md) for the documents in reading order.
 
 - **SourceRegion (interface)** — [Guard Types: Custom Guard Types](guard-types.md#custom-guard-types)
 - **SourceType (interface)** — [Guard Types: Source Types](guard-types.md#source-types)
+- **source type, default (`NoneSourceType`)** — [Guard Types: Source Types](guard-types.md#source-types)
 - **source level** — [Code Levels](code-levels.md), [Source Level Syntax](source-syntax.md)
 - **skeleton wurblet** — [Writing Wurblets: Skeleton](writing-wurblets.md#skeleton-extending-abstractjavawurblet)
 

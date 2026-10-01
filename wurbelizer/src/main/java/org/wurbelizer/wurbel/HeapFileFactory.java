@@ -22,6 +22,8 @@ import java.util.Map;
 
 /**
  * Factory and cache for {@link HeapFile}s.<br>
+ * The heapfile names are given without the leading dot used in here-documents and
+ * {@link WurbelHelper#openReader(String)}.<br>
  * The heapfiles are kept in the {@link WurbelContext#current() current} wurbel context.
  *
  * @author harald
@@ -29,7 +31,7 @@ import java.util.Map;
 public final class HeapFileFactory {
 
   /**
-   * initializes the heapfiles.
+   * Initializes (clears) the heapfiles of the current context.
    */
   public static void initialize() {
     Map<String,HeapFile> heapFiles = heapFiles();
@@ -67,7 +69,7 @@ public final class HeapFileFactory {
    * @param heapName the unique name of the heapfile
    * @param text the initial contents, null = empty.
    * @return the heapfile
-   * @throws WurbelException if heapname is not unique
+   * @throws WurbelException if the heapfile was created from another source file
    */
   public static HeapFile createOrOverwrite(String sourceName, String heapName, String text) throws WurbelException {
     Map<String,HeapFile> heapFiles = heapFiles();
@@ -106,11 +108,10 @@ public final class HeapFileFactory {
     }
   }
 
-
   /**
    * Removes a heapfile.
    *
-   * @param heapName the of heapfile
+   * @param heapName the name of the heapfile
    * @return true if removed, false if no such file.
    */
   public static boolean delete(String heapName) {

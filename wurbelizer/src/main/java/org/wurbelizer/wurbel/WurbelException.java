@@ -24,7 +24,7 @@ import java.io.Serial;
  * An exception thrown while executing a {@link org.wurbelizer.wurblet.Wurblet}.<br>
  * A {@code WurbelException} is counted as a build error and usually terminates the
  * build process at the end of the corresponding build phase.
- * Subclasses are provided for a different behaviour.
+ * Subclasses are provided for a different behavior.
  *
  * @author harald
  * @see WurbelTerminationException
@@ -36,7 +36,7 @@ public class WurbelException extends Exception {
   private static final long serialVersionUID = 1L;
 
   /**
-   * true if message contains a hint to the source of the error, false if default to file.
+   * true if the message contains a hint to the source of the error, false if default to file.
    */
   private final boolean sourceInfoIncluded;
 
@@ -45,7 +45,7 @@ public class WurbelException extends Exception {
    * Creates a wurbel exception.
    *
    * @param message the error message
-   * @param sourceInfoIncluded true if message contains a hint to the source of the error, false if default to file
+   * @param sourceInfoIncluded true if the message contains a hint to the source of the error, false if default to file
    * containing the wurblet
    * @param cause the cause
    */
@@ -58,7 +58,7 @@ public class WurbelException extends Exception {
    * Creates a wurbel exception.
    *
    * @param message the error message
-   * @param sourceInfoIncluded true if message contains a hint to the source of the error, false if default to file
+   * @param sourceInfoIncluded true if the message contains a hint to the source of the error, false if default to file
    * containing the wurblet
    */
   public WurbelException(String message, boolean sourceInfoIncluded) {

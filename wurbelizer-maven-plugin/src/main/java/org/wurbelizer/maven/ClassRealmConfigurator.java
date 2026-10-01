@@ -29,17 +29,16 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 
 import javax.inject.Named;
 
-
 /**
- * A custom configurator for the {@link WurbelMojo}.
+ * A custom configurator for the {@link WurbelMojo} and the {@link TestWurbelMojo}.
  * <p>
- * Extracts the classrealm and make it available to mojos.
- * This is necessary in multimodule maven projects, if wurblets are compiled
+ * Extracts the classrealm and makes it available to the mojos.
+ * This is necessary in multimodule maven projects if wurblets are compiled
  * in one module and used in other modules of the project. Otherwise,
  * the first build of the super-pom will fail.
  *
  * @author harald
- * @see WurbelMojo#setClassRealm(org.codehaus.plexus.classworlds.realm.ClassRealm)
+ * @see AbstractWurbelMojo#setClassRealm(org.codehaus.plexus.classworlds.realm.ClassRealm)
  */
 @Named("set-classrealm")
 public class ClassRealmConfigurator extends AbstractComponentConfigurator {
@@ -55,7 +54,7 @@ public class ClassRealmConfigurator extends AbstractComponentConfigurator {
       ((AbstractWurbelMojo) component).setClassRealm(containerRealm);
     }
     else  {
-      throw new ComponentConfigurationException("configurator can only be applied to an AbstractWurbelizerMojo");
+      throw new ComponentConfigurationException("configurator can only be applied to an AbstractWurbelMojo");
     }
 
     converterLookup.registerConverter(new ClassRealmConverter(containerRealm));

@@ -24,17 +24,17 @@ import java.util.Properties;
  * Utility class to scan for arguments and to do variable translation.<p>
  *
  * Arguments are usually separated by whitespaces.
- * However, sometimes arguments must include whitespaces, i.e.
- * must be quoted. There are two kinds quotes:<p>
+ * However, sometimes arguments must include whitespaces,
+ * i.e. must be quoted. There are two kinds of quotes:<p>
  *
- * double-quotes like {@code "test: $remote == --remote"}. The {@code $remote} will be translated.
+ * Double-quotes like {@code "test: $remote == --remote"}. The {@code $remote} will be translated.
  * A single-quote in a double-quoted string is allowed.<p>
  *
- * single-quotes like {@code --orderby='" ORDER BY " + CN_ID + " DESC"'}.
- * No translation will take place and such args may contain double-quotes.<p>
+ * Single-quotes like {@code --orderby='" ORDER BY " + CN_ID + " DESC"'}.
+ * No translation will take place, and such args may contain double-quotes.<p>
  *
  * Double-quotes in a double-quoted string must be quoted with a backslash.
- * Same is true for single-quotes in a single quoted string.
+ * The same is true for single-quotes in a single-quoted string.
  * A backslash is written as {@code \\}.<p>
  *
  * Notice that variable translation takes place <strong>after</strong> the arguments have been separated.
@@ -130,7 +130,7 @@ public class ArgScanner {
             if (Character.isWhitespace(c))  {
               break;
             }
-            // check for start of quoted string
+            // check for the beginning of quoted string
             if      (c == '"') {
               inDoubleQuote = true;
             }

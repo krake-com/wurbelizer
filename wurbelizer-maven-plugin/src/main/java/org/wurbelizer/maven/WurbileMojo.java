@@ -41,7 +41,8 @@ import java.io.IOException;
 /**
  * Wurbile Wurblets.<br>
  * The wurblet sources (wrbl-files) are translated to Java sources
- * and ser-files (serialized fixed text) and then compiled to Java class files.<br>
+ * and ser-files (serialized fixed text). The directory of the generated Java sources is added
+ * as a compile source root, so that they are compiled to class files in the compile phase.<br>
  * The Wurbler can later instantiate those class files as code generators.<br>
  * See the {@code wurbelizer:wurbel} goal.
  *
@@ -68,14 +69,15 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
   private File wurbletTargetJavaDir;
 
   /**
-   * Directory for the generated wurbley fixed text sources.
+   * Directory for the generated wurblet fixed text (.ser) files.
    */
   @Parameter(defaultValue = "${project.build.directory}/classes",
              property = "wurbile.textDir")
   private File wurbletTargetTextDir;
 
   /**
-   * Sets the indent of the generated Java source.
+   * Sets the indent of the generated Java source.<br>
+   * -1 means the wurbiler's default, i.e. autoindent.
    */
   @Parameter(defaultValue = "-1")
   private Integer indent;

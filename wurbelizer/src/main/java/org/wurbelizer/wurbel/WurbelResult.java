@@ -22,26 +22,29 @@ package org.wurbelizer.wurbel;
  * Result from wurbler.<br>
  * For a single file.
  *
- * @param wurbletCount the number of executed wurbletCount
+ * @param wurbletCount the number of executed wurblets (counted per pass over the source)
  * @param errors       the number of errors
  * @param updateType   the kind of update of the source file
  */
 public record WurbelResult(int wurbletCount, int errors, UpdateType updateType) {
 
   /**
-   * tells if and why file is updated.
+   * tells if and why the file is updated.
    */
   public enum UpdateType {
+
     /**
-     * file was not updated and no errors.
+     * The file was not updated and no errors.
      */
     UNCHANGED,
+
     /**
-     * file was updated without errors.
+     * The file was updated without errors.
      */
     UPDATED,
+
     /**
-     * heredocs in file found and written to disk, file is not updated.
+     * Heredocs in the file found and written to disk, the file is not updated.
      */
     HEREDOCS
   }

@@ -38,7 +38,7 @@ public class VisualStudioRegion extends AbstractSourceRegion {
 
   @Override
   public String createBegin(FoldType foldType, String guardName, SourceWurbletSubElement wurbletElement) {
-    // there is no initial fold type in visual studio
+    // there is no initial fold type in Visual Studio
     return REGION_BEGIN_1 + createCommentGeneratedBy(guardName, wurbletElement) + REGION_BEGIN_2 + guardName;
   }
 

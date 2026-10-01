@@ -36,7 +36,7 @@ public class SourceException extends Exception {
 
 
   /**
-   * Constructs an {@code SourceException} with the specified detail message.
+   * Constructs a {@code SourceException} with the specified detail message.
    *
    * @param elem the SourceElement containing the error, null if unknown.
    * @param message the detail message
@@ -47,9 +47,8 @@ public class SourceException extends Exception {
     this.doc = null;
   }
 
-
   /**
-   * Constructs an {@code SourceException} with the specified detail message.
+   * Constructs a {@code SourceException} with the specified detail message.
    *
    * @param doc the SourceDocument containing the error, null if unknown.
    * @param message the detail message
@@ -60,9 +59,8 @@ public class SourceException extends Exception {
     this.elem = null;
   }
 
-
   /**
-   * Constructs an {@code SourceException} with the specified detail message.
+   * Constructs a {@code SourceException} with the specified detail message.
    *
    * @param message the detail message
    */

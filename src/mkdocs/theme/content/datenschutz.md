@@ -80,7 +80,7 @@ privacy-friendly:
   **locally** from this site's own server. No third-party fonts, scripts or
   resources (e.g. Google Fonts, CDNs) are loaded at runtime.
 - **No analytics.** No web-analytics service is embedded.
-- **Local storage.** Your colour-scheme choice (light/dark) and your cookie
+- **Local storage.** Your color-scheme choice (light/dark) and your cookie
   consent are stored solely in your browser's `localStorage`; this data stays in
   your browser and is not sent to the server.
 

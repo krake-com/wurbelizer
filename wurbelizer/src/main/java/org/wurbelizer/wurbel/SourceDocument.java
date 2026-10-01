@@ -34,7 +34,7 @@ import java.util.Properties;
  * <p>
  * Source documents are divided into sections, so-called {@link SourceElement}s.
  * Each element can be manipulated independently. Especially new elements, so-called
- * guarded blocks, can be inserted, replaced and removed. They are identified by
+ * guarded blocks, can be inserted, replaced, and removed. They are identified by
  * a unique name, a tag, which is stored along with the section within the document.
  * Elements can also be addressed by their logical index (starting at 0).
  *
@@ -50,7 +50,7 @@ public class SourceDocument {
   private static final int INLINE_COMMENT_23_LEN = INLINE_COMMENT_23.length();
 
   private StringBuilder text;               // whole document as one String
-  private final String name;                // the documents name
+  private final String name;                // the document's name
   private final Properties wurbProps;       // extra wurblet properties
   private final Logger logger;              // the logger
   private final Verbosity verbosity;        // the verbosity
@@ -82,7 +82,6 @@ public class SourceDocument {
     checkGuardedElements();
   }
 
-
   /**
    * Constructs a SourceDocument from a {@link String}.
    *
@@ -99,8 +98,6 @@ public class SourceDocument {
 
     this(new StringBuilder(text), name, wurbProps, logger, verbosity);
   }
-
-
 
 
   /**
@@ -185,7 +182,6 @@ public class SourceDocument {
     }
   }
 
-
   /**
    * Removes a guarded section with a given name starting at a given logical index.
    *
@@ -202,7 +198,7 @@ public class SourceDocument {
         deleteElement(i);
         /*
          * Because the guarded blocks begin with a single line comment which is
-         * indendet by a newline + <spaces> the code-block before must be made
+         * indented by a newline + <spaces> the code-block before must be made
          * smaller to cut off this garbage. Otherwise, the generated sources
          * would get longer and longer... ;-)
          */
@@ -239,7 +235,6 @@ public class SourceDocument {
     return -1;
   }
 
-
   /**
    * Removes a guarded section with a given name.
    *
@@ -251,7 +246,6 @@ public class SourceDocument {
     return deleteGuarded(guardedName, 0);
   }
 
-
   /**
    * Replaces a guarded section.
    *
@@ -261,9 +255,9 @@ public class SourceDocument {
    * @param str the new text
    * @param wurbletElement the wurblet element, null if none
    *
-   * @return the index &ge; of the replaced element, -1 if not found
+   * @return the index &ge; 0 of the replaced element, -1 if not found
    *
-   * @throws org.wurbelizer.wurbel.SourceException if operation failed
+   * @throws org.wurbelizer.wurbel.SourceException if the operation failed
    */
   public int replaceGuarded(SourceRegion guardType, SourceRegion.FoldType foldType,
                             String guardedName, String str,
@@ -275,7 +269,6 @@ public class SourceDocument {
     }
     return ndx;
   }
-
 
   /**
    * Replaces an inline wurblet section.
@@ -289,7 +282,7 @@ public class SourceDocument {
    * @param elemNdx the index of the SourceElement
    * @param wurblet the wurblet
    *
-   * @throws org.wurbelizer.wurbel.SourceException if operaton failed
+   * @throws org.wurbelizer.wurbel.SourceException if the operation failed
    */
   public void replaceInline(String str, int elemNdx, SourceWurbletSubElement wurblet) throws SourceException {
     // adjust element index
@@ -374,7 +367,6 @@ public class SourceDocument {
     }
   }
 
-
   /**
    * Removes an element at given index.
    *
@@ -396,10 +388,9 @@ public class SourceDocument {
     }
   }
 
-
   /**
    * Gets the line number for a given character position.
-   * For performance reasons line number or not calculated when parsing
+   * For performance reasons, line numbers are not calculated when parsing
    * the document but only when printing an error message.
    *
    * @param pos the character position in the document.
@@ -421,7 +412,7 @@ public class SourceDocument {
 
 
   /**
-   * Prints the name of the document without the package name.
+   * Prints the name of the document without the directory.
    *
    * @return the name of the document
    */
@@ -430,7 +421,6 @@ public class SourceDocument {
     int ndx = name.lastIndexOf(File.separatorChar);
     return ndx > 0 ? name.substring(ndx+1) : name;
   }
-
 
   /**
    * Gets the name of the document.
@@ -450,7 +440,6 @@ public class SourceDocument {
     return text;
   }
 
-
   /**
    * Gets the optional properties for this document
    *
@@ -459,7 +448,6 @@ public class SourceDocument {
   public Properties getProperties() {
     return wurbProps;
   }
-
 
   /**
    * Sets the text of the document.
@@ -575,7 +563,7 @@ public class SourceDocument {
         }
       }
       else {
-        // looking for start of next guarded block
+        // looking for the beginning of next guarded block
         if (elem.getType() == SourceElement.Type.SINGLE_COMMENT) {
           String elemText = elem.getText();
           for (SourceRegion region : SourceRegion.getAll()) {
@@ -629,7 +617,7 @@ public class SourceDocument {
 
     // phase 3: insert CODE-elements for the rest
     List<SourceElement> docList = new ArrayList<>();
-    int pos = 0;      // position in text
+    int pos = 0;      // position in the text
     for (SourceElement elem : elements) {
       if (elem.getBegin() > pos) {
         SourceElement code = new SourceElement(this, SourceElement.Type.CODE, pos, elem.getBegin(), null);
@@ -651,7 +639,6 @@ public class SourceDocument {
     elements = docList;
   }
 
-
   /**
    * Gets the list of all elements of this document.
    *
@@ -660,7 +647,6 @@ public class SourceDocument {
   public List<SourceElement> getElements() {
     return elements;
   }
-
 
   /**
    * Checks that the guarded blocks are unique among the whole document.

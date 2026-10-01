@@ -29,7 +29,9 @@ import java.io.IOException;
 import java.util.Locale;
 
 /**
- * Invokes the wurbiler from the console.
+ * Invokes the wurbiler from the console.<br>
+ * The generated Java source and .ser file are written to the directory of the .wrbl file,
+ * with the package directories appended.
  *
  * @author harald
  */
@@ -41,7 +43,7 @@ public class ConsoleWurbiler {
    */
   private static void usage() {
     System.out.println(
-      "usage: java org.wurbelizer.console.wurbile.ConsoleWurbiler [--verbosity=default|info|debug] [--indent=n] [--extends=<classpath>] [--package=<package>] <wurbelizable>.wrbl");
+      "usage: java org.wurbelizer.console.wurbile.ConsoleWurbiler [--verbosity=default|info|debug] [--indent=n] [--extends=<parentclass>] [--package=<package>] <wurbelizable>.wrbl");
     System.exit(1);
   }
 

@@ -166,7 +166,7 @@ public class DTOWurblet extends AbstractJavaWurblet {
     public String getSetterName() { return "set" + firstToUpper(name); }
   }
 
-  protected String filename;            // here-doc holding the model (given as "$> .$filename")
+  protected String filename;            // here-doc holding the model (given as "@> .$filename")
   protected List<Property> properties;  // the DTO properties
 
   @Override
@@ -241,7 +241,12 @@ wurblet-level expression back into the output. Put `DTO.wrbl` in
   private final @(property.getType())@ @(property.getName())@;  // @(property.getComment())@
 @[
     }
+]@
 
+  /**
+   * Creates a @(getClassName())@.
+   *
+@[
     // create constructor
     StringBuilder args = new StringBuilder();
     for (Property property: properties) {
@@ -290,7 +295,7 @@ wurblet compiler), compiles the generated Java, and packages the `wurblets` jar.
 
 The `sample` module *uses* the wurblet. Its `pom.xml` runs the `wurbel` goal, loads the
 wurblets from the `wurblets` artifact built above, and prepends the package
-`com.example.wurblets` so a simple tag name like `DTO` resolves:
+`com.example.wurblets` so a simple wurblet name like `DTO` resolves:
 
 ```xml
 <project ...>
