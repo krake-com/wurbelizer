@@ -206,12 +206,12 @@ usually hides this. In a parallel build, however, the consuming module may start
 module is built, and then picks up an outdated artifact from the local repository or fails. To enforce
 the build order, also declare a regular dependency on the wurblet module. With type `pom` and scope
 `provided`, it only adds the edge to the build order, without putting the wurblets on the compile
-classpath or passing them on to consumers of the module:
+classpath or passing them on to consumers of the module. Example:
 
 ```xml
 <dependency>
   <groupId>${project.groupId}</groupId>
-  <artifactId>tentackle-persistence-wurblets</artifactId>
+  <artifactId>myapp-wurblets</artifactId>
   <version>${project.version}</version>
   <type>pom</type>
   <scope>provided</scope>
