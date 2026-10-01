@@ -132,8 +132,74 @@ public abstract class AbstractWurbelMojo extends AbstractWurbelizerMojo {
   private Properties wurbletProperties;
 
   /**
-   * Classpaths for loading wurblets.<br>
-   * Used for all non-fully-qualified wurblet anchors.
+   * The artifacts containing the wurblets.<br>
+   * Each entry is a regular Maven dependency with {@code groupId}, {@code artifactId}, {@code version} and
+   * optionally {@code classifier} and {@code type}:
+   * <pre>
+   * &lt;wurbletDependencies&gt;
+   *   &lt;wurbletDependency&gt;
+   *     &lt;groupId&gt;org.example&lt;/groupId&gt;
+   *     &lt;artifactId&gt;example-wurblets&lt;/artifactId&gt;
+   *     &lt;version&gt;1.0&lt;/version&gt;
+   *   &lt;/wurbletDependency&gt;
+   * &lt;/wurbletDependencies&gt;
+   * </pre>
+   * The artifacts are resolved, together with their transitive runtime dependencies and with respect to the
+   * project's dependency management, each time the mojo is executed. They are loaded by a separate classloader,
+   * a child realm of the plugin's classrealm, created for this execution only. The wurbelizer core packages are
+   * imported from the plugin's classrealm. The realm becomes the thread's context classloader, is available to
+   * the wurblets via {@link WurbelContext#getWurbletClassLoader()} and is disposed of when the execution ends.
+   *
+   * <p><b>wurbletDependencies versus plugin dependencies</b><br>
+   * Wurblets can also be added to the {@code <dependencies>} of the plugin declaration. They are then loaded by
+   * the plugin's classrealm itself. Maven creates this realm only once per build and caches it, so all modules and
+   * all executions of the build share the same wurblet classes and thus the same static state, such as models,
+   * caches and other singletons. In that case {@link WurbelContext#getWurbletClassLoader()} returns {@code null}.
+   * With {@code wurbletDependencies}, on the contrary, each execution gets fresh classes with fresh static state.
+   * Different modules may even use different versions of the same wurblet artifact.
+   *
+   * <p><b>Wurblets built in the same reactor</b><br>
+   * If the wurblets are compiled with the {@code wurbile} goal in a module of the same multi-module build,
+   * the {@code wurbletDependencies} are resolved from the reactor at the time the consuming module is
+   * wurbeled. Hence, the wurblets just built are used and not a stale copy cached in the plugin's classrealm
+   * or in the local repository.<br>
+   * However, Maven does not interpret the plugin's configuration when it determines the build order of the modules.
+   * Unlike a plugin dependency, a {@code wurbletDependency} does not make the consuming module depend on the
+   * wurblet module. In a sequential build, the order of the {@code <modules>} usually hides this. In a parallel
+   * build ({@code mvn -T ...}), however, only declared dependencies count, and the consuming module may start
+   * before the wurblet module is built. It then picks up an outdated artifact from the local repository or fails.
+   * Therefore, the consuming module should additionally declare a regular dependency on the wurblet module
+   * to enforce the build order. With type {@code pom} and scope {@code provided}, the dependency affects
+   * only the build order and does not put the wurblets on the compile classpath:
+   * <pre>
+   * &lt;dependency&gt;
+   *   &lt;groupId&gt;org.example&lt;/groupId&gt;
+   *   &lt;artifactId&gt;example-wurblets&lt;/artifactId&gt;
+   *   &lt;version&gt;1.0&lt;/version&gt;
+   *   &lt;type&gt;pom&lt;/type&gt;
+   *   &lt;scope&gt;provided&lt;/scope&gt;
+   * &lt;/dependency&gt;
+   * </pre>
+   *
+   * <p><b>Parallel builds and thread safety</b><br>
+   * Wurblets that are not thread-safe are executed one at a time within the JVM, even if Maven builds several
+   * modules in parallel. Only wurblets returning {@code true} from {@code isThreadSafe()} run concurrently.
+   * Since each execution processes its sources sequentially, wurblets that keep their state in singletons
+   * are thread-safe nonetheless, as long as they are isolated in the classloader of the current execution.
+   * This holds only if they are loaded via {@code wurbletDependencies}. The wurblets can check that at runtime:
+   * <pre>
+   * &#64;Override
+   * public boolean isThreadSafe() {
+   *   ClassLoader loader = WurbelContext.current().getWurbletClassLoader();
+   *   return loader != null &amp;&amp; getClass().getClassLoader() == loader;
+   * }
+   * </pre>
+   * The <a href="https://tentackle.org">Tentackle</a> wurblets, for example, implement this check in
+   * {@code org.tentackle.wurblet.WurbletThreadSafety.isIsolated(Class)}. They run concurrently if declared as
+   * {@code wurbletDependencies} and fall back to sequential execution if declared as plugin dependencies.
+   *
+   * @see org.wurbelizer.wurblet.Wurblet#isThreadSafe()
+   * @see WurbelContext#getWurbletClassLoader()
    */
   @Parameter
   private List<WurbletDependency> wurbletDependencies;

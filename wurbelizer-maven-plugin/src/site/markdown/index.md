@@ -18,6 +18,13 @@ classes compiled in earlier phases are visible at wurbel time. `WurbelMojo` and
 `TestWurbelMojo` extend `AbstractWurbelMojo`; `WurbileMojo` extends
 `AbstractWurbelizerMojo`.
 
+## Requirements
+
+- Java 25 or newer
+- Maven 3.9.10 or newer, or Maven 4. On Maven 4 the plugin
+  runs as a Maven 3 API plugin through the compatibility layer, with no POM changes
+  needed. All goals are thread-safe on both versions.
+
 ## Usage
 
 See the [Plugin Documentation](plugin-info.html) for the full goal reference,

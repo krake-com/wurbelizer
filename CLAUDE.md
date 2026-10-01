@@ -36,7 +36,9 @@ Use American English spelling for all code comments and documentation (e.g. "beh
 
 ## Build Commands
 
-Requires Java 25+ and Maven 3.9.10+. The enforcer requires `file.encoding=UTF-8`:
+Requires Java 25+ and Maven 3.9.10+. The build and the plugin also work with Maven 4 (verified with 4.0.0-rc-7).
+On Maven 4, `-Dfile.encoding=UTF-8` causes a harmless warning that it cannot be set as a system property. The enforcer check still passes.
+The enforcer requires `file.encoding=UTF-8`:
 
 ```bash
 # Build all modules

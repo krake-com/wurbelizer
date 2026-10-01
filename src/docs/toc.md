@@ -38,6 +38,7 @@ How to run the wurbiler and wurbler from common build tools.
   - [Goals and parameters](maven.md#goals-and-parameters)
   - [A real-world configuration](maven.md#a-real-world-configuration)
   - [Parallel builds](maven.md#parallel-builds)
+  - [Maven 4](maven.md#maven-4)
 - [Ant Integration](ant.md)
   - [Wurbile](ant.md#wurbile)
   - [Wurbel](ant.md#wurbel)

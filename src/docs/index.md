@@ -25,6 +25,7 @@ See the [Table of Contents](toc.md) for the documents in reading order.
 
 - **backslash escaping / continuation line** —
   [Source Level Syntax](source-syntax.md), [Wurblet Level Syntax](wurblet-syntax.md)
+- **build order (reactor, `wurbletDependencies`)** — [Maven Integration: Parallel builds](maven.md#parallel-builds)
 - **build tool integration** — [Build Tool Integration](integration.md)
 - **built-in variables (`classname`, `packagename`, ...)** — [Source Level Syntax: Built-in Variables](source-syntax.md#built-in-variables)
 
@@ -126,6 +127,7 @@ See the [Table of Contents](toc.md) for the documents in reading order.
 
 ## M
 
+- **Maven 4** — [Maven Integration: Maven 4](maven.md#maven-4)
 - **Maven integration** — [Maven Integration](maven.md),
   [real-world configuration](maven.md#a-real-world-configuration)
 - **Maven parameters** — [Maven: Goals and parameters](maven.md#goals-and-parameters)

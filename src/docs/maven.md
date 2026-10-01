@@ -198,6 +198,43 @@ Wurblets that rely on the isolation must check which classloader loaded them, se
 [Thread safety](writing-wurblets.md#thread-safety). The Tentackle wurblets, for example, run
 in parallel only if they are declared as `wurbletDependencies`, as in the configuration above.
 
+If the wurblets are built in a module of the same reactor, keep the build order in mind. Maven
+determines the order of the modules from their dependencies, including plugin `<dependencies>`, but
+it does not look into the plugin's `<configuration>`. So a `wurbletDependency` alone does not make the
+consuming module depend on the wurblet module. In a sequential build, the order of the `<modules>`
+usually hides this. In a parallel build, however, the consuming module may start before the wurblet
+module is built, and then picks up an outdated artifact from the local repository or fails. To enforce
+the build order, also declare a regular dependency on the wurblet module. With type `pom` and scope
+`provided`, it only adds the edge to the build order, without putting the wurblets on the compile
+classpath or passing them on to consumers of the module:
+
+```xml
+<dependency>
+  <groupId>${project.groupId}</groupId>
+  <artifactId>tentackle-persistence-wurblets</artifactId>
+  <version>${project.version}</version>
+  <type>pom</type>
+  <scope>provided</scope>
+</dependency>
+```
+
+## Maven 4
+
+The plugin requires Maven 3.9.10 or newer and also runs on Maven 4. It is built against the
+Maven 3 plugin API, so Maven 4 runs it through its compatibility layer. Projects don't need
+any change to their POMs.
+
+Maven 4 is supported in the following ways:
+
+- The custom configurator `set-classrealm`, which gives the mojos access to the plugin's
+  classrealm, keeps working. So wurblets compiled by `wurbile` in one module can still be
+  used by `wurbel` in other modules of the same reactor.
+- `wurbletDependencies` are resolved through the Maven Resolver API that Maven 4 still
+  provides to Maven 3 plugins. Each execution keeps its own child realm, as described in
+  [Parallel builds](#parallel-builds).
+- All goals are thread-safe on Maven 4 as well, including `mvn -T ...`.
+- The plugin passes Maven 4's plugin validation with no reported issues.
+
 ---
 
 **Navigation:** [← Previous: Build Tool Integration](integration.md) | [Contents](toc.md) · [Index](index.md) | [Next: Ant Integration →](ant.md)
