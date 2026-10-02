@@ -335,17 +335,17 @@ range from a dozen lines to a couple of thousand.
 If you want to read real wurblets, this is a reasonable order, from the simplest
 technique to the most involved:
 
-| Wurblet | Lines | Illustrates |
-|---|---:|---|
-| `Inject` | 50 | an [inline wurblet](source-syntax.md#unnamed-anchor); scans the arguments, prints one value, no model at all |
-| `ColumnLengths` | 27 | the minimal model-driven wurblet: iterate over attributes, emit a constant each |
-| `AttributeNames` | 36 | the same, plus a boolean option (`--noif`) altering the emitted code |
-| `MethodCache` | 23 | escaping `@` in generated annotations (`\@Override`) |
-| `Include` | 65 | reading a file or heap file; error handling with an optional `--missingok` |
-| `Methods` | 180 | branching on many model options; generating javadoc along with the code |
-| `ModelComment` | 189 | `@{phase 2}@`; generating a *comment* rather than code |
-| `DbUpdateBy` | 111 | `@{config}@`, shared `.incl` fragments and three output streams at once |
-| `PdoRelations` | 2063 | how big a wurblet can get before you should reconsider the design |
+| Wurblet          | Lines | Illustrates                                                                                                  |
+|------------------|------:|--------------------------------------------------------------------------------------------------------------|
+| `Inject`         |    50 | an [inline wurblet](source-syntax.md#unnamed-anchor); scans the arguments, prints one value, no model at all |
+| `ColumnLengths`  |    27 | the minimal model-driven wurblet: iterate over attributes, emit a constant each                              |
+| `AttributeNames` |    36 | the same, plus a boolean option (`--noif`) altering the emitted code                                         |
+| `MethodCache`    |    23 | escaping `@` in generated annotations (`\@Override`)                                                         |
+| `Include`        |    65 | reading a file or heap file; error handling with an optional `--missingok`                                   |
+| `Methods`        |   180 | branching on many model options; generating javadoc along with the code                                      |
+| `ModelComment`   |   189 | `@{phase 2}@`; generating a *comment* rather than code                                                       |
+| `DbUpdateBy`     |   111 | `@{config}@`, shared `.incl` fragments and three output streams at once                                      |
+| `PdoRelations`   |  2063 | how big a wurblet can get before you should reconsider the design                                            |
 
 Note the proportions. The bulk of Tentackle's wurblets is small, because each one
 generates a single aspect; the large ones are the exception, not the model to follow.
