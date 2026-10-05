@@ -583,7 +583,7 @@
             <version>${maven.central-publishing.plugin.version}</version>
             <extensions>true</extensions>
             <configuration>
-              <publishingServerId>central</publishingServerId>
+              <publishingServerId>sonatype-central</publishingServerId>
               <deploymentName>wurbelizer</deploymentName>
             </configuration>
           </plugin>
