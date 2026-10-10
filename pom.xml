@@ -514,7 +514,7 @@
                       <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                     </manifest>
                     <manifestEntries>
-                      <Implementation-Build-Date>${maven.build.timestamp}</Implementation-Build-Date>
+                      <Implementation-Build-Date>${project.build.outputTimestamp}</Implementation-Build-Date>
                     </manifestEntries>
                   </archive>
                 </configuration>
@@ -541,7 +541,7 @@
                       <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                     </manifest>
                     <manifestEntries>
-                      <Implementation-Build-Date>${maven.build.timestamp}</Implementation-Build-Date>
+                      <Implementation-Build-Date>${project.build.outputTimestamp}</Implementation-Build-Date>
                     </manifestEntries>
                   </archive>
                 </configuration>
