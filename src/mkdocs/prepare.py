@@ -51,11 +51,17 @@ def readme_to_index(text: str) -> str:
     - the README's leading logo image is promoted to the page's H1, so it becomes
       the title/hero (and MkDocs does not inject the nav title "Home" as a heading);
     - drop helper paragraphs that point at the excluded toc.md / index.md pages;
+    - drop the Maven Central version badge (a third-party image that would be
+      frozen at build time);
     - rewrite ``./src/docs/`` links so they resolve inside the site.
     """
-    # Drop whole paragraphs that reference the excluded helper pages.
+    # Drop whole paragraphs that reference the excluded helper pages, and the
+    # version badge: it is a third-party image that the privacy plugin would
+    # freeze at build time, so it would show a stale version.
     paragraphs = re.split(r"\n\s*\n", text)
-    paragraphs = [p for p in paragraphs if "toc.md" not in p and "index.md" not in p]
+    paragraphs = [p for p in paragraphs
+                  if "toc.md" not in p and "index.md" not in p
+                  and "img.shields.io" not in p]
 
     # Drop now-empty sections: a heading immediately followed by another heading
     # or the end of the document (e.g. "## Contents" once its helper text is gone).

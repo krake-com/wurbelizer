@@ -1,5 +1,7 @@
 ![Wurbelizer](./src/docs/assets/Logo_wurbelizer_V4.png)
 
+[![Maven Central](https://img.shields.io/maven-central/v/org.wurbelizer/wurbelizer?label=Maven%20Central)](https://central.sonatype.com/namespace/org.wurbelizer)
+
 The Wurbelizer is a code generator, written in Java, using Java as its
 template language and embedded within source files, usually Java. Rather than creating entire
 source files, it modifies well-defined regions of code. It is lightweight, easy to
