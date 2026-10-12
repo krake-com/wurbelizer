@@ -49,7 +49,6 @@
     <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <dependency.locations.enabled>false</dependency.locations.enabled>
-    <netbeans.hint.license>wurbelizer</netbeans.hint.license>
 
     <javac.version>25</javac.version>
     <javac.lint>all,-processing</javac.lint>
