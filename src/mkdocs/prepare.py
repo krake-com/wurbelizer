@@ -3,7 +3,7 @@
 
 The page content lives in the repository's real docs (../docs) and README; this
 script assembles a clean MkDocs `docs_dir` from them without ever modifying the
-sources, so Bitbucket rendering keeps working. Run it via `make prepare`
+sources, so GitHub rendering keeps working. Run it via `make prepare`
 (automatically invoked by `make serve` / `make build`).
 
 Standard library only — no third-party dependencies.
@@ -21,7 +21,7 @@ REPO_README = (HERE / ".." / ".." / "README.md").resolve()
 THEME = HERE / "theme"
 OUT = HERE / "docs"                              # generated docs_dir (git-ignored)
 
-# Content pages copied verbatim (minus their Bitbucket nav footer), in any order.
+# Content pages copied verbatim (minus their GitHub nav footer), in any order.
 # toc.md and index.md are intentionally excluded — Material provides nav + search.
 CONTENT_PAGES = [
     "quickstart.md",
@@ -41,7 +41,7 @@ NAV_FOOTER = re.compile(r"\n+---\s*\n+\*\*Navigation:\*\*.*$", re.S)
 
 
 def strip_nav_footer(text: str) -> str:
-    """Remove the Bitbucket prev/next navigation footer (Material adds its own)."""
+    """Remove the GitHub prev/next navigation footer (Material adds its own)."""
     return NAV_FOOTER.sub("\n", text)
 
 
@@ -91,7 +91,7 @@ def main() -> None:
         shutil.rmtree(OUT)
     OUT.mkdir(parents=True)
 
-    # 1. Content pages (strip the Bitbucket nav footer).
+    # 1. Content pages (strip the GitHub nav footer).
     for name in CONTENT_PAGES:
         src = SRC_DOCS / name
         if not src.exists():

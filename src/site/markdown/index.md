@@ -25,5 +25,5 @@ into guarded blocks of your source files, regenerating until the code stabilizes
 ## Resources
 
 - **Documentation:** <https://wurbelizer.org>
-- **Source:** <https://bitbucket.org/krake-oss/wurbelizer/>
+- **Source:** <https://github.com/krake-com/wurbelizer/>
 - **Published by:** [Krake Softwaretechnik](https://krake.de)
