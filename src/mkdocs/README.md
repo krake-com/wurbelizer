@@ -72,6 +72,11 @@ Both `serve` and `build` run `prepare.py` first, so edits to `../docs`, the repo
   choice + consent), disclosed in the bilingual consent banner and the privacy page.
 - The **ResizeObserver polyfill is self-hosted** (see below) — no `unpkg.com`
   request is ever made.
+- The **repository facts are not fetched**: for a github.com `repo_url`, Material
+  would load the stars/forks from `api.github.com` in the visitor's browser. The
+  override [`overrides/partials/source.html`](overrides/partials/source.html)
+  keeps the repository link but not the fetch, and `extra.consent.cookies.github`
+  is off in `mkdocs.yml`.
 - An Impressum and a Datenschutzerklärung (both German/English placeholders) are
   linked from the navigation and the footer.
 

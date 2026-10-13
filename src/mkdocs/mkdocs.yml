@@ -109,6 +109,12 @@ extra:
       third parties. Fonts and all content are served locally. Only your browser's
       <em>localStorage</em> is used — to remember your colour-scheme choice
       (light/dark) and to store this consent.
+    # With a github.com repo_url, Material would add a "GitHub" checkbox and, once
+    # accepted, fetch the repository facts from api.github.com in the browser.
+    # Disabled: the site makes no third-party requests (see also
+    # overrides/partials/source.html).
+    cookies:
+      github: false
     actions:
       - accept
       - reject
