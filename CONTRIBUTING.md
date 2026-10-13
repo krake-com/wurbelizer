@@ -48,7 +48,8 @@ a system property. The enforcer check still passes.
 | `src/mkdocs`              | builds the documentation website from `README.md` and `src/docs` |
 
 If you are new to the code base, read [Code Levels](src/docs/code-levels.md) and
-[Writing Wurblets](src/docs/writing-wurblets.md) first.
+[Writing Wurblets](src/docs/writing-wurblets.md) first. The design of the code itself
+is described in [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## Submitting Changes
 
