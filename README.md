@@ -107,3 +107,4 @@ generation the Wurbelizer is designed for.
 
 See the full [Table of Contents](./src/docs/toc.md) and the [Index](./src/docs/index.md)
 for detailed, section-level navigation.
+Release history is in the [Changelog](./CHANGELOG.md).
