@@ -38,14 +38,31 @@ import java.util.StringTokenizer;
  */
 public final class WurbelHelper {
 
-  private static final String LINE_DELIM = "\n";
-  private static Properties envProperties   = null;         // properties from environment
-  private static Properties extraProperties = null;         // extra properties (e.g. from ant)
+  /**
+   * Gets the environment variables.
+   */
+  private static class Environment extends Properties {
 
-  private static Map<String, SourceRegion> sourceRegions;   // map of available regions <type : SourceRegion>
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    public Environment() {
+
+      super();
+
+      for (Map.Entry<String,String> entry: System.getenv().entrySet()) {
+        setProperty(entry.getKey(), entry.getValue());
+      }
+    }
+  }
+
+  private static final String LINE_DELIM = "\n";
+  private static volatile Properties envProperties;         // properties from environment
+
+  private static Map<String, SourceRegion> sourceRegions;   // map of available regions <type:SourceRegion>
   private static SourceRegion defaultSourceRegion;          // the default source region
 
-  private static Map<String, SourceType> sourceTypes;       // map of available file types <extension : SourceType>
+  private static Map<String, SourceType> sourceTypes;       // map of available file types <extension:SourceType>
   private static SourceType defaultSourceType;              // the default source type
 
   /**
@@ -54,7 +71,7 @@ public final class WurbelHelper {
    *
    * @return the region map, never null
    */
-  public static Map<String, SourceRegion> getSourceRegionMap() {
+  public static synchronized Map<String, SourceRegion> getSourceRegionMap() {
     if (sourceRegions == null) {
       sourceRegions = new HashMap<>();
       for (SourceRegion region : ServiceLoader.load(SourceRegion.class)) {
@@ -73,11 +90,10 @@ public final class WurbelHelper {
    *
    * @return the default region, null if none
    */
-  public static SourceRegion getDefaultSourceRegion() {
+  public static synchronized SourceRegion getDefaultSourceRegion() {
     getSourceRegionMap();
     return defaultSourceRegion;
   }
-
 
   /**
    * Lazily gets the map of source types.<br>
@@ -85,7 +101,7 @@ public final class WurbelHelper {
    *
    * @return the type map, never null
    */
-  public static Map<String, SourceType> getSourceTypeMap() {
+  public static synchronized Map<String, SourceType> getSourceTypeMap() {
     if (sourceTypes == null) {
       sourceTypes = new HashMap<>();
       for (SourceType type : ServiceLoader.load(SourceType.class)) {
@@ -103,13 +119,14 @@ public final class WurbelHelper {
    *
    * @return the default type, null if none
    */
-  public static SourceType getDefaultSourceType() {
+  public static synchronized SourceType getDefaultSourceType() {
+    getSourceTypeMap();
     return defaultSourceType;
   }
 
   /**
    * Translates variables using StringBuilder.
-   * The translation is recursive, i.e. loops until no more replacements were performed.
+   * The translation is recursive, i.e., loops until no more replacements were performed.
    *
    * @param buf the argument buffer to be translated/parsed in-place
    * @param getenv true if check environment, false if system property
@@ -118,9 +135,8 @@ public final class WurbelHelper {
    */
   public static void translateVariables(StringBuilder buf, boolean getenv, boolean lastLoop, Properties otherProps) {
 
-    if (getenv && envProperties == null)  {
-      envProperties = new Environment();    // initialize first
-    }
+    Properties envProps = getenv ? getOrCreateEnvProperties() : null;
+    Properties extraProps = getExtraProperties();
 
     boolean replaced;
 
@@ -142,12 +158,12 @@ public final class WurbelHelper {
 
           String value;
           if (getenv) {
-            value = envProperties.getProperty(key);
+            value = envProps.getProperty(key);
           }
           else  {
             value = System.getProperty(key);
-            if (value == null && extraProperties != null) {
-              value = extraProperties.getProperty(key);
+            if (value == null && extraProps != null) {
+              value = extraProps.getProperty(key);
             }
           }
           if (value == null && otherProps != null)  {
@@ -165,7 +181,7 @@ public final class WurbelHelper {
     } while (replaced);
 
     if (lastLoop) {
-      // translate \$ to $ (this allows \$ to suppress variable substituion)
+      // translate \$ to $ (this allows \$ to suppress variable substitution)
       int len = buf.length() - 1;
       for (int i=0; i < len; i++) {
         if (buf.charAt(i) == '\\' && buf.charAt(i+1) == '$') {
@@ -176,10 +192,9 @@ public final class WurbelHelper {
     }
   }
 
-
   /**
    * Translates variables in Strings.
-   * The translation is recursive, i.e. loops until no more replacements were performed.
+   * The translation is recursive, i.e., loops until no more replacements were performed.
    *
    * @param arg the argument to be translated/parsed
    * @param getenv true if check environment, false if system property
@@ -195,9 +210,8 @@ public final class WurbelHelper {
     return buf.toString();
   }
 
-
   /**
-   * Translates variables in arguments, first properties, second environmen. Using StringBuilder.
+   * Translates variables in arguments, first properties, second environment. Using StringBuilder.
    *
    * @param buf argument buffer to be translated/parsed in place
    * @param otherProps != null to use given properties for translation as well
@@ -206,7 +220,6 @@ public final class WurbelHelper {
     translateVariables(buf, false, false, otherProps);
     translateVariables(buf, true, true, otherProps);
   }
-
 
   /**
    * Translates variables in arguments, first properties, second environment
@@ -223,47 +236,25 @@ public final class WurbelHelper {
     return buf.toString();
   }
 
-
-
   /**
-   * Gets the environment variables.
-   */
-  private static class Environment extends Properties {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
-
-    public Environment() {
-
-      super();
-
-      // since 1.5 getenv() is back again :-))
-      for (Map.Entry<String,String> entry: System.getenv().entrySet()) {
-        setProperty(entry.getKey(), entry.getValue());
-      }
-    }
-  }
-
-
-  /**
-   * Set extra properties (valid among all wurblets).
+   * Set extra properties (valid among all wurblets).<br>
+   * The properties are kept in the {@link WurbelContext#current() current} wurbel context.
    *
    * @param props the properties
    */
   public static void setExtraProperties(Properties props) {
-    extraProperties = props;
+    WurbelContext.current().setExtraProperties(props);
   }
 
-
   /**
-   * Gets the extra properties.
+   * Gets the extra properties.<br>
+   * The properties are kept in the {@link WurbelContext#current() current} wurbel context.
    *
    * @return the properties
    */
   public static Properties getExtraProperties() {
-    return extraProperties;
+    return WurbelContext.current().getExtraProperties();
   }
-
 
   /**
    * Sets environment properties (valid among all wurblets)
@@ -274,7 +265,6 @@ public final class WurbelHelper {
     envProperties = props;
   }
 
-
   /**
    * Gets the environment properties.
    *
@@ -284,13 +274,12 @@ public final class WurbelHelper {
     return envProperties;
   }
 
-
   /**
    * Perform indentation on generated source code.
-   * Implements the indent=... wurbler argumemt
+   * Implements the indent=... wurbler argument
    *
    * @param source is the original string (of lines)
-   * @param indent is the number of spaces to insert at start of each line
+   * @param indent is the number of spaces to insert at the start of each line
    *
    * @return the new source string
    */
@@ -312,8 +301,6 @@ public final class WurbelHelper {
     }
     return source;
   }
-
-
 
   /**
    * Scans a property line.
@@ -344,7 +331,6 @@ public final class WurbelHelper {
     return null;
   }
 
-
   /**
    * Gets the part of a string before a given delimiter.
    *
@@ -361,7 +347,6 @@ public final class WurbelHelper {
     }
     return str;
   }
-
 
   /**
    * Gets the part of a string after a given delimiter.
@@ -380,18 +365,15 @@ public final class WurbelHelper {
     return str;
   }
 
-
   /**
    * Gets the first line from a multi-line string.
    * Nice in tables.
    * @param str the multiline string
-   * @return the first line, null if str == null
+   * @return the first line; null if str == null
    */
   public static String firstLine(String str) {
     return firstBefore(str, '\n');
   }
-
-
 
   /**
    * Gets the reader for a given filename.<br>
@@ -402,7 +384,7 @@ public final class WurbelHelper {
    * @param fileName the name of the file
    * @return the reader
    *
-   * @throws WurbelException if reading the file failed, cause is {@link FileNotFoundException} if file does not exist
+   * @throws WurbelException if reading the file failed, the cause is {@link FileNotFoundException} if the file does not exist
    */
   public static Reader openReader(String fileName) throws WurbelException {
     if (fileName.charAt(0) == '.')  {
@@ -426,7 +408,6 @@ public final class WurbelHelper {
     }
   }
 
-
   /**
    * Deletes a file.
    *
@@ -441,7 +422,6 @@ public final class WurbelHelper {
       return new File(fileName).delete();
     }
   }
-
 
   /**
    * Translates a string to CRLF line endings.<br>
@@ -506,6 +486,21 @@ public final class WurbelHelper {
     }
     return count;
   }
+
+
+  /**
+   * Gets the environment properties.<br>
+   * Lazily initialized from the process environment, if not set.
+   *
+   * @return the properties
+   */
+  private static synchronized Properties getOrCreateEnvProperties() {
+    if (envProperties == null) {
+      envProperties = new Environment();
+    }
+    return envProperties;
+  }
+
 
   private WurbelHelper() {}
 

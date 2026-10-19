@@ -20,7 +20,8 @@
  * Maven plugins.
  * <ul>
  * <li>{@link org.wurbelizer.maven.WurbileMojo}: compile wurblets</li>
- * <li>{@link org.wurbelizer.maven.WurbelMojo}: run wurblets</li>
+ * <li>{@link org.wurbelizer.maven.WurbelMojo}: run wurblets on the main sources</li>
+ * <li>{@link org.wurbelizer.maven.TestWurbelMojo}: run wurblets on the test sources</li>
  * </ul>
  */
 package org.wurbelizer.maven;

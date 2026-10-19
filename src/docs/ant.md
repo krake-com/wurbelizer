@@ -25,7 +25,7 @@ The wurbile target then looks like this:
     <mkdir dir="${wbuild}"/>
     <wurbile srcdir="${wrbl}" destdir="${wbuild}" includes="**/*.wrbl" />
     <!-- compile wurbiled wurblets -->
-    <javac debug="on" source="11" deprecation="true"
+    <javac debug="on" release="25" deprecation="true"
         destdir="${wbuild}" includes="**" >
         <src path="${wsrc}"/>
         <src path="${wbuild}"/>
@@ -44,14 +44,25 @@ extension `.wrbl`).
 - `${wbuild}`: directory where the wurbiled sources and compiled classes
 are placed.
 
+The `destdir` attribute sets the directory for the generated Java sources and `.ser` files.
+The package directory of each wurblet (see [`@{package}@`](wurblet-syntax.md#package)) is
+appended. Without `destdir`, the files are written below the directory of each `.wrbl` file.
+
 The `wurb-cp` classpath defines all archives necessary to compile
 the wurbiled wurblets. An optional step may create a jar archive of all
 wurblets from `${wbuild}`.
 
 Additional options for the wurbile task:
-- verbose sets the verbosity (bool, default false).
-- failonerror determines whether to stop the ant build on error (bool,
-default true).
+- `verbosity` sets the verbosity: `default`, `info` or `debug` (default `default`).
+- `failonerror` determines whether to stop the ant build on error (bool,
+default `true`).
+- `proceed` is the inverse of `failonerror` (bool, default `false`).
+- `indent` sets the initial indentation of the generated Java source
+(default `-1`, i.e. the wurbiler's default).
+- `parentclass` sets the default parent class for wurblets without an
+[`@{extends}@`](wurblet-syntax.md#extends) directive (default `AbstractWurblet`).
+- `packagename` sets the default package for wurblets without a
+[`@{package}@`](wurblet-syntax.md#package) directive.
 
 Of course, all options as defined by `...ant.taskdefs.MatchingTask` can
 be applied as well.
@@ -90,14 +101,14 @@ An advanced example of the wurbler ant target may look like this:
 
 ```xml
 <target name="wurbelize" depends="apt" description="wurbelize sources">
-    <wurbelize printstacktrace="true" printwurblet="false"
+    <wurbelize printstacktrace="true"
         srcdir="${src}" includes="**/*.wurb"
         wurbletpath="org.tentackle.wurblets:de.krake.myapp.wurblets"/>
-    <wurbelize printstacktrace="true" printwurblet="false"
+    <wurbelize printstacktrace="true"
         srcdir="${src}/de/krake/myapp/dbms"
-        infoDir="${apt}" includes="*.java"
+        analyzedir="${apt}" includes="*.java"
         wurbletpath="org.tentackle.wurblets:de.krake.myapp.wurblets"/>
-    <wurbelize printstacktrace="true" printwurblet="false"
+    <wurbelize printstacktrace="true"
         srcdir="${src}/de/krake/myapp/dbms/trip" includes="*.java"
         wurbletpath="org.tentackle.wurblets:de.krake.myapp.wurblets"/>
 </target>
@@ -122,28 +133,38 @@ Steps 2 and 3 reveal some other options:
 
 - `wurbletpath` sets the package names the wurbler uses to load
 wurblets that are referenced without an absolute class name. Package names are
-separated by colons. In the example above, the wurbler first tries to prepend
+separated by colons (semicolons and whitespace work as well). In the example above, the wurbler first tries to prepend
 `org.tentackle.wurblets`, and if that fails, `de.krake.myapp.wurblets`.
 - `printstacktrace` enables or disables a stacktrace for errors encountered
 during the execution of wurblets (boolean, default is `false`). This is not to
 be confused with exceptions thrown by the wurblets themselves!
-- `printwurblet` logs the name of each processed wurblet together with its
-filename (bool, default `false`). This is useful for verifying the order
-in which wurblets are invoked, especially if some wurblets rely on data
-produced by others. By default, only the names of the files that were
-modified are printed.
-- `infodir` defines a directory containing extra data for wurblet processing, 
+- `analyzedir` defines a directory containing extra data for wurblet processing,
 usually to exchange information between wurblets. For example,
 a JDK "apt" (annotation processing) run may produce information that other
-wurblets rely on (as is the case in Tentackle).
-- `runonce` determines whether wurbelizing a file is allowed more than
-once within an ant build (bool, default `true`).
-- `verbose` sets the verbosity (bool, default `false`).
+wurblets rely on (as is the case in Tentackle). Wurblets access files in this
+directory via `Wurbler.getAnalyzeFile(name)`.
+- `runonce` determines whether a file is wurbelized only once within an ant build
+(bool, default `true`). A file is skipped by later task executions, but it is still processed
+in all phases and restarts of the execution that processes it first.
+- `dryrun` only parses the source files without running any wurblets
+(bool, default `false`).
+- `verbosity` sets the verbosity: `default`, `info` or `debug` (default `default`).
+With `info`, the names of the modified files are logged; with `debug`, every
+processed wurblet is logged together with its filename, which is useful for
+verifying the order in which wurblets are invoked.
 - `failonerror` determines whether to stop the ant build on error (bool,
-default `true`).
+default `true`). A `WurbelTerminationException` thrown by a wurblet stops the task immediately.
+- `proceed` is the inverse of `failonerror` (bool, default `false`).
 
 Again, all options from org.apache.tools.ant.taskdefs.MatchingTask
 apply as well.
+
+All Ant properties are passed to the wurblets as extra properties (see
+[Wurbler Properties](writing-wurblets.md#wurbler-properties)) and can be used as
+`$`-variables in the sources. Wurblets may access them via the namespace `"extra"` or its
+synonym `"ant"`. Unlike the Maven plugin, the Ant task starts
+directly with phase 1: here-documents are written during the regular passes
+(see [Processing Order and Phases](source-syntax.md#processing-order-and-phases)).
 
 The guardtype-property determines the patterns used to define a guarded block.
 The wurbelizer provides different guard types. The default is `netbeans`, which

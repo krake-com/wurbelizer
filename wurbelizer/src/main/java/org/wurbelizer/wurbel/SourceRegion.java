@@ -23,8 +23,10 @@ import java.util.Collection;
 /**
  * Generates comments to mark generated code as named regions.
  * <p>
- * Source region types must be registed in {@code META-INF/services/org.wurbelizer.wurbel.SourceRegion}.<br>
- * The wurbelizer already provides some implementations with {@code 'netbeans'} being by default.
+ * The start and end comments must be single-line comments, since only those are checked for region markers.
+ * <p>
+ * Source region types must be registered in {@code META-INF/services/org.wurbelizer.wurbel.SourceRegion}.<br>
+ * The wurbelizer already provides some implementations with {@code 'netbeans'} being the default.
  */
 public interface SourceRegion {
 
@@ -33,10 +35,10 @@ public interface SourceRegion {
    */
   enum FoldType {
 
-    /** editor fold which is collapsed by default. */
+    /** editor fold that is collapsed by default. */
     COLLAPSED,
 
-    /** editor fold which is expanded by default. */
+    /** editor fold that is expanded by default. */
     EXPANDED
   }
 
@@ -78,18 +80,18 @@ public interface SourceRegion {
   String createEnd(FoldType foldType, String guardName, SourceWurbletSubElement wurbletElement);
 
   /**
-   * Gets the region's name (wurblet tag) if this is the start comment is of this region type.
+   * Gets the region's name (wurblet tag) if the comment is the start comment of this region type.
    *
    * @param comment the comment string
-   * @return the region's name if is of this type
+   * @return the region's name, null if not a start comment of this type
    */
   String getBeginName(String comment);
 
   /**
-   * Gets the region's name (wurblet tag) if this is the end comment is of this region type.
+   * Gets the region's name (wurblet tag) if the comment is the end comment of this region type.
    *
    * @param comment the comment string
-   * @return the region's name if is of this type
+   * @return the region's name, null if not an end comment of this type
    */
   String getEndName(String comment);
 

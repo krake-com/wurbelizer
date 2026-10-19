@@ -28,20 +28,19 @@ import java.util.StringTokenizer;
 /**
  * A {@code SourceElement} represents a section within a {@link SourceDocument}.
  * <p>
- * Source elements belong to one of five categories (types):
+ * Source elements belong to one of four categories (types):
  * <ul>
  * <li>block comment (Type.BLOCK_COMMENT)</li>
  * <li>single line comment (Type.SINGLE_COMMENT)</li>
  * <li>code block (Type.CODE)</li>
- * <li>netbeans guarded section (Type.GUARDED_NETBEANS)</li>
- * <li>other guarded section (Type.GUARDED_OTHER)</li>
+ * <li>guarded block of any guard type (Type.GUARDED)</li>
  * </ul>
  * Comment blocks or guarded blocks may contain other {@link SourceSubElement}s.
  * There are two kinds of sub elements: single-line and multi-line.
  * Single line sub elements end at the end of the line where they started. A wurblet
  * anchor is a single line sub element. Single line sub elements may be enlarged
- * beyond the end of the line by a continuation line (backslash at the end of line).
- * Multi-line sub elements like here- or property-documents are terminated a special
+ * beyond the end of the line by a continuation line (backslash at the end of the line).
+ * Multi-line sub elements like here- or property-documents are terminated by a special
  * control sequence. Furthermore, all leading comment text starting each line will
  * be cut off and will not become part of the contents of the sub element (works like a
  * rectangular cut).
@@ -77,7 +76,6 @@ public class SourceElement {
   private List<SourceWurbletSubElement>  wurblets;              // List of wurblets
   private List<SourceHereSubElement>     hereDocuments;         // List of here-documents
   private List<SourcePropertySubElement> propertyDocuments;     // List of property-documents
-
 
 
   /**
@@ -293,7 +291,6 @@ public class SourceElement {
     }
   }
 
-
   /**
    * Gets the contents of this element
    *
@@ -302,7 +299,6 @@ public class SourceElement {
   public String getText()  {
     return doc.getText().substring(begin, end);
   }
-
 
   /**
    * Gets the string from the beginning of the line, up to this element.
@@ -325,16 +321,14 @@ public class SourceElement {
     return firstLineLead;
   }
 
-
   /**
    * Checks whether this element is a code block.
    *
-   * @return true if element contains sourcecode
+   * @return true if the element contains sourcecode
    */
   public boolean isCode() {
     return type == Type.CODE;
   }
-
 
   /**
    * Checks whether this element is a guarded block.
@@ -345,7 +339,6 @@ public class SourceElement {
     return type == Type.GUARDED;
   }
 
-
   /**
    * Checks whether this element is a comment.
    *
@@ -354,7 +347,6 @@ public class SourceElement {
   public boolean isComment()  {
     return type == Type.BLOCK_COMMENT || type == Type.SINGLE_COMMENT;
   }
-
 
   /**
    * Checks whether this element contains wurblets.
@@ -365,7 +357,6 @@ public class SourceElement {
     return wurblets != null && !wurblets.isEmpty();
   }
 
-
   /**
    * Gets the list of wurblets.
    *
@@ -375,16 +366,14 @@ public class SourceElement {
     return wurblets;
   }
 
-
   /**
    * Checks whether this element contains here-documents.
    *
-   * @return true if element contains here-documents
+   * @return true if the element contains here-documents
    */
   public boolean containsHereDocuments() {
     return hereDocuments != null && !hereDocuments.isEmpty();
   }
-
 
   /**
    * Gets the list of here-documents.
@@ -395,16 +384,14 @@ public class SourceElement {
     return hereDocuments;
   }
 
-
   /**
    * Checks whether this element contains property documents.
    *
-   * @return true if element contains property-documents
+   * @return true if the element contains property-documents
    */
   public boolean containsPropertyDocuments() {
     return propertyDocuments != null && !propertyDocuments.isEmpty();
   }
-
 
   /**
    * Gets the list of property documents.
@@ -415,11 +402,10 @@ public class SourceElement {
     return propertyDocuments;
   }
 
-
   /**
    * Checks whether this element contains only whitespaces.
    *
-   * @return true if element contains only whitespaces or newlines
+   * @return true if the element contains only whitespaces or newlines
    */
   public boolean isWhiteEmpty() {
     String str = getText();
@@ -432,7 +418,6 @@ public class SourceElement {
     return true;
   }
 
-
   /**
    * Gets the {@link SourceDocument} this element belongs to.
    *
@@ -441,7 +426,6 @@ public class SourceElement {
   public SourceDocument getSourceDocument() {
     return doc;
   }
-
 
   /**
    * Gets the parent wurblet that generated this element.
@@ -452,7 +436,6 @@ public class SourceElement {
     return parentWurbletElement;
   }
 
-
   /**
    * Gets the type of this source element.
    *
@@ -461,7 +444,6 @@ public class SourceElement {
   public Type getType() {
     return type;
   }
-
 
   /**
    * Gets the start offset of this element within its document.
@@ -472,7 +454,6 @@ public class SourceElement {
     return begin;
   }
 
-
   /**
    * Sets the start offset of this element within its document.
    *
@@ -482,7 +463,6 @@ public class SourceElement {
     this.begin = begin;
   }
 
-
   /**
    * Gets the end offset of this element within its document.
    *
@@ -491,7 +471,6 @@ public class SourceElement {
   public int getEnd() {
     return end;
   }
-
 
   /**
    * Sets the end offset of this element within its document.
@@ -517,7 +496,6 @@ public class SourceElement {
     }
   }
 
-
   /**
    * Removes characters in text and updates doc and all other elements.
    *
@@ -527,7 +505,6 @@ public class SourceElement {
   public void deleteText(int startNdx, int endNdx)  {
     doc.deleteText(this.begin + startNdx, this.begin + endNdx);
   }
-
 
   /**
    * Gets the guarded name if this is a guarded block.
@@ -547,7 +524,6 @@ public class SourceElement {
   public void setGuardedName(String guardedName) {
     this.guardedName = guardedName;
   }
-
 
   /**
    * Prints the name and line info of the element.

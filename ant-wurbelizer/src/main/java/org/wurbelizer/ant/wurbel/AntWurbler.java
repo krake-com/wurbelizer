@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 package org.wurbelizer.ant.wurbel;
 
 import org.apache.tools.ant.BuildException;
@@ -33,6 +32,7 @@ import org.wurbelizer.wurbel.SourceWurbler;
 import org.wurbelizer.wurbel.WurbelException;
 import org.wurbelizer.wurbel.WurbelHelper;
 import org.wurbelizer.wurbel.WurbelResult;
+import org.wurbelizer.wurbel.WurbelTerminationException;
 import org.wurbelizer.wurbel.Wurbler;
 
 import java.io.File;
@@ -48,25 +48,25 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 
-
 /**
  * Ant Task to invoke the SourceWurbler.<br>
- * This task will recursively scan the sourcedir looking *.java-files or
+ * This task will recursively scan the sourcedir looking for *.java-files or
  * *.wurb-files and their corresponding Java source files to wurbelize.
  * If it finds a wurb-file <strong>and</strong> its java-file, the java file will be passed
  * through the SourceWurbler applying all wurblet-directives. As an alternative,
  * the java files can be given without wurb-files.<p>
  *
+ * All Ant properties are passed to the wurblets as extra properties. Wurblets may access them via the
+ * namespace {@code "extra"} or its synonym {@code "ant"}.<p>
+ *
  * Integrate into ant with:
  * <pre>
- *   &lt;taskdef name="wurbel" classname="org.wurbelizer.AntWurbler"/&gt;
+ *   &lt;taskdef name="wurbelize" classname="org.wurbelizer.ant.wurbel.AntWurbler"/&gt;
  * </pre>
  * Make sure that wurbelizer.jar is in the classpath of ant.
  *
  * @author harald
  */
-
-
 public class AntWurbler extends MatchingTask {
 
   private static final String FAIL_MSG = "Wurbelization failed! See the wurbelizers error output for details.";
@@ -74,9 +74,9 @@ public class AntWurbler extends MatchingTask {
   // list of files already processed (for runOnce) within an ant-session
   private static final Set<String> filesDone = new TreeSet<>();
 
-  private         Path src;             // source path (must be the same for java and wurb-files!)
-  private         String[] wurbletPath; // classpath for loading the wurblets
-  private         String analyzeDir;    // wurblet extra info file
+  private Path src;                     // source path (must be the same for java and wurb-files!)
+  private String[] wurbletPath;         // classpath for loading the wurblets
+  private String analyzeDir;            // directory with extra wurblet information
   private boolean failOnError;          // fail on wurblet error (default)
   private boolean printStackTrace;      // true = print stacktrace on each exception
   private Verbosity verbosity;          // tell what's going on
@@ -85,9 +85,8 @@ public class AntWurbler extends MatchingTask {
   private File[]  wurbleList;           // list of all java-files that need to be wurbelized
 
 
-
   /**
-   * Creates an instanceof of a wurbler for wurbelization of source files from within ant.
+   * Creates an instance of a wurbler for wurbelization of source files from within ant.
    */
   public AntWurbler() {
     super();
@@ -112,7 +111,6 @@ public class AntWurbler extends MatchingTask {
     }
   }
 
-
   /**
    * Gets the verbosity.
    * @return the verbosity
@@ -121,18 +119,17 @@ public class AntWurbler extends MatchingTask {
     return verbosity.toString().toLowerCase(Locale.ROOT);
   }
 
-
   /**
-   * Sets whether files should be wurbelized more than once within a single ant-run.
+   * Sets whether files should be wurbelized only once within a single ant-run.
    * Enabling this feature allows specifying source files with wildcards in more than
    * one ant target without the need to provide an extra exclude-clause.
+   * A file is still processed in all phases and restarts of the task execution that processes it first.
    *
    * @param runOnce true if run once (default), false to run even more than once.
    */
   public void setRunOnce(boolean runOnce) {
     this.runOnce = runOnce;
   }
-
 
   /**
    * Gets the runonce feature.
@@ -142,7 +139,6 @@ public class AntWurbler extends MatchingTask {
   public boolean isRunOnce() {
     return runOnce;
   }
-
 
   /**
    * Returns whether this is only a dry run.
@@ -162,7 +158,6 @@ public class AntWurbler extends MatchingTask {
     this.dryRun = dryRun;
   }
 
-
   /**
    * Sets the wurblet info directory.
    *
@@ -171,7 +166,6 @@ public class AntWurbler extends MatchingTask {
   public void setAnalyzeDir(String analyzeDir) {
     this.analyzeDir = analyzeDir;
   }
-
 
   /**
    * Gets the wurblet info directory.
@@ -182,10 +176,9 @@ public class AntWurbler extends MatchingTask {
     return analyzeDir;
   }
 
-
   /**
    * Sets the print stacktrace feature.
-   * If an exception in thrown while executing a wurblet the wurbler prints a
+   * If an exception is thrown while executing a wurblet the wurbler prints a
    * diagnostic message containing the file and location within the file of the wurblet-anchor.
    * Setting this attribute to true will also print a stacktrace which is handy
    * for debugging wurblets.
@@ -196,7 +189,6 @@ public class AntWurbler extends MatchingTask {
     this.printStackTrace = printStackTrace;
   }
 
-
   /**
    * Gets the stacktrace flag.
    *
@@ -205,8 +197,6 @@ public class AntWurbler extends MatchingTask {
   public boolean getPrintStackTrace() {
     return printStackTrace;
   }
-
-
 
   /**
    * Creates a path for source wurbelization.
@@ -219,18 +209,6 @@ public class AntWurbler extends MatchingTask {
     }
     return src.createPath();
   }
-
-
-  /**
-   * Recreate a path for source wurbelization.
-   *
-   * @return a nested src element.
-   */
-  protected Path recreateSrc() {
-    src = null;
-    return createSrc();
-  }
-
 
   /**
    * Sets the source directories to find the source Java files.
@@ -245,7 +223,6 @@ public class AntWurbler extends MatchingTask {
     }
   }
 
-
   /**
    * Gets the source dirs to find the source java files.
    *
@@ -255,18 +232,16 @@ public class AntWurbler extends MatchingTask {
     return src;
   }
 
-
   /**
    * Sets the fail on error flag.
-   * Indicates whether the build will continue
-   * even if there are compilation errors; defaults to true.
+   * Indicates whether the build will stop
+   * if there are wurbel errors; defaults to true.
    *
-   * @param fail if true halt the build on failure
+   * @param fail if true, halt the build on failure
    */
   public void setFailOnError(boolean fail) {
     failOnError = fail;
   }
-
 
   /**
    * Gets the failonerror flag.
@@ -277,17 +252,15 @@ public class AntWurbler extends MatchingTask {
     return failOnError;
   }
 
-
   /**
    * Sets whether to proceed on error.
-   * This is the inverse of Failonerror.
+   * This is the inverse of failonerror.
    *
    * @param proceed true to proceed on error
    */
   public void setProceed(boolean proceed) {
     failOnError = !proceed;
   }
-
 
   /**
    * Executes the task.
@@ -301,7 +274,7 @@ public class AntWurbler extends MatchingTask {
     resetFileLists();
     exportProperties();
 
-    // scan source directories directory to build up wurbelize list
+    // scan source directories to build up the wurbelize list
     String[] list = src.list();
     for (String list1 : list) {
       File srcDir = getProject().resolveFile(list1);
@@ -318,6 +291,79 @@ public class AntWurbler extends MatchingTask {
     wurbelize();
   }
 
+  /**
+   * Gets the list of files to be wurbelized.
+   *
+   * @return the array of files, never null
+   */
+  public File[] getFileList() {
+    return wurbleList;
+  }
+
+  /**
+   * Gets the wurblet path.
+   *
+   * @return the wurbletpath String[]-array (this is not an ANT-arg!)
+   */
+  public String[] getWurbletPathArray()  {
+    return wurbletPath;
+  }
+
+  /**
+   * Gets the wurblet path as a colon-separated string.
+   *
+   * @return the wurbletpath
+   */
+  public String getWurbletpath() {
+    StringBuilder path = new StringBuilder();
+    if (wurbletPath != null) {
+      boolean first = true;
+      for (String s: wurbletPath) {
+        if (first)  {
+          first = false;
+        }
+        else  {
+          path.append(':');
+        }
+        path.append(s);
+      }
+    }
+    return path.toString();
+  }
+
+  /**
+   * Sets the package names to load the wurblets.
+   * The path is a colon-separated list of strings,
+   * e.g.: {@code wurbletpath="org.tentackle.wurblets:de.krake.myapp.wurblets"}.
+   * Semicolons and whitespace are accepted as separators as well.
+   *
+   * @param path colon-separated list of package names
+   */
+  public void setWurbletpath(String path) {
+    List<String> pathList = new ArrayList<>();
+    StringTokenizer stok = new StringTokenizer(path, " \t\r;:");
+    while (stok.hasMoreTokens())  {
+      pathList.add(stok.nextToken());
+    }
+    if (pathList.isEmpty()) {
+      wurbletPath = null;
+    }
+    else  {
+      wurbletPath = new String[pathList.size()];
+      pathList.toArray(wurbletPath);
+    }
+  }
+
+
+  /**
+   * Recreate a path for source wurbelization.
+   *
+   * @return a nested src element.
+   */
+  protected Path recreateSrc() {
+    src = null;
+    return createSrc();
+  }
 
   /**
    * Extracts all ant-properties to make them available in wurblet-args.
@@ -338,7 +384,6 @@ public class AntWurbler extends MatchingTask {
     WurbelHelper.setExtraProperties(props);
   }
 
-
   /**
    * Clears the list of files to be compiled and copied.
    */
@@ -346,10 +391,8 @@ public class AntWurbler extends MatchingTask {
     wurbleList = new File[0];
   }
 
-
-
   /**
-   * Checks if given filename applies.<br>
+   * Checks if the given filename applies.<br>
    * By default, Java and wurb-files are ok.
    *
    * @param srcDir the source directory
@@ -366,8 +409,6 @@ public class AntWurbler extends MatchingTask {
     }
     return null;
   }
-
-
 
   /**
    * Scans the directory looking for source files to be wurbelized.
@@ -397,17 +438,6 @@ public class AntWurbler extends MatchingTask {
     }
   }
 
-
-  /**
-   * Gets the list of files to be wurbelized.
-   *
-   * @return the array of files, never null
-   */
-  public File[] getFileList() {
-    return wurbleList;
-  }
-
-
   /**
    * Checks that all required attributes have been set and nothing
    * silly has been entered.
@@ -423,11 +453,18 @@ public class AntWurbler extends MatchingTask {
     }
   }
 
-
   /**
    * Perform the wurbelization.
    */
   protected void wurbelize() {
+
+    // determine the files to process in this run (once for all phases and restarts)
+    List<File> files = new ArrayList<>();
+    for (File file : wurbleList) {
+      if (!runOnce || filesDone.add(file.getAbsolutePath())) {
+        files.add(file);
+      }
+    }
 
     int phase = 1;
     TreeSet<Integer> collectedPhases = new TreeSet<>();
@@ -449,11 +486,7 @@ public class AntWurbler extends MatchingTask {
         Set<String> errorsSoFar = new HashSet<>();
 
 
-        for (File file : wurbleList) {
-
-          if (runOnce && !filesDone.add(file.getAbsolutePath())) {
-            continue;   // skip
-          }
+        for (File file : files) {
 
           try {
             wurbeledFilesCount++;
@@ -470,7 +503,7 @@ public class AntWurbler extends MatchingTask {
                 verbosity, errorsSoFar, collectedPhases) {
 
               /**
-               * gets the property value for a given namespace and key.
+               * Gets the property value for a given namespace and key.
                * Overwritten from AbstractWurbler to set "ant" synonym for "extra".
                * Just to make it easier to remember... ;-)
                *
@@ -511,12 +544,21 @@ public class AntWurbler extends MatchingTask {
           }
 
           catch (WurbelException | SourceException | RuntimeException ex)  {
+            errorFilesCount++;
             String msg = ex instanceof SourceException ? "FAILED" : file.getName();
             if (printStackTrace) {
               log(msg, ex, Project.MSG_ERR);
             }
             else  {
               log(msg + ": " + ex, Project.MSG_ERR);
+            }
+            if (ex instanceof WurbelTerminationException) {
+              // severe error: don't process any further files
+              if (failOnError) {
+                throw new BuildException(FAIL_MSG, ex, getLocation());
+              }
+              log(FAIL_MSG, Project.MSG_ERR);
+              return;
             }
           }
         }
@@ -544,62 +586,6 @@ public class AntWurbler extends MatchingTask {
         break;
       }
       phase = nextPhase;
-    }
-  }
-
-
-  /**
-   * Gets the wurblet path.
-   *
-   * @return the wurbletpath String[]-array (this is not an ANT-arg!)
-   */
-  public String[] getWurbletPathArray()  {
-    return wurbletPath;
-  }
-
-
-  /**
-   * Gets the wurblet path as a colon-separated string.
-   *
-   * @return the wurbletpath
-   */
-  public String getWurbletpath() {
-    StringBuilder path = new StringBuilder();
-    if (wurbletPath != null) {
-      boolean first = true;
-      for (String s: wurbletPath) {
-        if (first)  {
-          first = false;
-        }
-        else  {
-          path.append(':');
-        }
-        path.append(s);
-      }
-    }
-    return path.toString();
-  }
-
-
-  /**
-   * Sets the package names to load the wurblets.
-   * The path is a colon-separated list of strings,
-   * e.g.: {@code wurbletpath="org.tentacle.wurblets:de.krake.jplsbl.wurblets"}
-   *
-   * @param path colon-separated list of package names
-   */
-  public void setWurbletpath(String path) {
-    List<String> pathList = new ArrayList<>();
-    StringTokenizer stok = new StringTokenizer(path, " \t\r;:");
-    while (stok.hasMoreTokens())  {
-      pathList.add(stok.nextToken());
-    }
-    if (pathList.isEmpty()) {
-      wurbletPath = null;
-    }
-    else  {
-      wurbletPath = new String[pathList.size()];
-      pathList.toArray(wurbletPath);
     }
   }
 

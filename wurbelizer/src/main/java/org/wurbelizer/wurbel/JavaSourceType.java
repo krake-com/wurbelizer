@@ -26,6 +26,9 @@ import java.util.regex.Pattern;
 
 /**
  * The Java source type.
+ * <p>
+ * Extracts the properties of the first class, interface, or record declared in the file.
+ * Enums are not recognized.
  *
  * @author harald
  */
@@ -38,23 +41,23 @@ public class JavaSourceType implements SourceType {
   public static final String CLASS_NAME = "classname";
 
   /**
-   * Property holding the java record name of the source file, if it is a record (without package).
+   * Property holding the java record name of the source file if it is a record (without package).
    */
   public static final String RECORD_NAME = "recordname";
 
   /**
-   * Property holding the java interface name of the source file, if it is an interface (without package).
+   * Property holding the java interface name of the source file if it is an interface (without package).
    */
   public static final String INTERFACE_NAME = "interfacename";
 
   /**
-   * Property holding the package name of the class, record or interface.
+   * Property holding the package name of the class, record, or interface.
    */
   public static final String PACKAGE_NAME = "packagename";
 
   /**
-   * Property holding the java definition of the class, record or interface.<br>
-   * This is the rest of the definition without the class, record or interface name.
+   * Property holding the java definition of the class, record, or interface.<br>
+   * This is the rest of the definition without the class, record, or interface name.
    */
   public static final String DEFINITION = "definition";
 
@@ -67,7 +70,7 @@ public class JavaSourceType implements SourceType {
   public static final String EXTENDS = "extends_";
 
   /**
-   * Property holding for the implemented interfaces.<br>
+   * Property holding the implemented interfaces.<br>
    * The first interface starts with 0, i.e. the application
    * has to loop on {@code getProperty(IMPLEMENTS + ndx)}.
    */
@@ -179,7 +182,7 @@ public class JavaSourceType implements SourceType {
           }
           code = code.trim();
           props.setProperty(DEFINITION, code);
-          extractImplements(props, code);   // records are final, but can implement interfaces
+          extractImplements(props, code);   // records are final but can implement interfaces
           break;
         }
 
@@ -189,6 +192,7 @@ public class JavaSourceType implements SourceType {
     }
     return props;
   }
+
 
   /**
    * Extracts the modifiers.
@@ -205,7 +209,6 @@ public class JavaSourceType implements SourceType {
       props.setProperty(MODIFIERS + (ndx++), matcher.group(2));
     }
   }
-
 
   /**
    * Extracts the annotations.
@@ -232,7 +235,7 @@ public class JavaSourceType implements SourceType {
     if (matcher.find()) {
       // first extends found
       if (isInterface) {
-        // check for more (if this is an interface
+        // check for more (if this is an interface)
         int ndx = 0;
         props.setProperty(EXTENDS + (ndx++), matcher.group(2));
         matcher = MORE_PATTERN.matcher(code.substring(matcher.end()));
@@ -257,7 +260,7 @@ public class JavaSourceType implements SourceType {
   private void extractImplements(Properties props, String code) {
     Matcher matcher = IMPLEMENTS_PATTERN.matcher(code);
     if (matcher.find()) {
-      // check for more (if this is an interface
+      // check for more interfaces
       int ndx = 0;
       props.setProperty(IMPLEMENTS + (ndx++), matcher.group(2));
       matcher = MORE_PATTERN.matcher(code.substring(matcher.end()));

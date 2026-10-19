@@ -18,8 +18,8 @@
 
 package org.wurbelizer.misc;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 /**
  * A simple default logger.<br>
@@ -91,9 +91,10 @@ public class DefaultLogger implements Logger {
 
 
   private String getStackTraceAsString(Throwable cause) {
-    try (PrintStream ps = new PrintStream(new ByteArrayOutputStream())) {
-      cause.printStackTrace(ps);
-      return ps.toString();
+    StringWriter sw = new StringWriter();
+    try (PrintWriter pw = new PrintWriter(sw)) {
+      cause.printStackTrace(pw);
     }
+    return sw.toString();
   }
 }

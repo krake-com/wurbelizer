@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 package org.wurbelizer.maven;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -30,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.wurbelizer.misc.Constants;
 import org.wurbelizer.misc.Logger;
 import org.wurbelizer.misc.Verbosity;
+import org.wurbelizer.wurbel.WurbelContext;
 import org.wurbelizer.wurbel.WurbelHelper;
 import org.wurbelizer.wurbile.SourceWurbiler;
 import org.wurbelizer.wurbile.WurbileException;
@@ -40,17 +40,18 @@ import java.io.IOException;
 
 /**
  * Wurbile Wurblets.<br>
- * The wurblet sources (wrbl-files) are translated to Java-sources
- * and ser-files (serialized fixed text) and then compiled to Java class files.<br>
- * Those class files can later be instantiated as code generators by the Wurbler.<br>
- * See the wurbelizer:wurbel goal.
+ * The wurblet sources (wrbl-files) are translated to Java sources
+ * and ser-files (serialized fixed text). The directory of the generated Java sources is added
+ * as a compile source root, so that they are compiled to class files in the compile phase.<br>
+ * The Wurbler can later instantiate those class files as code generators.<br>
+ * See the {@code wurbelizer:wurbel} goal.
  *
  * @author harald
  */
 @Mojo(name = "wurbile",
-      defaultPhase = LifecyclePhase.GENERATE_SOURCES)
+      defaultPhase = LifecyclePhase.GENERATE_SOURCES,
+      threadSafe = true)
 public class WurbileMojo extends AbstractWurbelizerMojo {
-
 
   /**
    * Directory holding the wurblet sources.
@@ -68,18 +69,18 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
   private File wurbletTargetJavaDir;
 
   /**
-   * Directory for the generated wurbley fixed text sources.
+   * Directory for the generated wurblet fixed text (.ser) files.
    */
   @Parameter(defaultValue = "${project.build.directory}/classes",
              property = "wurbile.textDir")
   private File wurbletTargetTextDir;
 
   /**
-   * Sets the indent of the generated Java source.
+   * Sets the indent of the generated Java source.<br>
+   * -1 means the wurbiler's default, i.e. autoindent.
    */
   @Parameter(defaultValue = "-1")
   private Integer indent;
-
 
 
   /**
@@ -89,11 +90,7 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
 
 
   @Override
-  public void execute() throws MojoExecutionException, MojoFailureException {
-
-    if (isSkipped()) {
-      return;
-    }
+  protected void doExecute(WurbelContext context) throws MojoExecutionException, MojoFailureException {
 
     // validate configuration
     validate();
@@ -142,18 +139,16 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
     }
   }
 
-
-
   /**
    * Creates an instance of a wurbiler.
    *
    * @param wrblFile the input wurbelizer file
-   * @param outputJavaDir the output directory getting the Java-files
+   * @param outputJavaDir the output directory getting the Java files
    * @param outputTextDir the output directory getting the fixed text .ser-files.
    * @param logger the logger
    * @param verbosity the verbosity
    * @return the wurbiler
-   * @throws IOException if source file could not be loaded
+   * @throws IOException if the source file could not be loaded
    */
   protected Wurbiler createWurbiler(File wrblFile, File outputJavaDir, File outputTextDir, Logger logger, Verbosity verbosity)
          throws IOException {
@@ -195,7 +190,7 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
 
         File wurbletFile = new File(dirName + File.separator + fileName);
 
-        // set per file extra properties (e.g. for include processing)
+        // set per file extra properties (e.g., for include processing)
         WurbelHelper.getExtraProperties().setProperty("currentDir", wurbletFile.getParent());
         WurbelHelper.getExtraProperties().setProperty("currentFile", wurbletFile.getName());
 
@@ -239,7 +234,6 @@ public class WurbileMojo extends AbstractWurbelizerMojo {
     getLog().info(getPathRelativeToBasedir(new File(dirName).getAbsolutePath()) + ": " +
                   wurbiledFilesCount + " files wurbiled, " + errorFilesCount + " errors");
   }
-
 
   /**
    * Checks mandatory params.<br>

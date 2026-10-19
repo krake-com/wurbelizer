@@ -32,6 +32,7 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
@@ -43,13 +44,13 @@ import java.util.regex.Pattern;
  * Because ANT does not provide a foreach "out of the box", the main-method supports
  * file lists as follows:
  * <pre>
- * java org.wurbelizer.console.ConsoleWurbler --glob="blahdir/.*\.map$" &#64;
+ * java org.wurbelizer.console.wurbel.ConsoleWurbler --glob="blahdir/.*\.map$" &lt;wurblet&gt; &#64;
  * </pre>
- * The &#64; will be replaced by the filename and the wurblet is invoked for each such file.
- * Note that it's not a real globbing, but uses regex.
+ * The &#64; will be replaced by the filename, and the wurblet is invoked for each such file.
+ * Note that it's not a real globbing but uses regex.
  * This is not the most generic solution, but it does the job for wurblets like CreateTableSql.
  * <p>
- * Note that this wurbler runs each wurblet only once!
+ * Note that this wurbler runs the wurblet only once, in its phase!
  *
  * @author harald
  */
@@ -57,7 +58,7 @@ public class ConsoleWurbler extends AbstractWurbler {
 
   private final int phase;                      // wurblet execution phase
   private final Set<Integer> collectedPhases;   // the phases of all wurblets detected so far
-  private String analyzeDir;                    // wurblet extra analyze dir
+  private String analyzeDir;                    // directory with extra wurblet information
   private final Logger logger;                  // the default logger
   private Verbosity verbosity;                  // tell what's going on
 
@@ -83,6 +84,9 @@ public class ConsoleWurbler extends AbstractWurbler {
     int     wurbArgCount  = 0;
     boolean wurbletLoaded = false;
 
+    // work on a copy: consumed args are nulled, and the caller reuses the args for the next phase
+    args = args.clone();
+
     // parse command line args
     for (int argc=0; argc < args.length; argc++)  {
       String arg = args[argc];
@@ -95,7 +99,7 @@ public class ConsoleWurbler extends AbstractWurbler {
         args[argc] = null;    // consumed
       }
       else if (arg.startsWith("--analyzedir="))  {
-        analyzeDir = arg.substring(10);
+        analyzeDir = arg.substring(13);
         args[argc] = null;    // consumed
       }
       else if (!wurbletLoaded && !arg.startsWith("--")) {
@@ -106,11 +110,12 @@ public class ConsoleWurbler extends AbstractWurbler {
       }
       else if (arg.startsWith("--verbosity=")) {
         try {
-          this.verbosity = Verbosity.valueOf(arg.substring(12));
+          this.verbosity = Verbosity.valueOf(arg.substring(12).toUpperCase(Locale.ROOT));
         }
         catch (RuntimeException ex) {
           this.verbosity = Verbosity.DEFAULT;
         }
+        args[argc] = null;    // consumed
       }
       else  {
         wurbArgCount++;
@@ -175,16 +180,14 @@ public class ConsoleWurbler extends AbstractWurbler {
     }
   }
 
-
   /**
    * Prints the usage.
    */
   private static void usage() {
     System.out.println(
-      "usage: java org.wurbelizer.ConsoleWurbler [--|++out=<outputfile>] [--analyzedir=<dir>] [--verbosity=default|info|debug] <wurblet> [wurblet options and args...]");
+      "usage: java org.wurbelizer.console.wurbel.ConsoleWurbler [--|++out=<outputfile>] [--analyzedir=<dir>] [--verbosity=default|info|debug] [--glob=<regex>] <wurblet> [wurblet options and args...]");
     System.exit(1);
   }
-
 
   /**
    * single run
@@ -208,7 +211,6 @@ public class ConsoleWurbler extends AbstractWurbler {
       System.err.println("*/");
     }
   }
-
 
   /**
    * globbing run

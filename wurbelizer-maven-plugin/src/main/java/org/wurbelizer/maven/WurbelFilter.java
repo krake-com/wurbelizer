@@ -52,6 +52,7 @@ public class WurbelFilter implements WurbletExecutionFilter {
     this.excludeAnchorPatterns = Objects.requireNonNull(excludeAnchorPatterns);
   }
 
+
   @Override
   public boolean isExecutable(SourceWurbletSubElement wurbletElement) {
     boolean execute = true;
@@ -94,4 +95,5 @@ public class WurbelFilter implements WurbletExecutionFilter {
 
     return execute;
   }
+
 }

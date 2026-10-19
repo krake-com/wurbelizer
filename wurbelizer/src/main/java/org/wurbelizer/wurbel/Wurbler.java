@@ -31,27 +31,25 @@ import java.util.Properties;
 public interface Wurbler {
 
   /**
-   * file extension for the wurblet source.
+   * File extension for the wurblet property file going with a source file.
    */
   String WURBLET_PROPERTIES_EXTENSION = ".wurb";
 
   /**
-   * namespace for the runtime environment.
+   * Namespace for the runtime environment.
    */
   String PROPSPACE_ENV = "env";
 
   /**
-   * namespace for the wurblet.
+   * Namespace for the wurblet.
    */
   String PROPSPACE_WURBLET = "wurblet";
 
   /**
-   * extra namespace.<br>
-   * used for wurbletProperites in maven poms
+   * Extra namespace.<br>
+   * Used for the wurbletProperties in maven poms and the properties of an ant project.
    */
   String PROPSPACE_EXTRA = "extra";
-
-
 
 
   /**
@@ -86,9 +84,8 @@ public interface Wurbler {
   String WURBLET_WURBLETNAME = "wurbletname";
 
 
-
   /**
-   * Processes the source file, create here-docs and replace wurblet-guarded sections.
+   * Processes the source file, create here-docs, and replace wurblet-guarded sections.
    *
    * @return the wurbel result
    *
@@ -97,14 +94,12 @@ public interface Wurbler {
    */
   WurbelResult wurbel() throws WurbelException, SourceException;
 
-
   /**
    * Gets the fixed source texts.
    *
    * @return the source array
    */
   String[] getSource();
-
 
   /**
    * Gets the writer where to write generated code to.
@@ -113,7 +108,6 @@ public interface Wurbler {
    */
   PrintStream getPrintStream();
 
-
   /**
    * Gets the wurblet args.
    *
@@ -121,16 +115,14 @@ public interface Wurbler {
    */
   String[] getArgs();
 
-
   /**
    * Gets the invocation count.<br>
    * Wurblets are invoked as long as the data changes.
-   * Some wurblets need to know how often (i.e. to allocate HeapFiles only once)
+   * Some wurblets need to know how often (e.g. to allocate HeapFiles only once).
    *
    * @return the invocation count, starting at 1
    */
   int getInvocationCount();
-
 
   /**
    * Gets the property value for a given namespace and key.
@@ -142,7 +134,6 @@ public interface Wurbler {
    */
   String getProperty(String nameSpace, String key);
 
-
   /**
    * Gets all Properties within a namespace.
    *
@@ -152,11 +143,10 @@ public interface Wurbler {
    */
   Properties getProperties(String nameSpace);
 
-
   /**
    * Gets an analyze-information file.<br>
    * Some wurblets need extra information which is provided in files
-   * in the so-called analyzedir (example in ant: analyzedir=${apt})
+   * in the so-called analyze-directory (Maven parameter {@code analyzeDir}, Ant attribute {@code analyzedir}).
    *
    * @param name the filename relative to the analyze-directory
    *
@@ -164,13 +154,11 @@ public interface Wurbler {
    */
   File getAnalyzeFile(String name);
 
-
   /**
    * Gets the verbosity level.<br>
    * @return the verbosity
    */
   Verbosity getVerbosity();
-
 
   /**
    * Gets the logger.

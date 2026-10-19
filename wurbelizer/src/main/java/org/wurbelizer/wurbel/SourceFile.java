@@ -33,11 +33,10 @@ import java.io.Reader;
 import java.io.Writer;
 
 /**
- * In-memory file to check for changes before flush/flush.
+ * In-memory file to check for changes before it is written.
  * <p>
- * Manages a static set of such SourceFiles that can be closed
- * and thus released at one (meant to be attached to a single
- * SourceDocument).<br>
+ * SourceFiles are cached by the {@link SourceFileFactory} for the duration
+ * of a single wurbel run (meant to be attached to a single SourceDocument).<br>
  * Handles LF/CRLF mapping according to the original file contents.
  *
  * @author harald
@@ -66,7 +65,7 @@ public class SourceFile {
     char[] chars = new char[BUFSIZE];
     int numRead;
     try (Reader in = new InputStreamReader(new FileInputStream(filename), Settings.getEncodingCharset())) {
-      // read the source file according to the systems encoding
+      // read the source file according to the configured encoding
       while((numRead = in.read(chars)) > -1) {
         orgBuf.append(String.valueOf(chars, 0, numRead));
       }
@@ -95,16 +94,14 @@ public class SourceFile {
     return filename;
   }
 
-
   /**
    * Gets the original text (contents) of the file.
    *
-   * @return the original text, null = no such file
+   * @return the original text, null if no such file
    */
   public String getOrgText()  {
     return orgText;
   }
-
 
   /**
    * Returns whether the file is using CR+LF as line endings.
@@ -114,7 +111,6 @@ public class SourceFile {
   public Boolean isUsingCRLF() {
     return usingCRLF;
   }
-
 
   /**
    * Gets a stream for the file to be rewritten.<br>
@@ -131,7 +127,6 @@ public class SourceFile {
     return printStream;
   }
 
-
   /**
    * Converts the line-endings if necessary.
    *
@@ -145,7 +140,6 @@ public class SourceFile {
     return str;
   }
 
-
   /**
    * Gets the new text/contents of the file.
    *
@@ -155,10 +149,9 @@ public class SourceFile {
     return outStream == null ? null : convertLineEndings(outStream.toString());
   }
 
-
   /**
    * Updates the file.<br>
-   * Overrides the file's contents with given text.
+   * Overrides the file's contents with the given text.
    *
    * @param text the file's contents
    * @throws WurbelException if file IO failed
@@ -175,25 +168,27 @@ public class SourceFile {
     catch (IOException ex) {
       throw new WurbelException("flushing " + filename + " failed", ex);
     }
+    orgText = text;   // the file's contents from now on
   }
-
 
   /**
    * Closes the file.<br>
    * Updates the file in the filesystem only if changes were detected.
+   * The stream is discarded, i.e., a subsequent {@link #getStream()} starts with an empty stream.
    *
-   * @return true if file was changed
+   * @return true if the file was changed
    * @throws WurbelException if flush failed
    */
   public boolean flush() throws WurbelException {
     String text = getNewText();
+    outStream = null;
+    printStream = null;
     if (text != null && (orgText == null || !orgText.equals(text))) {
       update(text);
       return true;
     }
     return false;
   }
-
 
   /**
    * Clears all output.

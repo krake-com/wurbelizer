@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.wurbelizer</groupId>
     <artifactId>wurbelizer-parent</artifactId>
-    <version>25.6.5.0</version>
+    <version>25.7.0.0</version>
   </parent>
 
   <artifactId>wurbelizer</artifactId>
@@ -17,7 +17,6 @@
 
   <properties>
     <rootBasedir>${project.parent.basedir}</rootBasedir>
-    <timestamp>${maven.build.timestamp}</timestamp>
   </properties>
 
   <build>
@@ -43,6 +42,9 @@
             <manifest>
               <mainClass>org.wurbelizer.misc.Version</mainClass>
             </manifest>
+            <manifestEntries>
+              <Automatic-Module-Name>org.wurbelizer</Automatic-Module-Name>
+            </manifestEntries>
           </archive>
         </configuration>
       </plugin>

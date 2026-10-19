@@ -44,7 +44,6 @@ public interface Wurblet {
    */
   Wurbler getContainer();
 
-
   /**
    * Invokes the wurblet from within the container.
    *
@@ -54,7 +53,7 @@ public interface Wurblet {
 
   /**
    * Processes the generated code.<br>
-   * Used to filter, translater, etc... before being applied to the file.
+   * Used to filter, translate, etc... before being applied to the file.
    *
    * @param generatedCode the generated code
    * @return the processed generated code
@@ -62,12 +61,11 @@ public interface Wurblet {
   String process(String generatedCode);
 
   /**
-   * Performs any cleanup necessary after last invocation of a wurblet.
+   * Performs any cleanup necessary after the last invocation of a wurblet.
    *
    * @throws WurbelException if cleanup failed
    */
   void cleanup() throws WurbelException;
-
 
   /**
    * Returns the phase in which the wurblet runs.<br>
@@ -84,7 +82,6 @@ public interface Wurblet {
    */
   void setPhase(int phase);
 
-
   /**
    * Gets the wurblet specific configuration.
    *
@@ -98,5 +95,18 @@ public interface Wurblet {
    * @param config the config, null if none
    */
   void setConfiguration(String config);
+
+  /**
+   * Returns whether this wurblet is thread-safe.<br>
+   * Build tools may wurbel several sources concurrently, for example, the Maven plugin in parallel builds.
+   * Only thread-safe wurblets are executed concurrently. All others are executed sequentially,
+   * i.e., no two non-thread-safe wurblets run at the same time within the same JVM.
+   * <p>
+   * A wurblet is thread-safe if it doesn't share any mutable state with other wurblet instances,
+   * for example, in static fields or in non-thread-safe libraries.
+   *
+   * @return true if thread-safe, false if it must be executed sequentially
+   */
+  boolean isThreadSafe();
 
 }

@@ -35,11 +35,16 @@ Wurbelizer from two-level generators.
 How to run the wurbiler and wurbler from common build tools.
 
 - [Maven Integration](maven.md)
+  - [Goals and parameters](maven.md#goals-and-parameters)
   - [A real-world configuration](maven.md#a-real-world-configuration)
+  - [Parallel builds](maven.md#parallel-builds)
+  - [Maven 4](maven.md#maven-4)
 - [Ant Integration](ant.md)
   - [Wurbile](ant.md#wurbile)
   - [Wurbel](ant.md#wurbel)
 - [Console Integration](console.md)
+  - [Wurbile](console.md#wurbile)
+  - [Wurbel](console.md#wurbel)
 
 ### 3. [Wurblet Level Syntax](wurblet-syntax.md)
 
@@ -48,6 +53,7 @@ The `@`-based extensions used inside `.wrbl` files.
 - [Level Switching](wurblet-syntax.md#level-switching)
   - [Code Switching](wurblet-syntax.md#code-switching)
   - [Value Extraction](wurblet-syntax.md#value-extraction)
+  - [Escaping](wurblet-syntax.md#escaping)
   - [A complete example](wurblet-syntax.md#a-complete-example)
 - [Wurbiler Directives](wurblet-syntax.md#wurbiler-directives)
   - [include](wurblet-syntax.md#include) ·
@@ -69,27 +75,41 @@ The constructs the wurbler reads from application source comments.
 
 - [Wurblet Anchor](source-syntax.md#wurblet-anchor)
   - [Anchor and Guarded Block](source-syntax.md#anchor-and-guarded-block)
+  - [Lifecycle of a Guarded Block](source-syntax.md#lifecycle-of-a-guarded-block)
   - [Unnamed Anchor](source-syntax.md#unnamed-anchor)
   - [Conditional Anchor](source-syntax.md#conditional-anchor)
   - [Extra Indentation](source-syntax.md#extra-indentation)
   - [Editor Fold](source-syntax.md#editor-fold)
+  - [Execution Phase](source-syntax.md#execution-phase)
 - [Here Documents](source-syntax.md#here-documents)
+  - [Here-Document Details](source-syntax.md#here-document-details)
   - [Example: the model next to the code](source-syntax.md#example-the-model-next-to-the-code)
   - [Cross-file generation with heap files](source-syntax.md#cross-file-generation-with-heap-files)
 - [Variables](source-syntax.md#variables)
+  - [Resolution Order](source-syntax.md#resolution-order)
+  - [Built-in Variables](source-syntax.md#built-in-variables)
   - [Example: variables in a `.wurb` file](source-syntax.md#example-variables-in-a-wurb-file)
+- [Processing Order and Phases](source-syntax.md#processing-order-and-phases)
 
 ### 5. [Guard Types](guard-types.md)
 
 The pluggable patterns (`netbeans`, `coffeebytes`, `visualstudio`, custom) that
-delimit guarded blocks.
+delimit guarded blocks, and the pluggable source types.
+
+- [Fold Types](guard-types.md#fold-types)
+- [Custom Guard Types](guard-types.md#custom-guard-types)
+- [Source Types](guard-types.md#source-types)
 
 ### 6. [Writing Wurblets](writing-wurblets.md)
 
 Design guidance and the Wurbelizer API for building your own wurblets.
 
 - [Wurbelizer API](writing-wurblets.md#wurbelizer-api)
+  - [Wurblet Lifecycle](writing-wurblets.md#wurblet-lifecycle)
+  - [The Container](writing-wurblets.md#the-container)
   - [Wurbler Properties](writing-wurblets.md#wurbler-properties)
+  - [Heap Files API](writing-wurblets.md#heap-files-api)
+  - [Thread safety](writing-wurblets.md#thread-safety)
 - [Skeleton extending AbstractJavaWurblet](writing-wurblets.md#skeleton-extending-abstractjavawurblet)
 - [Errorhandling](writing-wurblets.md#errorhandling)
 - [Logging](writing-wurblets.md#logging)

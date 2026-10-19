@@ -44,7 +44,7 @@ public final class Version {
 
 
   /**
-   * Prints the version, copyright and license.
+   * Prints the version, copyright, and license.
    *
    * @param args command line arguments (not used)
    */

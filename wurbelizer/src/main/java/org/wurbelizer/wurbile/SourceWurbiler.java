@@ -53,17 +53,17 @@ public class SourceWurbiler extends AbstractWurbiler {
    * for wrblFile to be compiled to outputDir.
    *
    * @param wrblFile the input wurbelizer file
-   * @param outputJavaDir the output directory getting the Java-files
+   * @param outputJavaDir the output directory getting the Java files
    * @param outputTextDir the output directory getting the fixed text .ser-files.
    * @param logger the logger
    * @param verbosity the verbosity
-   * @throws IOException if source file could not be loaded
+   * @throws IOException if the source file could not be loaded
    */
   @SuppressWarnings("this-escape")
   public SourceWurbiler(File wrblFile, File outputJavaDir, File outputTextDir, Logger logger, Verbosity verbosity)
          throws IOException {
 
-    super(Files.newBufferedReader(wrblFile.toPath()), wrblFile.getName(), new StringWriter(), null);
+    super(Files.newBufferedReader(wrblFile.toPath(), Settings.getEncodingCharset()), wrblFile.getName(), new StringWriter(), null);
     this.wrblFile  = wrblFile;
     this.outputJavaDir = outputJavaDir;
     this.outputTextDir = outputTextDir;

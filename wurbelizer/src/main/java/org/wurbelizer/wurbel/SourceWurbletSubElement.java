@@ -29,7 +29,7 @@ import java.util.Properties;
  * <pre>
  * &#64;wurblet[(wurbler-args...)] &lt;guardname&gt; &lt;wurbletname&gt; [wurblet-args ...]
  * </pre>
- * The optional wurbler args must be enclosed in parantheses and are directives for
+ * The optional wurbler args must be enclosed in parentheses and are directives for
  * the container that executes the wurblets.
  * The guardname is mandatory and must be unique within the source file, except if
  * an inline wurblet (-,+,&lt;,&gt;).
@@ -45,7 +45,7 @@ public class SourceWurbletSubElement extends SourceSubElement {
   private String wurbletName;       // the name of the wurblet
   private String[] wurbletArgs;     // the wurblet arguments
   private String[] wurblerArgs;     // arguments for the wurbler (e.g. fixed indent)
-  private int wurbletBegin;         // text offset for begin of wurblet within whole document
+  private int wurbletBegin;         // text offset for start of wurblet within whole document
   private int wurbletEnd;           // text offset for end of wurblet within whole document
 
 
@@ -53,9 +53,9 @@ public class SourceWurbletSubElement extends SourceSubElement {
    * Creates a sub element.
    *
    * @param element the {@link SourceElement} containing the sub element.
-   * @param commentLead the comment lead string at start of line (null if none)
-   * @param wurbletBegin text offset for begin of wurblet within whole document
-   * @param wurbletEnd text offset for end of wurblet within whole document
+   * @param commentLead the comment lead string at the start of the line (null if none)
+   * @param wurbletBegin text offset for the start of wurblet within the whole document
+   * @param wurbletEnd text offset for the end of wurblet within the whole document
    *
    * @throws org.wurbelizer.wurbel.SourceException if creation failed
    */
@@ -81,7 +81,7 @@ public class SourceWurbletSubElement extends SourceSubElement {
         ArgScanner scanner = new ArgScanner(getText().substring(start, wend), props);
         String arg;
         while ((arg = scanner.next()) != null)  {
-          wrgList.add(arg);    // wurbler arguments || c == '{' || c == '['
+          wrgList.add(arg);    // wurbler arguments
         }
         start = wend + 1;
       }
@@ -127,7 +127,6 @@ public class SourceWurbletSubElement extends SourceSubElement {
     setWurbletArgs(argList.toArray(new String[0]));
   }
 
-
   /**
    * Gets the parent wurblet element that generated the code for this wurblet element.
    *
@@ -139,7 +138,7 @@ public class SourceWurbletSubElement extends SourceSubElement {
 
 
   /**
-   * Gets the text offset for the start of the wurblet within whole document.
+   * Gets the text offset for the start of the wurblet within the whole document.
    *
    * @return the start
    */
@@ -148,7 +147,7 @@ public class SourceWurbletSubElement extends SourceSubElement {
   }
 
   /**
-   * Gets the text offset for end of wurblet within whole document.
+   * Gets the text offset for the end of wurblet within the whole document.
    *
    * @return the end
    */
@@ -166,9 +165,8 @@ public class SourceWurbletSubElement extends SourceSubElement {
     wurbletEnd += diff;
   }
 
-
   /**
-   * Checks whether this is an inline wurblet related the previous code block.
+   * Checks whether this is an inline wurblet related to the previous code block.
    *
    * @return true if inline wurblet for the previous block
    */
@@ -177,9 +175,8 @@ public class SourceWurbletSubElement extends SourceSubElement {
     return c == '-' || c == '<';
   }
 
-
   /**
-   * Checks whether this is an inline wurblet related the next code block.
+   * Checks whether this is an inline wurblet related to the next code block.
    *
    * @return true if inline wurblet for the next block
    */
@@ -187,7 +184,6 @@ public class SourceWurbletSubElement extends SourceSubElement {
     char c = getName().charAt(0);
     return c == '+' || c == '>';
   }
-
 
   /**
    * Checks if this is an inline wurblet.
@@ -198,7 +194,6 @@ public class SourceWurbletSubElement extends SourceSubElement {
     return isInlinePreviousBlock() || isInlineNextBlock();
   }
 
-
   /**
    * Gets the name of the wurblet.
    *
@@ -208,16 +203,14 @@ public class SourceWurbletSubElement extends SourceSubElement {
     return wurbletName;
   }
 
-
   /**
    * Sets the name of the wurblet.
    *
-   * @param wurbletName the name of the wurbet
+   * @param wurbletName the name of the wurblet
    */
   public void setWurbletName(String wurbletName) {
     this.wurbletName = wurbletName;
   }
-
 
   /**
    * Gets the wurblet args.
@@ -228,7 +221,6 @@ public class SourceWurbletSubElement extends SourceSubElement {
     return wurbletArgs;
   }
 
-
   /**
    * Sets the wurblet args.
    *
@@ -237,7 +229,6 @@ public class SourceWurbletSubElement extends SourceSubElement {
   public void setWurbletArgs(String[] wurbletArgs) {
     this.wurbletArgs = wurbletArgs;
   }
-
 
   /**
    * Gets the wurbler (wurblet container) args.
@@ -248,7 +239,6 @@ public class SourceWurbletSubElement extends SourceSubElement {
     return wurblerArgs;
   }
 
-
   /**
    * Sets the wurbler (wurblet container) args
    *
@@ -257,7 +247,6 @@ public class SourceWurbletSubElement extends SourceSubElement {
   public void setWurblerArgs(String[] wurblerArgs) {
     this.wurblerArgs = wurblerArgs;
   }
-
 
   /**
    * Prints the name of the subelement/element/document.

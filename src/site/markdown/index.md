@@ -15,12 +15,12 @@ into guarded blocks of your source files, regenerating until the code stabilizes
 
 ## Modules
 
-| Module | Description |
-|--------|-------------|
-| [wurbelizer](wurbelizer/) | Core library (`org.wurbelizer.*`) — wurbiler, wurbler and wurblet runtime. |
-| [wurbelizer-maven-plugin](wurbelizer-maven-plugin/) | Maven integration: `wurbile`, `wurbel` and `test-wurbel` goals. |
-| [ant-wurbelizer](ant-wurbelizer/) | Ant task integration (`org.wurbelizer.ant.*`). |
-| [console-wurbelizer](console-wurbelizer/) | Illustrative command-line wrapper. |
+| Module                                              | Description                                                                |
+|-----------------------------------------------------|----------------------------------------------------------------------------|
+| [wurbelizer](wurbelizer/)                           | Core library (`org.wurbelizer.*`) — wurbiler, wurbler and wurblet runtime. |
+| [wurbelizer-maven-plugin](wurbelizer-maven-plugin/) | Maven integration: `wurbile`, `wurbel` and `test-wurbel` goals.            |
+| [ant-wurbelizer](ant-wurbelizer/)                   | Ant task integration (`org.wurbelizer.ant.*`).                             |
+| [console-wurbelizer](console-wurbelizer/)           | Illustrative command-line wrapper.                                         |
 
 ## Resources
 

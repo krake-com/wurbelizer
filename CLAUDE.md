@@ -36,7 +36,9 @@ Use American English spelling for all code comments and documentation (e.g. "beh
 
 ## Build Commands
 
-Requires Java 25+ and Maven 3.9.0+. The enforcer requires `file.encoding=UTF-8`:
+Requires Java 25+ and Maven 3.9.10+. The build and the plugin also work with Maven 4 (verified with 4.0.0-rc-7).
+On Maven 4, `-Dfile.encoding=UTF-8` causes a harmless warning that it cannot be set as a system property. The enforcer check still passes.
+The enforcer requires `file.encoding=UTF-8`:
 
 ```bash
 # Build all modules
@@ -78,12 +80,12 @@ wurbelizer-parent/          (root POM, version 25.0-SNAPSHOT)
 
 ### Key Interfaces
 
-| Interface | Package | Role |
-|---|---|---|
-| `Wurbler` | `org.wurbelizer.wurbel` | Container that loads and runs a wurblet against a source file |
-| `Wurblet` | `org.wurbelizer.wurblet` | A code generator; implements `run()`, `process()`, `cleanup()` |
-| `Wurbiler` | `org.wurbelizer.wurbile` | Compiler that translates `.wrbl` source to Java + `.ser` |
-| `SourceRegion` | `org.wurbelizer.wurbel` | Guard-type strategy; registered via `META-INF/services` SPI |
+| Interface      | Package                  | Role                                                                                                                                                                       |
+|----------------|--------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Wurbler`      | `org.wurbelizer.wurbel`  | Container that loads and runs a wurblet against a source file                                                                                                              |
+| `Wurblet`      | `org.wurbelizer.wurblet` | A code generator; implements `run()`, `process()`, `cleanup()`; `isThreadSafe()` (default `false` in `AbstractWurblet`) — non-thread-safe wurblets are serialized JVM-wide |
+| `Wurbiler`     | `org.wurbelizer.wurbile` | Compiler that translates `.wrbl` source to Java + `.ser`                                                                                                                   |
+| `SourceRegion` | `org.wurbelizer.wurbel`  | Guard-type strategy; registered via `META-INF/services` SPI                                                                                                                |
 
 ### Key Classes
 
@@ -92,7 +94,8 @@ wurbelizer-parent/          (root POM, version 25.0-SNAPSHOT)
 - **`AbstractWurbiler`** — Base `Wurbiler` implementation. Translates `@[...]@` / `@(...)@` / `@{...}@` syntax from a `.wrbl` reader into a Java writer and a `List<String>` (fixed source).
 - **`HeapFile`** / **`HeapFileFactory`** — In-memory files for here-documents. Files whose name starts with `.` stay on the heap; others are written to disk. Heap files persist for the whole wurbel lifecycle phase across all source files.
 - **`AbstractWurblet`** / **`AbstractJavaWurblet`** — Base classes for wurblets; extend via `@{extends}@` directive in `.wrbl` source.
-- **`Settings`** — Global singleton for the file encoding charset (default UTF-8).
+- **`WurbelContext`** — Per-run state (encoding charset, extra properties, heap files, source files, wurblet classloader), bound via `ScopedValue`. The static accessors in `Settings`, `WurbelHelper`, `HeapFileFactory` and `SourceFileFactory` delegate to `WurbelContext.current()`; unbound callers (Ant, console, tests) share a global context. The Maven mojos bind a fresh context per execution and are `threadSafe`.
+- **`Settings`** — File encoding charset (default UTF-8), kept in the current `WurbelContext`.
 
 ### Guard Types (SPI)
 
@@ -105,11 +108,11 @@ Custom guard types implement `SourceRegion` and self-register.
 
 ### Maven Plugin Goals
 
-| Goal | Phase | Purpose |
-|---|---|---|
-| `wurbile` | `generate-sources` | Compile wurblet `.wrbl` sources → Java + `.ser` |
-| `wurbel` | `process-sources` | Run wurbler on main sources |
-| `test-wurbel` | `process-test-sources` | Run wurbler on test sources |
+| Goal          | Phase                  | Purpose                                         |
+|---------------|------------------------|-------------------------------------------------|
+| `wurbile`     | `generate-sources`     | Compile wurblet `.wrbl` sources → Java + `.ser` |
+| `wurbel`      | `process-sources`      | Run wurbler on main sources                     |
+| `test-wurbel` | `process-test-sources` | Run wurbler on test sources                     |
 
 The plugin uses a custom `ClassRealmConfigurator` (`set-classrealm`) so that wurblet classes compiled in earlier phases are visible at wurbel time. `WurbelMojo` and `TestWurbelMojo` both extend `AbstractWurbelMojo`; `WurbileMojo` extends `AbstractWurbelizerMojo`.
 
@@ -117,31 +120,34 @@ The plugin uses a custom `ClassRealmConfigurator` (`set-classrealm`) so that wur
 
 Files start at output level. Level-switching markers:
 
-| Marker | Meaning |
-|---|---|
-| `@[` … `]@` | Switch to wurblet (Java) level |
-| `@(` … `)@` | Embed wurblet-level expression in output |
-| `@{directive ...}@` | Wurbiler directive (compile-time) |
+| Marker              | Meaning                                  |
+|---------------------|------------------------------------------|
+| `@[` … `]@`         | Switch to wurblet (Java) level           |
+| `@(` … `)@`         | Embed wurblet-level expression in output |
+| `@{directive ...}@` | Wurbiler directive (compile-time)        |
+
+Escapes: `\@` → `@`, `\ ` → blank; other backslashes are copied verbatim (no continuation lines at wurblet level). Directives are only recognized outside `@[ ]@`.
 
 Common directives: `@{package}@`, `@{import}@`, `@{extends}@`, `@{implements}@`, `@{include}@`, `@{args}@`, `@{to <stream>}@`, `@{phase N}@`, `@{indent N|auto}@`, `@{comment ...}@`, `@{code ...}@`, `@{config ...}@`.
 
 ## Source-Level Syntax (inside application source files)
 
-| Construct | Syntax | Purpose |
-|---|---|---|
-| Wurblet anchor | `@wurblet[(wurbler-directive)] <tag> <WurbletClass> [args...]` | Bind generated code to a wurblet |
-| Here-document | `@> <filename>` … `@<` | Inline data file; `.filename` stays in heap |
-| Variable block | `@{` … `@}` inside a comment | Declare `key = value` variables |
-| Variable ref | `$var` or `${var}` | Used in args and variable values |
+| Construct      | Syntax                                                         | Purpose                                     |
+|----------------|----------------------------------------------------------------|---------------------------------------------|
+| Wurblet anchor | `@wurblet[(wurbler-directive)] <tag> <WurbletClass> [args...]` | Bind generated code to a wurblet            |
+| Here-document  | `@> <filename>` … `@<`                                         | Inline data file; `.filename` stays in heap |
+| Variable block | `@{` … `@}` inside a comment                                   | Declare `key = value` variables             |
+| Variable ref   | `$var` or `${var}`                                             | Used in args and variable values            |
 
 Anchors live in Java comments (single-line or block); generated code can contain new anchors, so the wurbler re-parses until stable. Args are whitespace-separated (quote to include whitespace) and may span lines via a trailing `\`. Variables resolve from inline `@{ @}` blocks, `.wurb` property files, Maven/Ant properties and environment variables (recursively).
 
 Optional wurbler directives in the `(...)`:
-- `test:$var==value` / `!=` — conditional anchor; skips the wurblet (emits `// condition not met`) when unmet
+- `test:$var==value` / `!=` — conditional anchor; when unmet, the wurblet is skipped and an existing guarded block is kept
 - `indent=N` — extra indentation; negative means *smart indent* (align to the anchor comment), the Java default
 - `fold=collapsed|expanded|none` — editor fold type for the guarded block (NetBeans only)
+- `phase=N` — overrides the wurblet's `@{phase}@` for this anchor
 
-Inline (unnamed) wurblets have a `<tag>` not starting with a letter and inject code between two empty block comments `/**/` in adjacent code. Tag starting with `-` or `<` targets the preceding block; all others (including `+`, `>`) target the following block.
+Inline (unnamed) wurblets have a `<tag>` starting with `-`, `<`, `+` or `>` and inject code between two empty block comments `/**/` (or `/*@*/`) in adjacent code. `-`/`<` targets the preceding block, `+`/`>` the following block. Any other tag is a regular named anchor.
 
 ## Testing
 

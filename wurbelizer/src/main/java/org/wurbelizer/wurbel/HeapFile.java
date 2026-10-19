@@ -77,7 +77,6 @@ public class HeapFile {
     return discarded;
   }
 
-
   /**
    * Resets (empties) the heapfile.
    */
@@ -85,7 +84,6 @@ public class HeapFile {
     out.flush();
     data.reset();
   }
-
 
   /**
    * Gets the contents of a heapfile.
@@ -96,7 +94,6 @@ public class HeapFile {
     out.flush();
     return data.toString();
   }
-
 
   /**
    * Gets the name of the heapfile.
@@ -133,13 +130,6 @@ public class HeapFile {
     }
   }
 
-
-  @Override
-  public String toString() {
-    return name;
-  }
-
-
   /**
    * Gets a reader for the contents.
    *
@@ -149,7 +139,6 @@ public class HeapFile {
     return new StringReader(getText());
   }
 
-
   /**
    * Get the print stream to print into the heapfile.
    *
@@ -158,7 +147,6 @@ public class HeapFile {
   public PrintStream getPrintStream()  {
     return out;
   }
-
 
   /**
    * Gets the last invocationCounter from wurbler-container (for optional use in wurblets).
@@ -170,10 +158,9 @@ public class HeapFile {
     return invocationCount;
   }
 
-
   /**
    * Sets the last invocation count.
-   * Wurblets may use this to save their invocation count in order to
+   * Wurblets may use this to save their invocation count to
    * check for redundant creation of heap files.
    *
    * @param invocationCount the invocation count.
@@ -182,7 +169,6 @@ public class HeapFile {
   public void setInvocationCount(int invocationCount) {
     this.invocationCount = invocationCount;
   }
-
 
   /**
    * Gets the remembered sourcename.
@@ -202,6 +188,11 @@ public class HeapFile {
    */
   public void setSourceName(String sourceName) {
     this.sourceName = sourceName;
+  }
+
+  @Override
+  public String toString() {
+    return name;
   }
 
 }

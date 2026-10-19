@@ -16,14 +16,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 package org.wurbelizer.ant.misc;
 
 import org.apache.tools.ant.Project;
 import org.wurbelizer.misc.Logger;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import static org.apache.tools.ant.Project.*;
 
@@ -88,7 +87,6 @@ public class AntLogger implements Logger {
     project.log(message, MSG_ERR);
   }
 
-
   @Override
   public void debug(String message, Throwable t) {
     debug(message + "\n" + getStackTraceAsString(t));
@@ -111,10 +109,11 @@ public class AntLogger implements Logger {
 
 
   private String getStackTraceAsString(Throwable cause) {
-    try (PrintStream ps = new PrintStream(new ByteArrayOutputStream())) {
-      cause.printStackTrace(ps);
-      return ps.toString();
+    StringWriter sw = new StringWriter();
+    try (PrintWriter pw = new PrintWriter(sw)) {
+      cause.printStackTrace(pw);
     }
+    return sw.toString();
   }
 
 }

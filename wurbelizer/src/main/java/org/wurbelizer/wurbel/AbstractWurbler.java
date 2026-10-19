@@ -23,15 +23,17 @@ import org.wurbelizer.wurblet.Wurblet;
 import org.wurbelizer.wurblet.WurbletData;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Provides basic functionality of a wurblet container.<br>
@@ -40,6 +42,14 @@ import java.util.Set;
  * @author harald
  */
 public abstract class AbstractWurbler implements Wurbler {
+
+  /**
+   * Lock to execute non-thread-safe wurblets sequentially.<br>
+   * The lock is JVM-wide (more precisely: classloader-wide) and shared by all concurrent wurbel runs.
+   *
+   * @see Wurblet#isThreadSafe()
+   */
+  static final ReentrantLock WURBLET_LOCK = new ReentrantLock();
 
   private Wurblet wurblet;            // current wurblet
   private List<Wurblet> wurblets;     // all wurblets invoked during the last run pass
@@ -52,7 +62,7 @@ public abstract class AbstractWurbler implements Wurbler {
 
   /**
    * Creates a wurbler.<br>
-   * The output of the wurblet output by default goes to stdout.
+   * By default, the wurblet's output goes to stdout.
    */
   @SuppressWarnings("this-escape")
   public AbstractWurbler()  {
@@ -63,15 +73,17 @@ public abstract class AbstractWurbler implements Wurbler {
 
 
   /**
-   * Loads the wurblet from persistant storage.<br>
-   * The wurblet's classname may be either absolute or relative. If relative
-   * a classpath must be provided. If the wurblet class could be loaded and
-   * the wurblet instance created the serialized fixed source will be loaded
-   * from a file with the same name as the wurblet-class but the extension replaced
-   * by {@code .ser}.
+   * Loads the wurblet.<br>
+   * The wurblet's classname may be either fully qualified or relative. If relative,
+   * the package names of the classPath are prepended in the given order, before the plain name is tried.
+   * The class is loaded by the {@link WurbelContext#getWurbletClassLoader() wurblet classloader}
+   * of the current context, if set.
+   * If the wurblet class could be loaded and the wurblet instance created, the serialized fixed source
+   * will be loaded from a resource with the same name as the wurblet-class but the extension
+   * {@code .ser}.
    *
-   * @param className the pathname of the java-class.
-   * @param classPath an optional list of prefixes to load the className from
+   * @param className the name of the wurblet class
+   * @param classPath an optional list of package names to load the className from
    * @param otherProps extra properties for this wurblet only, null = none
    *
    * @throws WurbelException if loading the wurblet failed
@@ -84,13 +96,18 @@ public abstract class AbstractWurbler implements Wurbler {
     Class<?> clazz  = null;
     setWurblet(null);
 
-    // search in classpath only if classPath set and className is not fully qualified
+    ClassLoader loader = WurbelContext.current().getWurbletClassLoader();
+    if (loader == null) {
+      loader = AbstractWurbler.class.getClassLoader();
+    }
+
+    // search in the classpath only if the classPath set, and the className is not fully qualified
     int max = (classPath == null || className.indexOf('.') > 0) ? 1 : classPath.length + 1;
     for (int i=0; i < max; i++) {
       String name = (i == max-1) ? className : (classPath[i] + "." + className);
       try {
         // load the class
-        clazz = Class.forName(name);
+        clazz = Class.forName(name, true, loader);
         if (Wurblet.class.isAssignableFrom(clazz))  {
           setWurblet((Wurblet) clazz.getDeclaredConstructor().newInstance());
           break;
@@ -115,22 +132,27 @@ public abstract class AbstractWurbler implements Wurbler {
     // make className relative, if absolute
     int ndx = className.lastIndexOf('.');
     String serName = (ndx > 0 ? className.substring(ndx+1) : className) + Constants.FILE_SOURCE_EXTENSION;
-    InputStream inp = clazz.getResourceAsStream(serName);   // clazz cannot be null due to wurblet != null and setWurblet above
-    if (inp == null) {
+    URL serUrl = clazz.getResource(serName);   // clazz cannot be null due to wurblet != null and setWurblet above
+    if (serUrl == null) {
       throw new WurbelException("no such fixed text object '" + serName + "'");
     }
 
-    try (ObjectInputStream is = new ObjectInputStream(inp)) {
-      WurbletData data = (WurbletData) is.readObject();
-      setSource(data.getSource());
-      setArgs(data.getArgs());
-      setFixedArgs(data.getArgs() != null);
+    try {
+      // don't use the JVM-wide cached jar file: it is closed when another classloader
+      // for the same jar is closed, e.g., in a concurrent wurbel execution of a parallel build
+      URLConnection connection = serUrl.openConnection();
+      connection.setUseCaches(false);
+      try (ObjectInputStream is = new ObjectInputStream(connection.getInputStream())) {
+        WurbletData data = (WurbletData) is.readObject();
+        setSource(data.getSource());
+        setArgs(data.getArgs());
+        setFixedArgs(data.getArgs() != null);
+      }
     }
     catch (IOException | ClassNotFoundException | RuntimeException ex) {
       throw new WurbelException("cannot read from fixed text object '" + serName + "'", ex);
     }
   }
-
 
   /**
    * Clears the list of all executed wurblets so far.
@@ -138,7 +160,6 @@ public abstract class AbstractWurbler implements Wurbler {
   public void clearInvokedWurblets() {
     wurblets = new ArrayList<>();
   }
-
 
   /**
    * Gets the list of all invoked wurblets so far.
@@ -148,7 +169,6 @@ public abstract class AbstractWurbler implements Wurbler {
   public List<Wurblet> getInvokedWurblets() {
     return wurblets;
   }
-
 
   /**
    * Runs the wurblet.
@@ -168,7 +188,6 @@ public abstract class AbstractWurbler implements Wurbler {
     return false;
   }
 
-
   /**
    * Invokes the cleanup method on all wurblets ran so far.
    *
@@ -177,7 +196,18 @@ public abstract class AbstractWurbler implements Wurbler {
   public void cleanupInvokedWurblets() throws WurbelException {
     if (wurblets != null) {
       for (Wurblet w: wurblets) {
-        w.cleanup();
+        if (w.isThreadSafe()) {
+          w.cleanup();
+        }
+        else {
+          WURBLET_LOCK.lock();
+          try {
+            w.cleanup();
+          }
+          finally {
+            WURBLET_LOCK.unlock();
+          }
+        }
       }
     }
   }
@@ -192,7 +222,6 @@ public abstract class AbstractWurbler implements Wurbler {
     return source;
   }
 
-
   /**
    * Sets the fixed source text.
    *
@@ -202,7 +231,6 @@ public abstract class AbstractWurbler implements Wurbler {
     this.source = source;
     clearInvokedWurblets();
   }
-
 
   /**
    * Gets the output stream where to write generated code to.
@@ -214,7 +242,6 @@ public abstract class AbstractWurbler implements Wurbler {
     return out;
   }
 
-
   /**
    * Sets the output stream.
    *
@@ -224,7 +251,6 @@ public abstract class AbstractWurbler implements Wurbler {
     this.out = out;
   }
 
-
   /**
    * Gets the wurblet.
    *
@@ -233,7 +259,6 @@ public abstract class AbstractWurbler implements Wurbler {
   public Wurblet getWurblet() {
     return wurblet;
   }
-
 
   /**
    * Sets the current wurblet.
@@ -250,7 +275,6 @@ public abstract class AbstractWurbler implements Wurbler {
     }
   }
 
-
   /**
    * Gets the wurblet args.
    *
@@ -260,7 +284,6 @@ public abstract class AbstractWurbler implements Wurbler {
   public String[] getArgs() {
     return args;
   }
-
 
   /**
    * Sets the wurblet args.
@@ -272,26 +295,23 @@ public abstract class AbstractWurbler implements Wurbler {
     this.args = Objects.requireNonNullElseGet(args, () -> new String[0]);
   }
 
-
   /**
-   * Checks if container is allowed to override the wurblet args.
+   * Checks if the container is allowed to override the wurblet args.
    *
-   * @return true if args are preset in the wurblet, else container may override
+   * @return true if args are set by the wurblet, else container may override
    */
   public boolean isFixedArgs() {
     return fixedArgs;
   }
 
-
   /**
    * Enables or disables the ability of the container to override the wurblet args.
    *
-   * @param fixedArgs true if args are fixed, false if container is allowed to override
+   * @param fixedArgs true if args are fixed, false if the container is allowed to override
    */
   public void setFixedArgs(boolean fixedArgs) {
     this.fixedArgs = fixedArgs;
   }
-
 
   /**
    * Gets the properties for a given namespace.
@@ -317,13 +337,12 @@ public abstract class AbstractWurbler implements Wurbler {
     }
   }
 
-
   /**
    * Gets the property value for a given namespace and key.
    *
    * @param nameSpace the name of the namespace, null for the default runtime java-properties.
    * @param key the key of the property value
-   * @return the value for key, null if no such key
+   * @return the value for the key, null if no such key
    */
   @Override
   public String getProperty(String nameSpace, String key) {

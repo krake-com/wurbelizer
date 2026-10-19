@@ -262,4 +262,11 @@ public class WurbelHelperTest {
     WurbelHelper.getSourceTypeMap();     // trigger lazy init of the default
     assertEquals(WurbelHelper.getDefaultSourceType().getFileExtension(), "");
   }
+
+  @Test
+  public void testUnregisteredExtensionFallsBackToDefaultSourceType() throws WurbelException {
+    assertEquals(SourceType.get(".xml").getFileExtension(), "");
+    assertEquals(SourceType.get(null).getFileExtension(), "");
+    assertEquals(SourceType.get(".java").getFileExtension(), ".java");
+  }
 }

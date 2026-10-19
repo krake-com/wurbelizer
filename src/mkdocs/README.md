@@ -12,6 +12,8 @@ The page content is **not** stored here. It is generated from the repository's
 real documentation by [`prepare.py`](prepare.py):
 
 - the project [`README.md`](../../README.md) becomes the site home page (`index.md`),
+  minus its Maven Central version badge (a third-party image that the privacy
+  plugin would freeze at build time),
 - the pages under [`../docs`](../docs) become the documentation pages,
 - the brand stylesheet, favicon and the bilingual legal pages under
   [`theme/`](theme) are copied in.
@@ -55,7 +57,7 @@ Both `serve` and `build` run `prepare.py` first, so edits to `../docs`, the repo
 
 - **Page content:** edit the Markdown under `../docs` (or the repo `README.md`).
   Do not edit `docs/` here — it is overwritten on every build.
-- **Colours / fonts / look:** edit [`theme/stylesheets/extra.css`](theme/stylesheets/extra.css).
+- **Colors / fonts / look:** edit [`theme/stylesheets/extra.css`](theme/stylesheets/extra.css).
 - **Navigation, theme options, consent banner:** edit [`mkdocs.yml`](mkdocs.yml).
 - **Legal pages:** edit [`theme/content/impressum.md`](theme/content/impressum.md)
   and [`theme/content/datenschutz.md`](theme/content/datenschutz.md). These are
@@ -66,7 +68,7 @@ Both `serve` and `build` run `prepare.py` first, so edits to `../docs`, the repo
 
 - Roboto is localized at build time by the Material **privacy** plugin — no Google
   Fonts requests at runtime.
-- No analytics, no tracking cookies. Only `localStorage` is used (colour-scheme
+- No analytics, no tracking cookies. Only `localStorage` is used (color-scheme
   choice + consent), disclosed in the bilingual consent banner and the privacy page.
 - The **ResizeObserver polyfill is self-hosted** (see below) — no `unpkg.com`
   request is ever made.

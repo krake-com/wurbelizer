@@ -18,36 +18,36 @@
 
 package org.wurbelizer.misc;
 
+import org.wurbelizer.wurbel.WurbelContext;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Global settings.
+ * Global settings.<br>
+ * The settings are kept in the {@link WurbelContext#current() current} wurbel context.
  *
  * @author harald
  */
 public final class Settings {
 
-  private static Charset encodingCharset = StandardCharsets.UTF_8;
-
-
   /**
    * Gets the encoding used to read and write files.<br>
    * Usually set by the maven plugins from "project.build.sourceEncoding".
    *
-   * @return the charset, default is {@link StandardCharsets#UTF_8}
+   * @return the encoding charset, default is {@link StandardCharsets#UTF_8}
    */
   public static Charset getEncodingCharset() {
-    return encodingCharset;
+    return WurbelContext.current().getEncodingCharset();
   }
 
   /**
    * Sets the encoding used to read and write files.
    *
-   * @param encodingCharset the charset, default is {@link StandardCharsets#UTF_8}
+   * @param encodingCharset the encoding charset, default is {@link StandardCharsets#UTF_8}
    */
   public static void setEncodingCharset(Charset encodingCharset) {
-    Settings.encodingCharset = encodingCharset;
+    WurbelContext.current().setEncodingCharset(encodingCharset);
   }
 
 
