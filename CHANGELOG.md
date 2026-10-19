@@ -426,6 +426,7 @@ First release with the new versioning scheme: the first number is the Java (LTS)
 
 Initial release in this repository.
 
+[Unreleased]: https://github.com/krake-com/wurbelizer/compare/25.7.0.0...develop
 [25.7.0.0]: https://github.com/krake-com/wurbelizer/releases/tag/25.7.0.0
 [25.6.5.0]: https://github.com/krake-com/wurbelizer/releases/tag/25.6.5.0
 [21.6.4.0]: https://github.com/krake-com/wurbelizer/releases/tag/21.6.4.0
