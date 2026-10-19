@@ -44,7 +44,7 @@
 
   <properties>
     <rootBasedir>${project.basedir}</rootBasedir>
-    <project.build.outputTimestamp>2026-10-10T00:00:00Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2026-10-19T15:30:00Z</project.build.outputTimestamp>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -75,30 +75,30 @@
     <maven.fluido.skin.version>2.1.0</maven.fluido.skin.version>
     <maven.source.plugin.version>3.4.0</maven.source.plugin.version>
     <maven.surefire.plugin.version>3.6.0</maven.surefire.plugin.version>
-    <maven.versions.plugin.version>2.22.0</maven.versions.plugin.version>
-    <maven.central-publishing.plugin.version>0.11.0</maven.central-publishing.plugin.version>
+    <maven.versions.plugin.version>2.23.0</maven.versions.plugin.version>
+    <maven.central-publishing.plugin.version>0.12.0</maven.central-publishing.plugin.version>
 
     <ant.version>1.10.18</ant.version>
-    <asm.version>9.10.1</asm.version>
+    <asm.version>9.11.1</asm.version>
     <javax.inject.version>1</javax.inject.version>
     <maven.file.management.version>3.2.0</maven.file.management.version>
     <maven.plugin.annotations.version>3.16.0</maven.plugin.annotations.version>
     <sisu.maven.plugin.version>1.1.0</sisu.maven.plugin.version>
-    <slf4j.version>2.0.19</slf4j.version>
+    <slf4j.version>2.0.20</slf4j.version>
     <testng.version>7.12.0</testng.version>
     <wagon.ssh.version>3.5.3</wagon.ssh.version>
 
   </properties>
 
   <scm>
-    <connection>scm:git:https://bitbucket.org/krake-oss/wurbelizer.git</connection>
-    <developerConnection>scm:git:ssh://git@bitbucket.org/krake-oss/wurbelizer.git</developerConnection>
-    <url>https://bitbucket.org/krake-oss/wurbelizer/</url>
+    <connection>scm:git:https://github.com/krake-com/wurbelizer.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/krake-com/wurbelizer.git</developerConnection>
+    <url>https://github.com/krake-com/wurbelizer/</url>
   </scm>
 
   <issueManagement>
-    <system>Bitbucket</system>
-    <url>https://bitbucket.org/krake-oss/wurbelizer/</url>
+    <system>GitHub</system>
+    <url>https://github.com/krake-com/wurbelizer/issues</url>
   </issueManagement>
 
   <distributionManagement>
@@ -584,6 +584,7 @@
             <configuration>
               <publishingServerId>sonatype-central</publishingServerId>
               <deploymentName>wurbelizer</deploymentName>
+              <checksums>required</checksums>
             </configuration>
           </plugin>
         </plugins>

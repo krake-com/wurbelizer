@@ -71,7 +71,7 @@ To navigate the documentation, see the
 
 The Wurbelizer did not start out as a standalone project. It emerged from practical
 development needs, originally created alongside the Java framework
-[Tentackle](https://bitbucket.org/krake-oss/tentackle/src/master/), which heavily
+[Tentackle](https://github.com/krake-com/tentackle), which heavily
 relies on generative programming, and was later opened up for anyone to use.
 
 Tentackle remains a real-world, large-scale user of the Wurbelizer. It is a Java
@@ -107,3 +107,4 @@ generation the Wurbelizer is designed for.
 
 See the full [Table of Contents](./src/docs/toc.md) and the [Index](./src/docs/index.md)
 for detailed, section-level navigation.
+Release history is in the [Changelog](./CHANGELOG.md).

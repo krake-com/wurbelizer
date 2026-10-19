@@ -9,7 +9,7 @@ transfer object* (DTO) and let the wurbler weave it into a hand-written source f
 The complete, runnable sources are available at
 [github.com/harrharr/wurbelizer-tutorial](https://github.com/harrharr/wurbelizer-tutorial).
 
-> The tutorial is written against `wurbelizer.version` `25.6.5.0` (JDK 25, Maven >= 3.9.10).
+> The tutorial is written against `wurbelizer.version` `25.7.0.0` (JDK 25, Maven >= 3.9.10).
 > The runnable reference sources on GitHub still pin older versions; the steps are
 > identical — just the version numbers below differ.
 
@@ -36,7 +36,7 @@ wurblet, and one that *uses* it to generate code.
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
-    <wurbelizer.version>25.6.5.0</wurbelizer.version>
+    <wurbelizer.version>25.7.0.0</wurbelizer.version>
   </properties>
 
   <modules>
