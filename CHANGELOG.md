@@ -18,9 +18,7 @@ current line. Such releases are listed briefly and refer to the release that int
 
 Issue numbers (`#n`) in releases prior to 2.1 refer to the former Bitbucket issue tracker.
 
-## [Unreleased]
-
-Development branch (`25.0-SNAPSHOT`), targeting Java 25.
+## [25.7.0.0] - 2026-10-19
 
 ### Added
 
