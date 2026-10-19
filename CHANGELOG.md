@@ -22,6 +22,8 @@ Issue numbers (`#n`) in releases prior to 2.1 refer to the former Bitbucket issu
 
 Development branch (`25.0-SNAPSHOT`), targeting Java 25.
 
+## [25.7.0.0] - 2026-10-19
+
 ### Added
 
 - `WurbelContext`: per-run state (encoding, extra properties, heap files, source files, wurblet classloader)
