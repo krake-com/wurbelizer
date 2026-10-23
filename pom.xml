@@ -21,7 +21,7 @@
   <licenses>
     <license>
       <name>GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1, February 1999</name>
-			<url>http://www.gnu.org/licenses/lgpl-2.1.txt</url>
+			<url>https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
@@ -90,7 +90,7 @@
 
   </properties>
 
-  <scm>
+  <scm child.scm.connection.inherit.append.path="false" child.scm.developerConnection.inherit.append.path="false" child.scm.url.inherit.append.path="false">
     <connection>scm:git:https://github.com/krake-com/wurbelizer.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/krake-com/wurbelizer.git</developerConnection>
     <url>https://github.com/krake-com/wurbelizer/</url>
@@ -438,6 +438,8 @@
         <configuration>
           <doclint>none</doclint>
           <failOnError>false</failOnError>
+          <!-- the plugin passes no-fonts by default, but javadoc still imports fonts/dejavu.css -->
+          <disableNoFonts>true</disableNoFonts>
           <bottom><![CDATA[<a href="${project.url}">Wurbelizer</a> - Agility in Code Generation]]></bottom>
         </configuration>
         <reportSets>
@@ -462,6 +464,26 @@
         <configuration>
           <bottom><![CDATA[<a href="${project.url}">Wurbelizer</a> - Agility in Code Generation]]></bottom>
         </configuration>
+        <reportSets>
+          <reportSet>
+            <id>default</id>
+            <reports>
+              <report>jxr-no-fork</report>
+              <report>aggregate</report>
+            </reports>
+          </reportSet>
+          <reportSet>
+            <!-- no test javadoc is generated: don't link to it -->
+            <id>test</id>
+            <configuration>
+              <linkJavadoc>false</linkJavadoc>
+            </configuration>
+            <reports>
+              <report>test-jxr-no-fork</report>
+              <report>test-aggregate</report>
+            </reports>
+          </reportSet>
+        </reportSets>
       </plugin>
 
       <plugin>
