@@ -15,7 +15,7 @@ combine the wurbelizer with traditional template engines such as [Velocity](http
 or [Freemarker](https://freemarker.apache.org/).
 For example, the [Tentackle Wizard](https://tentackle.org/tentackle/tentackle-wizard-maven-plugin/plugin-info.html) first generates the source files which contain the
 wurblet anchors and the wurbelizer later generates the implementation according to the
-model. See the [Tentackle tutorial](https://tentackle.org/tutorial/) for a sample project.
+model. See the [Tentackle quickstart](https://tentackle.org/quickstart/) for a sample project.
 
 ## Wurbelizer API
 
