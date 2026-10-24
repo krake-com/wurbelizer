@@ -7,7 +7,7 @@
 
   <groupId>org.wurbelizer</groupId>
   <artifactId>wurbelizer-parent</artifactId>
-  <version>25.0-SNAPSHOT</version>
+  <version>27.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Wurbelizer Parent</name>
@@ -44,13 +44,13 @@
 
   <properties>
     <rootBasedir>${project.basedir}</rootBasedir>
-    <project.build.outputTimestamp>2026-10-19T15:30:00Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2026-10-24T10:00:00Z</project.build.outputTimestamp>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <dependency.locations.enabled>false</dependency.locations.enabled>
 
-    <javac.version>25</javac.version>
+    <javac.version>27</javac.version>
     <javac.lint>all,-processing</javac.lint>
 
     <maven.version>3.9.10</maven.version>

@@ -69,7 +69,7 @@ mvn deploy -Ppublish
 ## Module Structure
 
 ```
-wurbelizer-parent/          (root POM, version 25.0-SNAPSHOT)
+wurbelizer-parent/          (root POM, version 27.0-SNAPSHOT)
 ├── wurbelizer/             core library (org.wurbelizer.*)
 ├── wurbelizer-maven-plugin/ Maven plugin (org.wurbelizer.maven.*)
 ├── ant-wurbelizer/         Ant integration (org.wurbelizer.ant.*)
