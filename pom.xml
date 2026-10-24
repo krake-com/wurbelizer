@@ -50,7 +50,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <dependency.locations.enabled>false</dependency.locations.enabled>
 
-    <javac.version>27</javac.version>
+    <javac.version>25</javac.version>
     <javac.lint>all,-processing</javac.lint>
 
     <maven.version>3.9.10</maven.version>

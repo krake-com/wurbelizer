@@ -20,7 +20,12 @@ Issue numbers (`#n`) in releases prior to 2.1 refer to the former Bitbucket issu
 
 ## [Unreleased]
 
-Development branch (`27.0-SNAPSHOT`), targeting Java 27.
+Development branch (`27.0-SNAPSHOT`), but still targeting Java 25!
+Maven 3.9.16 cannot read Java 27 class files due to bundled ASM 9.9.1, so Sisu fails to load the
+classrealm configuration, i.e., skips it silently.
+Maven 3.10.0 would work for local builds, but the Jenkins Maven plugin (latest 3.28) 
+doesn't support Java 27/Maven 3.10.0 either. 
+So we temporarily stick to target 25 until the Jenkins plugin is fixed.
 
 ## [25.7.0.0] - 2026-10-19
 
