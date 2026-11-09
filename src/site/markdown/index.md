@@ -9,7 +9,7 @@ That lives at **[wurbelizer.org](https://wurbelizer.org)**.
 
 ## What is the Wurbelizer?
 
-The Wurbelizer is a lightweight Java code generator distributed under LGPL 2.1.
+The Wurbelizer is a lightweight Java code generator distributed under LGPL 2.1 or later.
 It uses Java itself as its template language and weaves generated code directly
 into guarded blocks of your source files, regenerating until the code stabilizes.
 

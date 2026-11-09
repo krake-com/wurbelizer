@@ -1,6 +1,6 @@
 # Wurbelizer — Core Library
 
-The core of the Wurbelizer: a lightweight Java code generator (LGPL 2.1). This
+The core of the Wurbelizer: a lightweight Java code generator (LGPL 2.1 or later). This
 module contains the runtime that compiles wurblets, scans application sources for
 `@wurblet` anchors, and weaves generated code into guarded blocks — repeating
 until the output stabilizes. Packages live under `org.wurbelizer.*`.

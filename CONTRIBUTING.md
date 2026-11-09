@@ -88,5 +88,6 @@ The website is generated from `README.md` and `src/docs`, see
 ## License
 
 The Wurbelizer is distributed under the
-[GNU Lesser General Public License v2.1](LICENSE). By submitting a contribution, you
-agree that it is licensed under the same terms.
+[GNU Lesser General Public License, version 2.1](LICENSE) or (at your option) any
+later version (SPDX: `LGPL-2.1-or-later`). By submitting a contribution, you agree
+that it is licensed under the same terms.
