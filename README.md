@@ -55,7 +55,7 @@ To navigate the documentation, see the
   anchors. This makes multi-stage and self-referential generation possible, and a
   file is only written back to disk when something actually changed.
 
-- **Lightweight and easy to integrate.** A small, LGPL-2.1 library that is quick to
+- **Lightweight and easy to integrate.** A small, LGPL-2.1-or-later library that is quick to
   learn yet flexible and powerful. It drops into existing builds through first-class
   [Maven](./src/docs/maven.md) and [Ant](./src/docs/ant.md) integration, or a
   [console](./src/docs/console.md) runner, with no heavyweight runtime or framework
